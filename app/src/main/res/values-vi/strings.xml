@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Easy Recovery</string>
+    <string name="recover_photos">Khôi phục ảnh</string>
+    <string name="recover_videos">Khôi phục video</string>
+    <string name="recover_other_files">Khôi phục tệp tin khác</string>
+    <string name="recovered">ĐÃ KHÔI PHỤC</string>
+    <string name="bytes">B</string>
+    <string name="files">tệp</string>
+    <string name="photos">Ảnh</string>
+    <string name="videos">Video</string>
+    <string name="others">Khác</string>
+    <string name="settings">Cài đặt</string>
+</resources> 

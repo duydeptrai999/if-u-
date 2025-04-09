@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Easy Recovery</string>
+    <string name="recover_photos">Recover Photos</string>
+    <string name="recover_videos">Recover Videos</string>
+    <string name="recover_other_files">Recover Other Files</string>
+    <string name="recovered">RECOVERED</string>
+    <string name="bytes">B</string>
+    <string name="files">files</string>
+    <string name="photos">Photos</string>
+    <string name="videos">Videos</string>
+    <string name="others">Others</string>
+    <string name="settings">Settings</string>
+</resources>
