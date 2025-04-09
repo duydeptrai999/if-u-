@@ -62,3 +62,57 @@ Phần thống kê ở màn hình chính hiển thị:
 - Ứng dụng cần được cấp quyền truy cập bộ nhớ để thực hiện quét và khôi phục
 - Tỷ lệ khôi phục thành công phụ thuộc vào thời gian xóa và mức độ ghi đè lên dữ liệu
 - Quá trình quét có thể mất thời gian tùy thuộc vào dung lượng bộ nhớ của thiết bị 
+
+# Tính năng Khôi phục Ảnh và Video
+
+## Khôi phục Ảnh
+
+Tính năng khôi phục ảnh giúp người dùng tìm và khôi phục các ảnh đã bị xóa trên thiết bị.
+
+### Cách sử dụng:
+
+1. **Quét thiết bị**: 
+   - Màn hình chính hiển thị nút QUÉT màu xanh lá cây
+   - Nhấn vào nút QUÉT để bắt đầu quá trình quét tìm ảnh đã xóa
+   - Trong quá trình quét, màn hình hiển thị thông báo "Đang quét thiết bị..."
+
+2. **Xem kết quả quét**:
+   - Sau khi quét xong, màn hình hiển thị "Đã quét xong" cùng với các thông tin:
+     - Số lượng tệp được tìm thấy
+     - Kích thước tổng cộng
+     - Xem trước một số ảnh đã tìm thấy (tối đa 4 ảnh)
+   - Nhấn nút "Xem kết quả" để hiển thị danh sách đầy đủ các ảnh tìm thấy
+
+3. **Khôi phục ảnh**:
+   - Chọn các ảnh muốn khôi phục bằng cách nhấn vào ảnh
+   - Nhấn nút "Khôi phục đã chọn" để khôi phục các ảnh đã chọn
+   - Sau khi khôi phục thành công, ứng dụng sẽ thông báo số lượng ảnh đã khôi phục thành công
+
+## Khôi phục Video
+
+Tính năng khôi phục video hoạt động tương tự như khôi phục ảnh, nhưng dành cho các tệp video.
+
+### Cách sử dụng:
+
+1. **Quét thiết bị**: 
+   - Màn hình chính hiển thị nút QUÉT màu xanh lá cây
+   - Nhấn vào nút QUÉT để bắt đầu quá trình quét tìm video đã xóa
+   - Trong quá trình quét, màn hình hiển thị thông báo "Đang quét thiết bị..."
+
+2. **Xem kết quả quét**:
+   - Sau khi quét xong, màn hình hiển thị "Đã quét xong" cùng với các thông tin:
+     - Số lượng tệp được tìm thấy
+     - Kích thước tổng cộng
+     - Xem trước một số video đã tìm thấy (tối đa 4 video)
+   - Nhấn nút "Xem kết quả" để hiển thị danh sách đầy đủ các video tìm thấy
+
+3. **Khôi phục video**:
+   - Chọn các video muốn khôi phục bằng cách nhấn vào video
+   - Nhấn nút "Khôi phục đã chọn" để khôi phục các video đã chọn
+   - Sau khi khôi phục thành công, ứng dụng sẽ thông báo số lượng video đã khôi phục thành công
+
+## Lưu ý
+
+- Ứng dụng yêu cầu quyền truy cập bộ nhớ để quét và khôi phục tệp
+- Các tệp sau khi khôi phục sẽ được lưu vào thư mục RecoveredPhotos hoặc RecoveredVideos trong bộ nhớ ứng dụng
+- Tỷ lệ khôi phục thành công phụ thuộc vào thời gian tệp đã bị xóa và liệu dữ liệu có bị ghi đè hay không 

@@ -91,3 +91,25 @@
 ### Deprecated
 
 - Quy trình làm việc cũ không sử dụng cấu trúc "6 Docs"
+
+## [0.2.0] - 2023-07-05
+
+### Thêm mới
+- Thêm tính năng Khôi phục Video tương tự như tính năng Khôi phục Ảnh
+- Tạo giao diện người dùng cho tính năng khôi phục video
+- Thêm màn hình hiển thị kết quả quét video
+- Thêm khả năng xem và lựa chọn video để khôi phục
+
+### Chỉnh sửa
+- Cải thiện giao diện người dùng của chức năng quét và khôi phục ảnh
+- Thay đổi nút quét thành màu xanh lá cây theo yêu cầu
+- Bổ sung thêm chuỗi tiếng Việt cho các tính năng
+
+## [0.1.0] - 2023-07-01
+
+### Thêm mới
+- Tạo giao diện người dùng cho tính năng khôi phục ảnh
+- Thêm chức năng quét tìm ảnh đã xóa trên thiết bị
+- Thêm khả năng hiển thị và lựa chọn ảnh để khôi phục
+- Thêm màn hình thông báo kết quả quét
+- Hỗ trợ đa ngôn ngữ (Tiếng Anh và Tiếng Việt)
