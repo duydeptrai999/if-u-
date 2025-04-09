@@ -10,12 +10,15 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.htnguyen.ifu.R
 import com.htnguyen.ifu.adapter.PhotoAdapter
+import com.htnguyen.ifu.adapter.PreviewPhotoAdapter
 import com.htnguyen.ifu.model.RecoverableItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +27,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.text.DecimalFormat
 import java.util.Date
 
 class PhotoRecoveryActivity : AppCompatActivity() {
@@ -31,9 +35,17 @@ class PhotoRecoveryActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private lateinit var scanButton: Button
     private lateinit var recoverButton: Button
+    private lateinit var viewResultsButton: Button
     private lateinit var statusText: TextView
     private lateinit var recyclerView: RecyclerView
+    private lateinit var previewRecyclerView: RecyclerView
     private lateinit var adapter: PhotoAdapter
+    private lateinit var previewAdapter: PreviewPhotoAdapter
+    private lateinit var scanLayout: ConstraintLayout
+    private lateinit var scanResultLayout: ConstraintLayout
+    private lateinit var recoveryLayout: ConstraintLayout
+    private lateinit var foundFileCount: TextView
+    private lateinit var foundFileSize: TextView
     
     private val recoveredPhotos = mutableListOf<RecoverableItem>()
     private val STORAGE_PERMISSION_CODE = 101
@@ -42,13 +54,28 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_photo_recovery)
         
+        initViews()
+        setupRecyclerViews()
+        setupClickListeners()
+    }
+    
+    private fun initViews() {
         progressBar = findViewById(R.id.progressBar)
         scanButton = findViewById(R.id.scanButton)
         recoverButton = findViewById(R.id.recoverButton)
+        viewResultsButton = findViewById(R.id.viewResultsButton)
         statusText = findViewById(R.id.statusText)
         recyclerView = findViewById(R.id.recyclerView)
-        
-        // Cài đặt RecyclerView
+        previewRecyclerView = findViewById(R.id.previewRecyclerView)
+        scanLayout = findViewById(R.id.scanLayout)
+        scanResultLayout = findViewById(R.id.scanResultLayout)
+        recoveryLayout = findViewById(R.id.recoveryLayout)
+        foundFileCount = findViewById(R.id.foundFileCount)
+        foundFileSize = findViewById(R.id.foundFileSize)
+    }
+    
+    private fun setupRecyclerViews() {
+        // Cài đặt RecyclerView chính cho trang khôi phục
         recyclerView.layoutManager = GridLayoutManager(this, 3)
         adapter = PhotoAdapter(recoveredPhotos) { isSelected ->
             // Cập nhật nút khôi phục dựa trên việc có ảnh nào được chọn không
@@ -56,6 +83,16 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         }
         recyclerView.adapter = adapter
         
+        // Cài đặt RecyclerView cho preview
+        previewRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        previewAdapter = PreviewPhotoAdapter(recoveredPhotos)
+        previewRecyclerView.adapter = previewAdapter
+        
+        // Vô hiệu hóa nút khôi phục cho đến khi có ảnh được chọn
+        recoverButton.isEnabled = false
+    }
+    
+    private fun setupClickListeners() {
         scanButton.setOnClickListener {
             if (checkPermission()) {
                 scanForDeletedPhotos()
@@ -64,16 +101,46 @@ class PhotoRecoveryActivity : AppCompatActivity() {
             }
         }
         
+        viewResultsButton.setOnClickListener {
+            showRecoveryLayout()
+        }
+        
         recoverButton.setOnClickListener {
             recoverSelectedPhotos()
         }
         
-        // Vô hiệu hóa nút khôi phục cho đến khi có ảnh được chọn
-        recoverButton.isEnabled = false
-        
         findViewById<View>(R.id.backButton).setOnClickListener {
-            finish()
+            // Kiểm tra đang ở layout nào để quay lại đúng layout trước đó
+            when {
+                recoveryLayout.visibility == View.VISIBLE -> {
+                    showScanResultLayout()
+                }
+                scanResultLayout.visibility == View.VISIBLE -> {
+                    showScanLayout()
+                }
+                else -> {
+                    finish()
+                }
+            }
         }
+    }
+    
+    private fun showScanLayout() {
+        scanLayout.visibility = View.VISIBLE
+        scanResultLayout.visibility = View.GONE
+        recoveryLayout.visibility = View.GONE
+    }
+    
+    private fun showScanResultLayout() {
+        scanLayout.visibility = View.GONE
+        scanResultLayout.visibility = View.VISIBLE
+        recoveryLayout.visibility = View.GONE
+    }
+    
+    private fun showRecoveryLayout() {
+        scanLayout.visibility = View.GONE
+        scanResultLayout.visibility = View.GONE
+        recoveryLayout.visibility = View.VISIBLE
     }
     
     private fun checkPermission(): Boolean {
@@ -120,7 +187,6 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         
         // Xóa danh sách cũ nếu có
         recoveredPhotos.clear()
-        adapter.notifyDataSetChanged()
         
         CoroutineScope(Dispatchers.IO).launch {
             // Tìm kiếm các ảnh đã xóa trong bộ nhớ thiết bị
@@ -135,18 +201,44 @@ class PhotoRecoveryActivity : AppCompatActivity() {
             simulateFindingDeletedPhotos(dcimDir)
             simulateFindingDeletedPhotos(picturesDir)
             
+            // Tính tổng kích thước của các file tìm thấy
+            val totalSize = recoveredPhotos.sumOf { it.getSize() }
+            val formattedSize = formatFileSize(totalSize)
+            
             withContext(Dispatchers.Main) {
                 progressBar.visibility = View.GONE
                 scanButton.isEnabled = true
                 
                 if (recoveredPhotos.isEmpty()) {
                     statusText.text = getString(R.string.no_photos_found)
+                    showScanLayout()
                 } else {
-                    statusText.text = getString(R.string.photos_found, recoveredPhotos.size)
+                    // Cập nhật giao diện kết quả quét
+                    foundFileCount.text = recoveredPhotos.size.toString()
+                    foundFileSize.text = formattedSize
+                    
+                    // Cập nhật adapter
+                    adapter.notifyDataSetChanged()
+                    previewAdapter.notifyDataSetChanged()
+                    
+                    // Hiển thị layout kết quả quét
+                    showScanResultLayout()
                 }
-                
-                adapter.notifyDataSetChanged()
             }
+        }
+    }
+    
+    private fun formatFileSize(size: Long): String {
+        val df = DecimalFormat("0.00")
+        val sizeKb = size / 1024.0f
+        val sizeMb = sizeKb / 1024.0f
+        val sizeGb = sizeMb / 1024.0f
+        
+        return when {
+            sizeGb > 1 -> "${df.format(sizeGb)} GB"
+            sizeMb > 1 -> "${df.format(sizeMb)} MB"
+            sizeKb > 1 -> "${df.format(sizeKb)} KB"
+            else -> "$size B"
         }
     }
     
@@ -220,14 +312,15 @@ class PhotoRecoveryActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) {
                 progressBar.visibility = View.GONE
                 if (successCount > 0) {
-                    statusText.text = getString(R.string.recovery_success, successCount)
                     Toast.makeText(
                         this@PhotoRecoveryActivity,
                         getString(R.string.recovery_success, successCount),
                         Toast.LENGTH_LONG
                     ).show()
+                    
+                    // Quay lại màn hình chính
+                    showScanLayout()
                 } else {
-                    statusText.text = getString(R.string.recovery_failed)
                     Toast.makeText(
                         this@PhotoRecoveryActivity,
                         getString(R.string.recovery_failed),

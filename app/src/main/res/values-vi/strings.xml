@@ -36,4 +36,8 @@
     <string name="select_to_recover">Chọn ảnh để khôi phục</string>
     <string name="preview_thumbnail">Hình thu nhỏ xem trước</string>
     <string name="video_thumbnail">Hình thu nhỏ video</string>
+    <string name="recovery_failed">Không thể khôi phục các mục đã chọn</string>
+    <string name="no_items_selected">Chưa chọn mục nào để khôi phục</string>
+    <string name="tep_duoc_tim_thay">Tệp được tìm thấy</string>
+    <string name="kich_thuoc">Kích thước</string>
 </resources> 

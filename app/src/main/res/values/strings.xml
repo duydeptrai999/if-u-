@@ -26,7 +26,7 @@
     <string name="total_size">Total size</string>
     <string name="recovering_status">Recovering %d items...</string>
     <string name="recovery_success">Successfully recovered %d items</string>
-    <string name="recovery_failed">Failed to recover some items</string>
+    <string name="recovery_failed">Failed to recover selected items</string>
     <string name="permission_required">Storage permission required for recovery</string>
     <string name="select_items">Please select items to recover</string>
     <string name="photo_recovery">Photo Recovery</string>
@@ -38,4 +38,6 @@
     <string name="preview_thumbnail">Preview thumbnail</string>
     <string name="no_items_selected">No items selected for recovery</string>
     <string name="video_thumbnail">Video Thumbnail</string>
+    <string name="tep_duoc_tim_thay">Files found</string>
+    <string name="kich_thuoc">Size</string>
 </resources>
