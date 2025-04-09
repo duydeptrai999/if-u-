@@ -2,9 +2,11 @@ package com.htnguyen.ifu.recovery
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -52,6 +54,7 @@ class FileRecoveryActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setupTransparentStatusBar()
         setContentView(R.layout.activity_file_recovery)
         
         initViews()
@@ -350,6 +353,16 @@ class FileRecoveryActivity : AppCompatActivity() {
                     ).show()
                 }
             }
+        }
+    }
+    
+    private fun setupTransparentStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Xóa cờ FLAG_LAYOUT_NO_LIMITS để tránh view bị kéo lên phía trên
+            window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+            
+            // Thiết lập status bar icon màu tối (do status bar có màu nền nhạt)
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
     }
 } 

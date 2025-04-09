@@ -10,14 +10,33 @@ import android.widget.TextView
 import com.htnguyen.ifu.recovery.FileRecoveryActivity
 import com.htnguyen.ifu.recovery.PhotoRecoveryActivity
 import com.htnguyen.ifu.recovery.VideoRecoveryActivity
+import android.view.WindowManager
+import android.os.Build
+import android.view.View
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setupTransparentStatusBar()
         setContentView(R.layout.activity_main)
 
         setupUI()
+    }
+
+    private fun setupTransparentStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Xóa FLAG_LAYOUT_NO_LIMITS để tránh view bị kéo lên phía trên
+            window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+            
+            // Thiết lập status bar icon màu tối (do status bar có màu nền nhạt)
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            
+            // Đã thiết lập trong themes.xml:
+            // - statusBarColor: transparent
+            // - windowDrawsSystemBarBackgrounds: true
+            // - windowTranslucentStatus: false
+        }
     }
 
     private fun setupUI() {
