@@ -61,7 +61,7 @@ class PhotoRecoveryActivity : AppCompatActivity() {
     
     private fun initViews() {
         progressBar = findViewById(R.id.progressBar)
-        scanButton = findViewById(R.id.scanButton)
+        scanButton = findViewById(R.id.scanButtonContainer)
         recoverButton = findViewById(R.id.recoverButton)
         viewResultsButton = findViewById(R.id.viewResultsButton)
         statusText = findViewById(R.id.statusText)

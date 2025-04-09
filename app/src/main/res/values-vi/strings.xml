@@ -29,7 +29,7 @@
     <string name="permission_required">Cần quyền truy cập bộ nhớ để khôi phục</string>
     <string name="select_items">Vui lòng chọn các mục để khôi phục</string>
     <string name="photo_recovery">Khôi phục ảnh</string>
-    <string name="tap_to_scan_photos">Nhấn để quét ảnh đã xóa</string>
+    <string name="tap_to_scan_photos">Nhấn để quét ảnh</string>
     <string name="scan_complete">Đã quét xong</string>
     <string name="preview">Xem trước</string>
     <string name="view_results">Xem kết quả</string>
