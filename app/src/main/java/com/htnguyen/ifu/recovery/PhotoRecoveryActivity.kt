@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.view.View
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -33,7 +34,7 @@ import java.util.Date
 class PhotoRecoveryActivity : AppCompatActivity() {
 
     private lateinit var progressBar: ProgressBar
-    private lateinit var scanButton: Button
+    private lateinit var scanButton: FrameLayout
     private lateinit var recoverButton: Button
     private lateinit var viewResultsButton: Button
     private lateinit var statusText: TextView
