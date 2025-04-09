@@ -111,8 +111,41 @@ Tính năng khôi phục video hoạt động tương tự như khôi phục ả
    - Nhấn nút "Khôi phục đã chọn" để khôi phục các video đã chọn
    - Sau khi khôi phục thành công, ứng dụng sẽ thông báo số lượng video đã khôi phục thành công
 
+## Khôi phục File Khác
+
+Tính năng khôi phục file khác giúp người dùng tìm và khôi phục các loại file khác như tài liệu, bảng tính, PDF, v.v.
+
+### Cách sử dụng:
+
+1. **Quét thiết bị**: 
+   - Màn hình chính hiển thị nút QUÉT màu xanh lá cây
+   - Nhấn vào nút QUÉT để bắt đầu quá trình quét tìm file đã xóa
+   - Trong quá trình quét, màn hình hiển thị thông báo "Đang quét thiết bị..."
+
+2. **Xem kết quả quét**:
+   - Sau khi quét xong, màn hình hiển thị "Đã quét xong" cùng với các thông tin:
+     - Số lượng tệp được tìm thấy
+     - Kích thước tổng cộng
+     - Xem trước một số file đã tìm thấy (tối đa 4 file)
+   - Nhấn nút "Xem kết quả" để hiển thị danh sách đầy đủ các file tìm thấy
+
+3. **Khôi phục file**:
+   - Chọn các file muốn khôi phục bằng cách nhấn vào file
+   - Nhấn nút "Khôi phục đã chọn" để khôi phục các file đã chọn
+   - Sau khi khôi phục thành công, ứng dụng sẽ thông báo số lượng file đã khôi phục thành công
+
+4. **Phân loại file**:
+   - Ứng dụng tự động phân loại các file tìm thấy theo loại:
+     - PDF: File PDF
+     - Document: File văn bản (DOC, DOCX)
+     - Spreadsheet: File bảng tính (XLS, XLSX)
+     - Presentation: File trình chiếu (PPT, PPTX)
+     - Text: File văn bản thuần túy (TXT)
+     - Archive: File nén (ZIP, RAR, 7Z)
+     - Other: Các loại file khác
+
 ## Lưu ý
 
 - Ứng dụng yêu cầu quyền truy cập bộ nhớ để quét và khôi phục tệp
-- Các tệp sau khi khôi phục sẽ được lưu vào thư mục RecoveredPhotos hoặc RecoveredVideos trong bộ nhớ ứng dụng
+- Các tệp sau khi khôi phục sẽ được lưu vào thư mục RecoveredPhotos, RecoveredVideos hoặc RecoveredFiles trong bộ nhớ ứng dụng
 - Tỷ lệ khôi phục thành công phụ thuộc vào thời gian tệp đã bị xóa và liệu dữ liệu có bị ghi đè hay không 

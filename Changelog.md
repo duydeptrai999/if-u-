@@ -92,6 +92,20 @@
 
 - Quy trình làm việc cũ không sử dụng cấu trúc "6 Docs"
 
+## [0.3.0] - 2023-07-10
+
+### Thêm mới
+- Tính năng khôi phục các file khác (Other Files)
+- Khả năng phân loại file thành nhiều loại (PDF, Document, Spreadsheet, v.v.)
+- Tạo giao diện người dùng cho tính năng khôi phục file
+- Thêm các biểu tượng (icon) cho các loại file khác nhau
+- Thêm màn hình xem trước kết quả quét file
+
+### Cải thiện
+- Thêm tài liệu hướng dẫn sử dụng cho tính năng khôi phục file
+- Cải thiện thuật toán phát hiện và phân loại file
+- Bổ sung thêm chuỗi tiếng Việt cho tính năng khôi phục file
+
 ## [0.2.0] - 2023-07-05
 
 ### Thêm mới
