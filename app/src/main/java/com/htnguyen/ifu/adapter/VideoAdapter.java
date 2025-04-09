@@ -1,5 +1,8 @@
 package com.htnguyen.ifu.adapter;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +25,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
     private final List<RecoverableItem> items;
     private final Consumer<Boolean> onItemSelected;
     private boolean hasSelectedItems = false;
+    private final Context context;
 
-    public VideoAdapter(List<RecoverableItem> items, Consumer<Boolean> onItemSelected) {
+    public VideoAdapter(Context context, List<RecoverableItem> items, Consumer<Boolean> onItemSelected) {
+        this.context = context;
         this.items = items;
         this.onItemSelected = onItemSelected;
     }
@@ -40,8 +45,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
     public void onBindViewHolder(@NonNull VideoViewHolder holder, int position) {
         RecoverableItem item = items.get(position);
         
-        // Thiết lập thumbnail
-        holder.thumbnail.setImageURI(android.net.Uri.fromFile(item.getFile()));
+        // Thiết lập thumbnail sử dụng MediaMetadataRetriever
+        loadVideoThumbnail(item.getFile().getAbsolutePath(), holder.thumbnail);
         holder.thumbnail.setContentDescription(holder.itemView.getContext().getString(R.string.video_thumbnail));
         
         // Thiết lập kích thước
@@ -63,6 +68,24 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
             holder.checkbox.setChecked(newState);
             updateSelectedState();
         });
+    }
+    
+    private void loadVideoThumbnail(String videoPath, ImageView imageView) {
+        try {
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(videoPath);
+            Bitmap bitmap = retriever.getFrameAtTime(0);
+            if (bitmap != null) {
+                imageView.setImageBitmap(bitmap);
+            } else {
+                // Nếu không lấy được thumbnail, hiển thị hình mặc định
+                imageView.setImageResource(R.drawable.placeholder_video);
+            }
+            retriever.release();
+        } catch (Exception e) {
+            // Xử lý ngoại lệ, hiển thị hình mặc định
+            imageView.setImageResource(R.drawable.placeholder_video);
+        }
     }
 
     private void updateSelectedState() {

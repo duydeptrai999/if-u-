@@ -68,8 +68,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         settingsButton.setOnClickListener {
-            // Hiện tại chỉ hiển thị thông báo
-            Toast.makeText(this, getString(R.string.settings), Toast.LENGTH_SHORT).show()
+            // Mở màn hình cài đặt
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
         }
 
         // Initialize statistics values to zero (in a real app, these would be loaded from storage)

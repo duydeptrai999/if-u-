@@ -47,4 +47,18 @@
     <string name="select_files_to_recover">Select files to recover</string>
     <string name="file_icon">File icon</string>
     <string name="photo_recovery_desc">Ứng dụng sẽ quét bộ nhớ thiết bị để tìm kiếm và khôi phục các ảnh đã bị xóa. Quá trình này có thể mất vài phút tùy thuộc vào dung lượng bộ nhớ.</string>
+    
+    <!-- Settings screen strings -->
+    <string name="back">Back</string>
+    <string name="premium">Premium</string>
+    <string name="upgrade_to_premium">Upgrade to Premium</string>
+    <string name="premium_benefits">Remove ads and enjoy more benefits.</string>
+    <string name="upgrade">Upgrade</string>
+    <string name="language">Language</string>
+    <string name="vietnamese">Tiếng Việt</string>
+    <string name="english">English</string>
+    <string name="rate_app">Rate App</string>
+    <string name="share_app">Share App</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="terms_of_use">Terms of Use</string>
 </resources>

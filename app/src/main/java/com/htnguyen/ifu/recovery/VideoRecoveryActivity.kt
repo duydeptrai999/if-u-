@@ -106,7 +106,7 @@ class VideoRecoveryActivity : AppCompatActivity() {
     private fun setupRecyclerViews() {
         // Cài đặt RecyclerView chính cho trang khôi phục
         recyclerView.layoutManager = GridLayoutManager(this, 3)
-        adapter = VideoAdapter(recoveredVideos) { isSelected ->
+        adapter = VideoAdapter(this, recoveredVideos) { isSelected ->
             // Cập nhật nút khôi phục dựa trên việc có video nào được chọn không
             recoverButton.isEnabled = isSelected
         }
@@ -114,7 +114,7 @@ class VideoRecoveryActivity : AppCompatActivity() {
         
         // Cài đặt RecyclerView cho preview
         previewRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        previewAdapter = PreviewVideoAdapter(recoveredVideos)
+        previewAdapter = PreviewVideoAdapter(this, recoveredVideos)
         previewRecyclerView.adapter = previewAdapter
         
         // Vô hiệu hóa nút khôi phục cho đến khi có video được chọn

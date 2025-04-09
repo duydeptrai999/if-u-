@@ -43,6 +43,10 @@
         <activity
             android:name="com.htnguyen.ifu.recovery.FileRecoveryActivity"
             android:parentActivityName="com.htnguyen.ifu.MainActivity" />
+            
+        <activity
+            android:name=".SettingsActivity"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

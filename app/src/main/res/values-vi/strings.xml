@@ -46,4 +46,18 @@
     <string name="tap_to_scan_files">Nhấn để quét các tệp tin đã xóa</string>
     <string name="select_files_to_recover">Chọn tệp tin để khôi phục</string>
     <string name="file_icon">Biểu tượng tệp tin</string>
+    
+    <!-- Chuỗi mới cho màn hình cài đặt -->
+    <string name="back">Quay lại</string>
+    <string name="premium">Premium</string>
+    <string name="upgrade_to_premium">Nâng cấp lên Premium</string>
+    <string name="premium_benefits">Loại bỏ quảng cáo và tận hưởng nhiều lợi ích hơn.</string>
+    <string name="upgrade">Nâng cấp</string>
+    <string name="language">Đổi ngôn ngữ</string>
+    <string name="vietnamese">Tiếng Việt</string>
+    <string name="english">English</string>
+    <string name="rate_app">Đánh giá ứng dụng</string>
+    <string name="share_app">Chia sẻ ứng dụng</string>
+    <string name="privacy_policy">Chính sách bảo mật</string>
+    <string name="terms_of_use">Điều khoản sử dụng</string>
 </resources> 

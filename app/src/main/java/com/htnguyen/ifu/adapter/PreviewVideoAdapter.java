@@ -1,5 +1,8 @@
 package com.htnguyen.ifu.adapter;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +19,10 @@ import java.util.List;
 public class PreviewVideoAdapter extends RecyclerView.Adapter<PreviewVideoAdapter.PreviewViewHolder> {
 
     private final List<RecoverableItem> items;
+    private final Context context;
 
-    public PreviewVideoAdapter(List<RecoverableItem> items) {
+    public PreviewVideoAdapter(Context context, List<RecoverableItem> items) {
+        this.context = context;
         this.items = items;
     }
 
@@ -32,9 +37,27 @@ public class PreviewVideoAdapter extends RecyclerView.Adapter<PreviewVideoAdapte
     @Override
     public void onBindViewHolder(@NonNull PreviewViewHolder holder, int position) {
         RecoverableItem item = items.get(position);
-        // Tải thumbnail video
-        holder.imageView.setImageURI(android.net.Uri.fromFile(item.getFile()));
+        // Tải thumbnail video sử dụng MediaMetadataRetriever
+        loadVideoThumbnail(item.getFile().getAbsolutePath(), holder.imageView);
         holder.imageView.setContentDescription(holder.itemView.getContext().getString(R.string.video_thumbnail));
+    }
+    
+    private void loadVideoThumbnail(String videoPath, ImageView imageView) {
+        try {
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(videoPath);
+            Bitmap bitmap = retriever.getFrameAtTime(0);
+            if (bitmap != null) {
+                imageView.setImageBitmap(bitmap);
+            } else {
+                // Nếu không lấy được thumbnail, hiển thị hình mặc định
+                imageView.setImageResource(R.drawable.placeholder_video);
+            }
+            retriever.release();
+        } catch (Exception e) {
+            // Xử lý ngoại lệ, hiển thị hình mặc định
+            imageView.setImageResource(R.drawable.placeholder_video);
+        }
     }
 
     @Override
