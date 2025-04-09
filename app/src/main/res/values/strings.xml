@@ -11,4 +11,31 @@
     <string name="videos">Videos</string>
     <string name="others">Others</string>
     <string name="settings">Settings</string>
+    
+    <!-- New strings for recovery features -->
+    <string name="scan_button">Start Scan</string>
+    <string name="scan_button_short">SCAN</string>
+    <string name="recover_button">Recover Selected</string>
+    <string name="scanning_status">Scanning device...</string>
+    <string name="no_photos_found">No photos found to recover</string>
+    <string name="photos_found">Found %d photos to recover</string>
+    <string name="no_videos_found">No videos found to recover</string>
+    <string name="videos_found">Found %d videos to recover</string>
+    <string name="no_files_found">No files found to recover</string>
+    <string name="files_found">%d files found</string>
+    <string name="total_size">Total size</string>
+    <string name="recovering_status">Recovering %d items...</string>
+    <string name="recovery_success">Successfully recovered %d items</string>
+    <string name="recovery_failed">Failed to recover some items</string>
+    <string name="permission_required">Storage permission required for recovery</string>
+    <string name="select_items">Please select items to recover</string>
+    <string name="photo_recovery">Photo Recovery</string>
+    <string name="tap_to_scan_photos">Tap to scan for deleted photos</string>
+    <string name="scan_complete">Scan Complete</string>
+    <string name="preview">Preview</string>
+    <string name="view_results">View Results</string>
+    <string name="select_to_recover">Select photos to recover</string>
+    <string name="preview_thumbnail">Preview thumbnail</string>
+    <string name="no_items_selected">No items selected for recovery</string>
+    <string name="video_thumbnail">Video Thumbnail</string>
 </resources>
