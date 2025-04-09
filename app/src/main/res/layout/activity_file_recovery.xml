@@ -68,12 +68,12 @@
 
         <Button
             android:id="@+id/scanButton"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
             android:background="@drawable/button_scan"
             android:text="@string/scan_button_short"
             android:textColor="#4CAF50"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -86,10 +86,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/tap_to_scan_files"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textAlignment="center"
-            android:layout_marginTop="24dp"
+            android:textColor="#424242"
+            android:layout_marginTop="32dp"
             app:layout_constraintTop_toBottomOf="@id/scanButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <ImageView
+            android:id="@+id/fileScanIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_file"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/statusText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -111,8 +122,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/scan_complete"
-            android:textSize="24sp"
+            android:textSize="26sp"
             android:textStyle="bold"
+            android:textColor="#4CAF50"
             android:layout_marginTop="32dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -125,8 +137,9 @@
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
             android:layout_marginTop="24dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="#FFFFFF"
             app:layout_constraintTop_toBottomOf="@id/completeText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -134,7 +147,17 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:padding="20dp">
+
+                <ImageView
+                    android:id="@+id/fileFoundIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_file"
+                    app:layout_constraintTop_toTopOf="@id/filesFoundLabel"
+                    app:layout_constraintBottom_toBottomOf="@id/filesFoundLabel"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:tint="#4CAF50" />
 
                 <TextView
                     android:id="@+id/filesFoundLabel"
@@ -142,18 +165,31 @@
                     android:layout_height="wrap_content"
                     android:text="@string/tep_duoc_tim_thay"
                     android:textSize="16sp"
+                    android:textColor="#212121"
+                    android:layout_marginStart="12dp"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toEndOf="@id/fileFoundIcon" />
 
                 <TextView
                     android:id="@+id/foundFileCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
+                    android:textColor="#4CAF50"
                     tools:text="32"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
+
+                <ImageView
+                    android:id="@+id/sizeIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_file_size"
+                    android:layout_marginTop="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/filesFoundLabel"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:tint="#4CAF50" />
 
                 <TextView
                     android:id="@+id/fileSizeLabel"
@@ -161,16 +197,19 @@
                     android:layout_height="wrap_content"
                     android:text="@string/kich_thuoc"
                     android:textSize="16sp"
-                    android:layout_marginTop="12dp"
+                    android:textColor="#212121"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="16dp"
                     app:layout_constraintTop_toBottomOf="@id/filesFoundLabel"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toEndOf="@id/sizeIcon" />
 
                 <TextView
                     android:id="@+id/foundFileSize"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
+                    android:textColor="#4CAF50"
                     tools:text="15 MB"
                     app:layout_constraintTop_toTopOf="@id/fileSizeLabel"
                     app:layout_constraintEnd_toEndOf="parent" />
@@ -185,17 +224,18 @@
             android:layout_height="wrap_content"
             android:text="@string/preview"
             android:textStyle="bold"
-            android:textSize="16sp"
+            android:textSize="18sp"
+            android:textColor="#212121"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="32dp"
             app:layout_constraintTop_toBottomOf="@id/statsCard"
             app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/previewRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_marginTop="8dp"
+            android:layout_height="140dp"
+            android:layout_marginTop="12dp"
             android:clipToPadding="false"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
@@ -209,12 +249,13 @@
             android:layout_height="56dp"
             android:text="@string/view_results"
             android:textAllCaps="false"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:background="@drawable/button_primary"
             android:textColor="@android:color/white"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="32dp"
+            android:elevation="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -263,12 +304,13 @@
             android:layout_height="56dp"
             android:text="@string/recover_button"
             android:textAllCaps="false"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:background="@drawable/button_primary"
             android:textColor="@android:color/white"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="32dp"
+            android:elevation="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
