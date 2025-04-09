@@ -43,4 +43,7 @@
     <string name="tap_to_scan_videos">Tap to scan for deleted videos</string>
     <string name="select_videos_to_recover">Select videos to recover</string>
     <string name="video_play_icon">Video play icon</string>
+    <string name="tap_to_scan_files">Tap to scan for deleted files</string>
+    <string name="select_files_to_recover">Select files to recover</string>
+    <string name="file_icon">File icon</string>
 </resources>

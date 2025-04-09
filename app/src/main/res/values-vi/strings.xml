@@ -43,4 +43,7 @@
     <string name="tap_to_scan_videos">Nhấn để quét video đã xóa</string>
     <string name="select_videos_to_recover">Chọn video để khôi phục</string>
     <string name="video_play_icon">Biểu tượng phát video</string>
+    <string name="tap_to_scan_files">Nhấn để quét các tệp tin đã xóa</string>
+    <string name="select_files_to_recover">Chọn tệp tin để khôi phục</string>
+    <string name="file_icon">Biểu tượng tệp tin</string>
 </resources> 
