@@ -15,6 +15,11 @@ class RecoverableItem(private val file: File, private val size: Long, private va
     fun getFile(): File = file
     
     /**
+     * Trả về đường dẫn của file
+     */
+    fun getPath(): String = file.absolutePath
+    
+    /**
      * Trả về kích thước tập tin (bytes)
      */
     fun getSize(): Long = size
