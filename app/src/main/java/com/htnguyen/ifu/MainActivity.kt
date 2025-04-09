@@ -1,11 +1,15 @@
-package com.example.ifu
+package com.htnguyen.ifu
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.Toast
 import androidx.cardview.widget.CardView
 import android.widget.ImageView
 import android.widget.TextView
+import com.htnguyen.ifu.recovery.FileRecoveryActivity
+import com.htnguyen.ifu.recovery.PhotoRecoveryActivity
+import com.htnguyen.ifu.recovery.VideoRecoveryActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,27 +31,26 @@ class MainActivity : AppCompatActivity() {
 
         // Set click listeners for each recovery option
         photoRecoveryCard.setOnClickListener {
-            // For now just show a toast message
-            Toast.makeText(this, getString(R.string.recover_photos), Toast.LENGTH_SHORT).show()
-            // In a real app, navigate to photo recovery screen
+            // Mở màn hình khôi phục ảnh
+            val intent = Intent(this, PhotoRecoveryActivity::class.java)
+            startActivity(intent)
         }
 
         videoRecoveryCard.setOnClickListener {
-            // For now just show a toast message
-            Toast.makeText(this, getString(R.string.recover_videos), Toast.LENGTH_SHORT).show()
-            // In a real app, navigate to video recovery screen
+            // Mở màn hình khôi phục video
+            val intent = Intent(this, VideoRecoveryActivity::class.java)
+            startActivity(intent)
         }
 
         fileRecoveryCard.setOnClickListener {
-            // For now just show a toast message
-            Toast.makeText(this, getString(R.string.recover_other_files), Toast.LENGTH_SHORT).show()
-            // In a real app, navigate to other files recovery screen
+            // Mở màn hình khôi phục tệp tin khác
+            val intent = Intent(this, FileRecoveryActivity::class.java)
+            startActivity(intent)
         }
 
         settingsButton.setOnClickListener {
-            // For now just show a toast message
+            // Hiện tại chỉ hiển thị thông báo
             Toast.makeText(this, getString(R.string.settings), Toast.LENGTH_SHORT).show()
-            // In a real app, navigate to settings screen
         }
 
         // Initialize statistics values to zero (in a real app, these would be loaded from storage)
@@ -87,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         return when {
             size < kb -> "$size ${getString(R.string.bytes)}"
             size < mb -> String.format("%.2f KB", size.toFloat() / kb)
-            size < gb -> String.format("%.2f MB", size.toFloat() / mb)
+            size < mb * 1024 -> String.format("%.2f MB", size.toFloat() / mb)
             else -> String.format("%.2f GB", size.toFloat() / gb)
         }
     }
