@@ -35,4 +35,5 @@
     <string name="view_results">Xem kết quả</string>
     <string name="select_to_recover">Chọn ảnh để khôi phục</string>
     <string name="preview_thumbnail">Hình thu nhỏ xem trước</string>
+    <string name="video_thumbnail">Hình thu nhỏ video</string>
 </resources> 
