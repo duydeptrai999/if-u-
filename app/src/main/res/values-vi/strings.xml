@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Easy Recovery</string>
+    <string name="app_name">Khôi phục dễ dàng</string>
     <string name="recover_photos">Khôi phục ảnh</string>
     <string name="recover_videos">Khôi phục video</string>
     <string name="recover_other_files">Khôi phục các tệp khác</string>
@@ -12,18 +12,27 @@
     <string name="others">Khác</string>
     <string name="settings">Cài đặt</string>
     
-    <!-- New strings for recovery features -->
+    <!-- Chuỗi mới cho tính năng khôi phục -->
     <string name="scan_button">Bắt đầu quét</string>
+    <string name="scan_button_short">QUÉT</string>
     <string name="recover_button">Khôi phục đã chọn</string>
     <string name="scanning_status">Đang quét thiết bị...</string>
-    <string name="no_photos_found">Không tìm thấy ảnh nào để khôi phục</string>
-    <string name="photos_found">Tìm thấy %d ảnh có thể khôi phục</string>
-    <string name="no_videos_found">Không tìm thấy video nào để khôi phục</string>
-    <string name="videos_found">Tìm thấy %d video có thể khôi phục</string>
+    <string name="no_photos_found">Không tìm thấy ảnh để khôi phục</string>
+    <string name="photos_found">Tìm thấy %d ảnh để khôi phục</string>
+    <string name="no_videos_found">Không tìm thấy video để khôi phục</string>
+    <string name="videos_found">Tìm thấy %d video để khôi phục</string>
     <string name="no_files_found">Không tìm thấy tệp nào để khôi phục</string>
-    <string name="files_found">Tìm thấy %d tệp có thể khôi phục</string>
+    <string name="files_found">Tìm thấy %d tệp</string>
+    <string name="total_size">Tổng kích thước</string>
     <string name="recovering_status">Đang khôi phục %d mục...</string>
     <string name="recovery_success">Đã khôi phục thành công %d mục</string>
     <string name="permission_required">Cần quyền truy cập bộ nhớ để khôi phục</string>
     <string name="select_items">Vui lòng chọn các mục để khôi phục</string>
+    <string name="photo_recovery">Khôi phục ảnh</string>
+    <string name="tap_to_scan_photos">Nhấn để quét ảnh đã xóa</string>
+    <string name="scan_complete">Đã quét xong</string>
+    <string name="preview">Xem trước</string>
+    <string name="view_results">Xem kết quả</string>
+    <string name="select_to_recover">Chọn ảnh để khôi phục</string>
+    <string name="preview_thumbnail">Hình thu nhỏ xem trước</string>
 </resources> 
