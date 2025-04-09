@@ -40,4 +40,7 @@
     <string name="video_thumbnail">Video Thumbnail</string>
     <string name="tep_duoc_tim_thay">Files found</string>
     <string name="kich_thuoc">Size</string>
+    <string name="tap_to_scan_videos">Tap to scan for deleted videos</string>
+    <string name="select_videos_to_recover">Select videos to recover</string>
+    <string name="video_play_icon">Video play icon</string>
 </resources>

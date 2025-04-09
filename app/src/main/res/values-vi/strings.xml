@@ -40,4 +40,7 @@
     <string name="no_items_selected">Chưa chọn mục nào để khôi phục</string>
     <string name="tep_duoc_tim_thay">Tệp được tìm thấy</string>
     <string name="kich_thuoc">Kích thước</string>
+    <string name="tap_to_scan_videos">Nhấn để quét video đã xóa</string>
+    <string name="select_videos_to_recover">Chọn video để khôi phục</string>
+    <string name="video_play_icon">Biểu tượng phát video</string>
 </resources> 
