@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.htnguyen.ifu.R
 import com.htnguyen.ifu.model.RecoverableItem
+import android.util.Log
 
 class PhotoAdapter(
     private val photos: List<RecoverableItem>,
@@ -25,31 +26,46 @@ class PhotoAdapter(
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
         val photo = photos[position]
         
-        // Hiển thị tên file và kích thước
-        holder.fileName.text = photo.getFile().name
-        holder.fileSize.text = photo.getFormattedSize()
-        
-        // Hiển thị hình ảnh xem trước
-        Glide.with(holder.itemView.context)
-            .load(photo.getFile())
-            .placeholder(R.drawable.placeholder_image)
-            .error(R.drawable.ic_broken_image)
-            .centerCrop()
-            .into(holder.imagePreview)
+        try {
+            // Hiển thị tên file và kích thước
+            Log.d("PhotoAdapter", "Binding view for photo: ${photo.getFile().name}")
+            holder.fileName.text = photo.getFile().name
+            holder.fileSize.text = photo.getFormattedSize()
             
-        // Cập nhật trạng thái đã chọn
-        holder.checkBox.isChecked = photo.isSelected()
-        
-        // Xử lý sự kiện click
-        holder.itemView.setOnClickListener {
-            photo.setSelected(!photo.isSelected())
+            // Hiển thị hình ảnh xem trước
+            if (photo.getFile().exists() && photo.getFile().canRead()) {
+                Glide.with(holder.itemView.context)
+                    .load(photo.getFile())
+                    .placeholder(R.drawable.placeholder_image)
+                    .error(R.drawable.ic_broken_image)
+                    .centerCrop()
+                    .into(holder.imagePreview)
+            } else {
+                // Nếu không thể đọc file, hiển thị ảnh lỗi
+                holder.imagePreview.setImageResource(R.drawable.ic_broken_image)
+                Log.d("PhotoAdapter", "File không tồn tại hoặc không thể đọc: ${photo.getFile().absolutePath}")
+            }
+                
+            // Cập nhật trạng thái đã chọn
             holder.checkBox.isChecked = photo.isSelected()
-            checkIfAnySelected()
-        }
-        
-        holder.checkBox.setOnClickListener {
-            photo.setSelected(holder.checkBox.isChecked)
-            checkIfAnySelected()
+            
+            // Xử lý sự kiện click
+            holder.itemView.setOnClickListener {
+                photo.setSelected(!photo.isSelected())
+                holder.checkBox.isChecked = photo.isSelected()
+                checkIfAnySelected()
+            }
+            
+            holder.checkBox.setOnClickListener {
+                photo.setSelected(holder.checkBox.isChecked)
+                checkIfAnySelected()
+            }
+        } catch (e: Exception) {
+            Log.e("PhotoAdapter", "Lỗi khi hiển thị ảnh: ${e.message}")
+            // Hiển thị thông tin lỗi
+            holder.fileName.text = "Lỗi hiển thị ảnh"
+            holder.fileSize.text = ""
+            holder.imagePreview.setImageResource(R.drawable.ic_broken_image)
         }
     }
 

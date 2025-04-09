@@ -3,7 +3,7 @@
     <string name="app_name">Easy Recovery</string>
     <string name="recover_photos">Khôi phục ảnh</string>
     <string name="recover_videos">Khôi phục Video</string>
-    <string name="recover_other_files">Khôi phục tệp tin khác</string>
+    <string name="recover_other_files">Khôi phục tệp</string>
     <string name="recovered">ĐÃ KHÔI PHỤC</string>
     <string name="bytes">B</string>
     <string name="files">files</string>

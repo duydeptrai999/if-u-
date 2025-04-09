@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.htnguyen.ifu.R;
 import com.htnguyen.ifu.model.RecoverableItem;
 
@@ -32,9 +33,13 @@ public class PreviewPhotoAdapter extends RecyclerView.Adapter<PreviewPhotoAdapte
     @Override
     public void onBindViewHolder(@NonNull PreviewViewHolder holder, int position) {
         RecoverableItem item = items.get(position);
-        // Tải ảnh bằng thumbnail hoặc thư viện tải ảnh
-        // Trong ví dụ đơn giản này, chúng ta chỉ đặt nguồn từ tệp
-        holder.imageView.setImageURI(android.net.Uri.fromFile(item.getFile()));
+        // Sử dụng Glide để tải ảnh
+        Glide.with(holder.itemView.getContext())
+                .load(item.getFile())
+                .placeholder(R.drawable.placeholder_image)
+                .error(R.drawable.ic_broken_image)
+                .centerCrop()
+                .into(holder.imageView);
     }
 
     @Override
