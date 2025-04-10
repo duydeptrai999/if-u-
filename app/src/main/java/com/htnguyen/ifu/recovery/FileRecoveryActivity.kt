@@ -441,13 +441,6 @@ class FileRecoveryActivity : AppCompatActivity() {
         // statusText.text = getString(R.string.scanning_status)
         scanButton.isEnabled = false
         
-        // Không áp dụng hiệu ứng nhấp nháy cho statusText nữa
-        // val blinkAnimation = AlphaAnimation(0.5f, 1.0f)
-        // blinkAnimation.duration = 800
-        // blinkAnimation.repeatMode = Animation.REVERSE
-        // blinkAnimation.repeatCount = Animation.INFINITE
-        // statusText.startAnimation(blinkAnimation)
-        
         // Thêm hiệu ứng xoay cho nút quét
         scanButton.animate()
             .rotation(360f)
@@ -622,104 +615,128 @@ class FileRecoveryActivity : AppCompatActivity() {
      * Quét các thư mục thùng rác phổ biến để tìm file đã xóa
      */
     private fun scanTrashFolders() {
+        Log.d("FileRecovery", "Bắt đầu quét các thư mục thùng rác phổ biến")
+        
         val trashPaths = listOf(
-            // Google Files và các thùng rác phổ biến khác
-            "/storage/emulated/0/Android/data/com.google.android.apps.nbu.files/files/.trash",
-            "/storage/emulated/0/.trashed-files",
-            
             // Samsung
-            "/storage/emulated/0/DCIM/.trash", 
-            "/storage/emulated/0/DCIM/.trashbin",
-            "/storage/emulated/0/Documents/.trash",
+            "/storage/emulated/0/DCIM/.trash",
+            "/storage/emulated/0/DCIM/.Trash",
+            "/storage/emulated/0/.Trash",
             
-            // Xiaomi/MIUI 
+            // Xiaomi/MIUI
             "/storage/emulated/0/MIUI/Gallery/cloud/.trash",
-            "/storage/emulated/0/MIUI/Files/.trashbin",
-            "/storage/emulated/0/DCIM/.globalTrash",
+            "/storage/emulated/0/MIUI/.trash",
             
             // Huawei
-            "/storage/emulated/0/Documents/.recyclebin",
-            "/storage/emulated/0/Download/.FileTrash",
+            "/storage/emulated/0/.recycle",
+            "/storage/emulated/0/Huawei/.Trash",
             
             // OPPO/ColorOS
-            "/storage/emulated/0/Documents/.RecycleBin",
-            "/storage/emulated/0/Download/.RecycleBin",
+            "/storage/emulated/0/Recycle",
+            "/storage/emulated/0/.recyclebin",
             
-            // Vivo
-            "/storage/emulated/0/Documents/.DeletedFiles",
-            "/storage/emulated/0/.VivoFilesRecycler",
+            // Vivo/FuntouchOS
+            "/storage/emulated/0/.trashbin",
             
-            // OnePlus
-            "/storage/emulated/0/Documents/.dustbin",
-            "/storage/emulated/0/Download/.dustbin"
+            // Office temporary files
+            "/storage/emulated/0/Android/data/com.microsoft.office.word/files/temp",
+            "/storage/emulated/0/Android/data/com.microsoft.office.word/temp",
+            "/storage/emulated/0/Android/data/com.microsoft.office.excel/temp",
+            "/storage/emulated/0/Android/data/com.microsoft.office.powerpoint/temp",
+            "/storage/emulated/0/Documents/MicrosoftOffice/UnsavedFiles",
+            "/storage/emulated/0/Documents/Office Temp",
+            
+            // WPS Office
+            "/storage/emulated/0/Android/data/cn.wps.moffice_eng/files/recovery",
+            "/storage/emulated/0/Documents/WPS/backup",
+            "/storage/emulated/0/Documents/.backup",
+            "/storage/emulated/0/Android/data/cn.wps.moffice_eng/files/PdfData/temp",
+            
+            // Adobe Document Viewer
+            "/storage/emulated/0/Android/data/com.adobe.reader/files/temp",
+            "/storage/emulated/0/Android/data/com.adobe.reader/files/AdobeReader/tmp",
+            "/storage/emulated/0/Adobe/Acrobat/11.0/AutoSave",
+            
+            // Polaris Office
+            "/storage/emulated/0/Android/data/com.infraware.office.link/files/temp",
+            "/storage/emulated/0/Polaris Office/Temp",
+            
+            // Common trash locations for PDF readers
+            "/storage/emulated/0/Documents/.trash",
+            "/storage/emulated/0/Download/.trash",
+            "/storage/emulated/0/Download/RecycleBin",
+            
+            // Google Drive offline files
+            "/storage/emulated/0/Android/data/com.google.android.apps.docs/files/offline",
+            "/storage/emulated/0/Android/data/com.google.android.apps.docs/files/temp",
+            
+            // OneDrive offline files
+            "/storage/emulated/0/Android/data/com.microsoft.skydrive/files/temp",
+            
+            // Dropbox
+            "/storage/emulated/0/Android/data/com.dropbox.android/files/scratch",
+            
+            // SD Card locations (if supported)
+            "/storage/sdcard1/.trash",
+            "/storage/sdcard1/DCIM/.trash",
+            "/storage/sdcard1/Documents/.trash",
+            
+            // App specific temp folders
+            "/storage/emulated/0/Android/data/com.dropbox.android/files/scratch",
+            "/storage/emulated/0/Android/data/com.google.android.apps.docs/files/pinned_docs_files_do_not_edit",
+            
+            // LibreOffice
+            "/storage/emulated/0/Android/data/org.libreoffice/files/temp",
+            "/storage/emulated/0/LibreOffice/backup",
+            
+            // OfficeSuite
+            "/storage/emulated/0/Android/data/com.mobisystems.office/temp",
+            "/storage/emulated/0/Android/data/com.mobisystems.office/files/temp"
         )
         
-        for (path in trashPaths) {
-            val trashDir = File(path)
-            if (trashDir.exists() && trashDir.isDirectory) {
-                Log.d("FileRecovery", "Đang quét thùng rác: $path")
-                // Đánh dấu thư mục này đã được quét
-                scannedDirectories.add(trashDir.absolutePath)
-                scanTrashDirectory(trashDir)
+        for (trashPath in trashPaths) {
+            val trashDir = File(trashPath)
+            if (trashDir.exists() && trashDir.isDirectory && trashDir.canRead()) {
+                Log.d("FileRecovery", "Quét thư mục thùng rác: $trashPath")
+                simulateFindingDeletedFiles(trashDir)
+            } else {
+                Log.d("FileRecovery", "Bỏ qua thư mục thùng rác không tồn tại hoặc không đọc được: $trashPath")
             }
         }
+        
+        // Quét các thư mục tạm của hệ thống
+        val tempDirs = listOf(
+            // System temp directories
+            "/data/local/tmp",
+            "/storage/emulated/0/Android/data/com.android.providers.media/albumthumbs",
+            
+            // Bộ nhớ cache của trình duyệt (có thể chứa file đã download)
+            "/storage/emulated/0/Android/data/com.android.chrome/cache",
+            "/storage/emulated/0/Android/data/com.android.chrome/files/Download",
+            "/storage/emulated/0/Android/data/com.opera.browser/cache",
+            "/storage/emulated/0/Android/data/org.mozilla.firefox/cache"
+        )
+        
+        for (tempPath in tempDirs) {
+            val tempDir = File(tempPath)
+            if (tempDir.exists() && tempDir.isDirectory && tempDir.canRead()) {
+                Log.d("FileRecovery", "Quét thư mục tạm: $tempPath")
+                simulateFindingDeletedFiles(tempDir)
+            }
+        }
+        
+        Log.d("FileRecovery", "Hoàn thành quét thư mục thùng rác phổ biến")
     }
     
     /**
-     * Quét một thư mục thùng rác để tìm file đã xóa
-     */
-    private fun scanTrashDirectory(trashDir: File) {
-        try {
-            if (!trashDir.exists() || !trashDir.isDirectory || !trashDir.canRead()) {
-                return
-            }
-            
-            val files = trashDir.listFiles() ?: return
-            
-            for (file in files) {
-                try {
-                    if (file.isDirectory && file.canRead()) {
-                        // Quét đệ quy nếu là thư mục
-                        scanTrashDirectory(file)
-                    } else if (file.isFile && file.canRead() && isOtherFile(file.name) && file.length() > 0) {
-                        Log.d("FileRecovery", "Tìm thấy file trong thùng rác: ${file.absolutePath}")
-                        
-                        // Kiểm tra trùng lặp trước khi thêm vào danh sách
-                        if (!recoveredFiles.any { it.getPath() == file.absolutePath }) {
-                            // Tạo đối tượng RecoverableItem và đánh dấu là đã xóa
-                            val recoveredFile = RecoverableItem(
-                                file,
-                                file.length(),
-                                getFileType(file.name),
-                                true // Đánh dấu là file đã xóa
-                            )
-                            recoveredFiles.add(recoveredFile)
-                            Log.d("FileRecovery", "Đã thêm file vào danh sách phục hồi: ${file.absolutePath}")
-                        } else {
-                            Log.d("FileRecovery", "Bỏ qua file trùng lặp: ${file.absolutePath}")
-                        }
-                    }
-                } catch (e: SecurityException) {
-                    Log.e("FileRecovery", "Lỗi quyền khi xử lý file trong thùng rác: ${e.message}")
-                } catch (e: Exception) {
-                    Log.e("FileRecovery", "Lỗi khi xử lý file trong thùng rác: ${e.message}")
-                }
-            }
-        } catch (e: SecurityException) {
-            Log.e("FileRecovery", "Lỗi quyền khi quét thư mục thùng rác: ${e.message}")
-        } catch (e: Exception) {
-            Log.e("FileRecovery", "Lỗi khi quét thư mục thùng rác: ${e.message}")
-        }
-    }
-    
-    /**
-     * Kiểm tra xem thư mục có phải là thư mục thùng rác không
+     * Kiểm tra xem thư mục có phải là thư mục thùng rác hay không
      */
     private fun isTrashDirectory(directory: File): Boolean {
         val trashKeywords = listOf(
             ".trash", ".Trash", "trash", "Trash", "recycle", "Recycle", "bin", "Bin",
             "deleted", "Deleted", "dustbin", "Dustbin", ".RecycleBin", "recyclebin",
-            ".globalTrash"
+            ".globalTrash", ".trashbin", ".recyclebin", "Recovery", ".deleted",
+            "temp", "Temp", "tmp", "Tmp", "~", "scratch", "offline", "cache", "Archive"
         )
         
         val dirName = directory.name.lowercase()
@@ -733,12 +750,13 @@ class FileRecoveryActivity : AppCompatActivity() {
     /**
      * Kiểm tra xem file có nằm trong thư mục thùng rác không
      */
-    private fun isFileInTrashFolder(file: File): Boolean {
+    private fun isInTrashFolder(file: File): Boolean {
         // Danh sách các từ khóa trong đường dẫn giúp xác định thư mục thùng rác
         val trashKeywords = listOf(
             ".trash", ".Trash", "trash", "Trash", "recycle", "Recycle", "bin", "Bin",
-            "deleted", "Deleted", "dustbin", "Dustbin", ".RecycleBin", "recyclebin",
-            ".globalTrash"
+            ".globalTrash", ".trashbin", ".recyclebin", "Recovery", ".deleted",
+            "temp", "Temp", "tmp", "Tmp", "~", "scratch", "offline", "cache", "Archive",
+            "unsaved", "backup", "autosave", "autorecovery"
         )
         
         // Lấy đường dẫn tuyệt đối
@@ -752,16 +770,36 @@ class FileRecoveryActivity : AppCompatActivity() {
      * Kiểm tra xem file có phải là file đã xóa không
      */
     private fun isDeletedFile(file: File): Boolean {
-        // Kiểm tra tên file có bắt đầu bằng dấu chấm (thường là file ẩn/đã xóa)
-        val hasHiddenName = file.name.startsWith(".")
+        // Kiểm tra theo tên file
+        val name = file.name.lowercase()
         
-        // Kiểm tra đường dẫn file có chứa từ khóa thùng rác
-        val inTrashFolder = isFileInTrashFolder(file)
+        // Mẫu tên file đã xóa
+        val deletedPatterns = listOf(
+            "delete", "removed", "trash", "bin", ".del", "del_", "deleted_", "trashed_",
+            ".tmp", "~tmp", "~$", ".$", "~wrl", "~rf", ".bak", ".old", ".sav", ".backup",
+            "autosave", "autorecovery", "temp", "tmp", "scratch", "recovery", "unsaved", 
+            "^~", "^\\.~", "^\\$", "^acrash", "^auto_save_", "^backup_", "^copy of ", 
+            "\\.wbk$", "\\.bak$", "\\.tmp$", "\\.temp$", "\\.asd$", "\\.asv$", "\\.$\\$\\$$",
+            "^\\~\\$", "^\\.\\$", "^\\$\\$"
+        )
         
-        // Kiểm tra thư mục cha có phải là thư mục thùng rác
-        val inTrashDirectory = file.parentFile?.let { isTrashDirectory(it) } ?: false
+        // Kiểm tra nếu tên file chứa từ khóa của file đã xóa
+        if (deletedPatterns.any { name.contains(it) }) {
+            return true
+        }
         
-        return hasHiddenName || inTrashFolder || inTrashDirectory
+        // Kiểm tra nếu file nằm trong thư mục thùng rác
+        if (isInTrashFolder(file)) {
+            return true
+        }
+        
+        // Kiểm tra tên file với mẫu đặc biệt: những file bắt đầu với ký tự . hoặc ~ và không phải là file hệ thống
+        if ((name.startsWith(".") || name.startsWith("~")) 
+            && !name.equals(".nomedia") && !name.contains("cache") && !name.contains("config")) {
+            return true
+        }
+        
+        return false
     }
     
     private fun formatFileSize(size: Long): String {
@@ -786,6 +824,12 @@ class FileRecoveryActivity : AppCompatActivity() {
                 return
             }
             
+            // Giới hạn độ sâu quét để tránh quét quá lâu (có thể tùy chỉnh)
+            if (scannedDirectories.size > 1000) {
+                Log.d("FileRecovery", "Đã đạt giới hạn số lượng thư mục quét, dừng quét")
+                return
+            }
+            
             // Đánh dấu thư mục này đã được quét
             scannedDirectories.add(directory.absolutePath)
             
@@ -801,6 +845,15 @@ class FileRecoveryActivity : AppCompatActivity() {
                 
                 Log.d("FileRecovery", "Tìm thấy ${files.size} file/thư mục trong ${directory.absolutePath}")
                 
+                // Danh sách từ khóa đánh dấu tệp có thể khôi phục
+                val recoveryKeywords = listOf(
+                    "backup", "bak", "temp", "tmp", "old", "save", "copy", "recovery", 
+                    "autorecovery", "autosave", "~$", ".$", ".tmp", ".old", ".bak", ".sav",
+                    "unsaved", "scratch", "offline", "archive", "history", "version", 
+                    ".asd", ".asv", ".wbk", ".xlk", ".xlsb", ".gsheet", ".gdoc", ".gslides",
+                    ".pptx~", ".xlsx~", ".docx~", ".pdf~", ".odt~", ".ods~", ".odp~"
+                )
+                
                 for (file in files) {
                     try {
                         if (file.isDirectory && file.canRead()) {
@@ -810,15 +863,21 @@ class FileRecoveryActivity : AppCompatActivity() {
                             // Quét đệ quy các thư mục, ưu tiên thư mục thùng rác
                             if (isTrashDir || (!file.name.startsWith(".") && !file.name.equals("Android", true))) {
                                 simulateFindingDeletedFiles(file)
+                            } else if ((file.isHidden || file.name.contains("temp", true) || 
+                                      file.name.contains("tmp", true) || file.name.contains("backup", true))) {
+                                // Quét cả thư mục ẩn có thể chứa file backup
+                                simulateFindingDeletedFiles(file)
                             }
-                        } else if (file.isFile && file.canRead() && isOtherFile(file.name) && file.length() > 0) {
+                        } else if (file.isFile && file.canRead() && isOtherFile(file) && file.length() > 0) {
                             Log.d("FileRecovery", "Tìm thấy file: ${file.absolutePath}")
                             
-                            // Kiểm tra nếu file này đã xóa
+                            // Kiểm tra nếu file này đã xóa hoặc là file backup/temp
                             val isDeleted = isDeletedFile(file)
+                            val isBackupFile = recoveryKeywords.any { file.name.contains(it, true) } ||
+                                               file.name.matches(Regex(".*~\\d+\\..*")) // Mẫu tên file backup ~1.doc, ~2.xlsx
                             
-                            if (isDeleted) {
-                                Log.d("FileRecovery", "Đây là file đã xóa: ${file.absolutePath}")
+                            if (isDeleted || isBackupFile) {
+                                Log.d("FileRecovery", "Đây là file đã xóa hoặc file backup: ${file.absolutePath}")
                                 
                                 // Kiểm tra trùng lặp trước khi thêm file vào danh sách
                                 if (!recoveredFiles.any { it.getPath() == file.absolutePath }) {
@@ -855,29 +914,66 @@ class FileRecoveryActivity : AppCompatActivity() {
     }
     
     private fun isOtherFile(fileName: String): Boolean {
-        val extension = fileName.substringAfterLast('.', "").lowercase()
-        // Lấy file không phải ảnh hoặc video
+        val extension = getFileExtension(fileName)
         return !isImageFile(extension) && !isVideoFile(extension) && extension.isNotEmpty()
     }
     
-    private fun isImageFile(extension: String): Boolean {
-        return extension in listOf("jpg", "jpeg", "png", "gif", "bmp", "webp")
+    private fun isOtherFile(file: File): Boolean {
+        return isOtherFile(file.name)
     }
-    
+
+    private fun isImageFile(extension: String): Boolean {
+        val imageExtensions = listOf("jpg", "jpeg", "png", "gif", "bmp", "webp", "heic", "heif", "raw", "tiff", "tif")
+        return imageExtensions.contains(extension.lowercase())
+    }
+
     private fun isVideoFile(extension: String): Boolean {
-        return extension in listOf("mp4", "3gp", "mkv", "avi", "mov", "wmv")
+        val videoExtensions = listOf("mp4", "3gp", "mkv", "mov", "avi", "flv", "webm", "m4v", "mpg", "mpeg")
+        return videoExtensions.contains(extension.lowercase())
+    }
+
+    private fun getFileExtension(fileName: String): String {
+        return try {
+            fileName.substringAfterLast(".", "")
+        } catch (e: Exception) {
+            ""
+        }
     }
     
     private fun getFileType(fileName: String): String {
-        val extension = fileName.substringAfterLast('.', "").lowercase()
+        val extension = getFileExtension(fileName).lowercase()
+        
         return when (extension) {
-            "pdf" -> "pdf"
-            "doc", "docx" -> "document"
-            "xls", "xlsx" -> "spreadsheet" 
-            "ppt", "pptx" -> "presentation"
-            "txt" -> "text"
-            "zip", "rar", "7z" -> "archive"
-            else -> "other"
+            // Documents
+            "pdf" -> "PDF Document"
+            "doc", "docx", "rtf", "odt", "pages" -> "Word Document"
+            "xls", "xlsx", "csv", "ods", "numbers" -> "Spreadsheet"
+            "ppt", "pptx", "pps", "ppsx", "odp", "key" -> "Presentation"
+            
+            // Text and Code files
+            "txt", "log" -> "Text File"
+            "md" -> "Markdown File"
+            "html", "htm" -> "HTML File"
+            "xml" -> "XML File"
+            "json" -> "JSON File"
+            "js" -> "JavaScript File"
+            "css" -> "CSS File"
+            "java", "kt", "c", "cpp", "py", "php" -> "Code File"
+            
+            // Archives
+            "zip", "rar", "7z", "tar", "gz", "bz2", "xz" -> "Archive"
+            "iso" -> "Disk Image"
+            
+            // E-books
+            "epub", "mobi", "djvu", "azw", "azw3" -> "E-book"
+            
+            // Others
+            "apk" -> "Android Package"
+            "vcf" -> "Contact File"
+            "ics" -> "Calendar File"
+            
+            // Default
+            else -> if (extension.isEmpty()) "Unknown File" else "$extension File"
         }
     }
     
@@ -1019,6 +1115,95 @@ class FileRecoveryActivity : AppCompatActivity() {
             
             // Thiết lập status bar icon màu tối (do status bar có màu nền nhạt)
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
+    }
+
+    /**
+     * Quét các thư mục thùng rác cũ và thêm vào danh sách files cần khôi phục
+     */
+    private fun scanOldTrashDirectories() {
+        val trashDirs = mutableListOf<File>()
+        
+        // Thư mục thùng rác ứng dụng quản lý file
+        trashDirs.add(File("/storage/emulated/0/.estrongs/recycle"))
+        trashDirs.add(File("/storage/emulated/0/.files_trash"))
+        trashDirs.add(File("/storage/emulated/0/.trash"))
+        trashDirs.add(File("/storage/emulated/0/Trash"))
+        trashDirs.add(File("/storage/emulated/0/.Trash"))
+        trashDirs.add(File("/storage/emulated/0/LOST.DIR"))
+        trashDirs.add(File("/storage/emulated/0/RECYCLED"))
+        trashDirs.add(File("/storage/emulated/0/RECYCLER"))
+        trashDirs.add(File("/storage/emulated/0/$RECYCLE.BIN"))
+        
+        // Thư mục thùng rác Google Files
+        val googleFilesDir = File("/storage/emulated/0/Android/data/com.google.android.apps.nbu.files/files/trash")
+        if (googleFilesDir.exists() && googleFilesDir.canRead()) {
+            trashDirs.add(googleFilesDir)
+        }
+        
+        // Thêm các thư mục rác của Microsoft Office
+        trashDirs.add(File("/storage/emulated/0/Documents/MicrosoftOffice/UnsavedFiles"))
+        trashDirs.add(File("/storage/emulated/0/Android/data/com.microsoft.office.word/files/temp"))
+        trashDirs.add(File("/storage/emulated/0/Android/data/com.microsoft.office.excel/files/temp"))
+        trashDirs.add(File("/storage/emulated/0/Android/data/com.microsoft.office.powerpoint/files/temp"))
+        trashDirs.add(File("/storage/emulated/0/Android/data/com.microsoft.office.officehubrow/cache"))
+        
+        // Thêm các thư mục rác của WPS Office
+        trashDirs.add(File("/storage/emulated/0/Android/data/cn.wps.moffice_eng/files/PdfData/temp"))
+        trashDirs.add(File("/storage/emulated/0/Android/data/cn.wps.moffice_eng/files/tmp"))
+        trashDirs.add(File("/storage/emulated/0/Android/data/cn.wps.moffice_eng/cache"))
+        
+        // Thêm các thư mục rác của Adobe Acrobat/Reader
+        trashDirs.add(File("/storage/emulated/0/Android/data/com.adobe.reader/files/AdobeReader/tmp"))
+        trashDirs.add(File("/storage/emulated/0/Adobe/Reader/tmp"))
+        
+        // Thêm các thư mục rác của OfficeSuite
+        trashDirs.add(File("/storage/emulated/0/Android/data/com.mobisystems.office/temp"))
+        trashDirs.add(File("/storage/emulated/0/Android/data/com.mobisystems.office/cache"))
+        
+        // Thêm các thư mục rác của Polaris Office
+        trashDirs.add(File("/storage/emulated/0/Android/data/com.infraware.office.link/temp"))
+        
+        // Thêm các thư mục rác của Google Docs, Sheets, Slides
+        trashDirs.add(File("/storage/emulated/0/Android/data/com.google.android.apps.docs.editors.docs/cache"))
+        trashDirs.add(File("/storage/emulated/0/Android/data/com.google.android.apps.docs.editors.sheets/cache"))
+        trashDirs.add(File("/storage/emulated/0/Android/data/com.google.android.apps.docs.editors.slides/cache"))
+        
+        // Quét các thư mục thùng rác
+        for (dir in trashDirs) {
+            if (dir.exists() && dir.canRead()) {
+                scanDirectoryRecursively(dir)
+            }
+        }
+    }
+
+    /**
+     * Scan all potential locations for deleted files
+     */
+    private fun scanAllPotentialLocations() {
+        try {
+            scanExternalStorage()
+            scanDownloadsDirectory()
+            scanDocumentsDirectory()
+            scanAndroidDataDirectory()
+            scanOldTrashDirectories() // Thêm quét thư mục rác cũ
+            
+            binding.progressBar.visibility = View.GONE
+            binding.tvProgress.visibility = View.GONE
+            
+            if (filesFound.isEmpty()) {
+                binding.tvNoFilesFound.visibility = View.VISIBLE
+                binding.rvFiles.visibility = View.GONE
+            } else {
+                binding.tvNoFilesFound.visibility = View.GONE
+                binding.rvFiles.visibility = View.VISIBLE
+                filesAdapter.updateFiles(filesFound)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error scanning for deleted files", e)
+            binding.progressBar.visibility = View.GONE
+            binding.tvProgress.visibility = View.GONE
+            Toast.makeText(this, getString(R.string.error_scanning_files), Toast.LENGTH_SHORT).show()
         }
     }
 } 
