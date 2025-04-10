@@ -1206,4 +1206,43 @@ class FileRecoveryActivity : AppCompatActivity() {
             Toast.makeText(this, getString(R.string.error_scanning_files), Toast.LENGTH_SHORT).show()
         }
     }
+
+    /**
+     * Quét thư mục đệ quy để tìm các file trong thư mục thùng rác
+     */
+    private fun scanDirectoryRecursively(directory: File) {
+        try {
+            if (!directory.exists() || !directory.isDirectory || !directory.canRead()) {
+                return
+            }
+            
+            val files = directory.listFiles()
+            
+            if (files != null) {
+                for (file in files) {
+                    if (file.isDirectory && file.canRead()) {
+                        // Đệ quy quét thư mục con
+                        scanDirectoryRecursively(file)
+                    } else if (file.isFile && file.canRead() && isOtherFile(file) && file.length() > 0) {
+                        // Kiểm tra trùng lặp trước khi thêm vào danh sách
+                        if (!recoveredFiles.any { it.getPath() == file.absolutePath }) {
+                            // Tạo đối tượng RecoverableItem và đánh dấu là file đã xóa
+                            val recoveredFile = RecoverableItem(
+                                file,
+                                file.length(),
+                                getFileType(file.name),
+                                true // Đánh dấu là file đã xóa
+                            )
+                            recoveredFiles.add(recoveredFile)
+                            Log.d("FileRecovery", "Thêm file từ thư mục thùng rác cũ: ${file.absolutePath}")
+                        }
+                    }
+                }
+            }
+        } catch (e: SecurityException) {
+            Log.e("FileRecovery", "Lỗi quyền truy cập khi quét thư mục thùng rác: ${directory.absolutePath}")
+        } catch (e: Exception) {
+            Log.e("FileRecovery", "Lỗi khi quét thư mục thùng rác: ${directory.absolutePath}")
+        }
+    }
 } 
