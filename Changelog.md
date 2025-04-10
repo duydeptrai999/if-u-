@@ -44,6 +44,7 @@
 - Thêm tính năng xem trực tiếp file đã khôi phục khi nhấn vào từng mục trong danh sách
 - Thêm FileViewerActivity để hiển thị ảnh và video trực tiếp trong ứng dụng khi không có ứng dụng bên ngoài phù hợp
 - Cải thiện xử lý lỗi khi mở file và thông báo chi tiết cho người dùng
+- Thêm tính năng chia sẻ ảnh và video từ màn hình xem file
 
 ### Changed
 

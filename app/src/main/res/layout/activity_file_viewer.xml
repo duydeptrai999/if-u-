@@ -38,10 +38,22 @@
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@id/ivBack"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/ivShare"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:text="example_image.jpg" />
+
+        <ImageView
+            android:id="@+id/ivShare"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:src="@drawable/ic_share"
+            android:contentDescription="@string/share"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:tint="#FFFFFF" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -252,11 +252,227 @@ Bảng `recovered_files` với các cột:
    - Đối với video, sử dụng các điều khiển phát/dừng, thanh tiến trình để điều khiển việc phát
    - Xoay thiết bị để xem ở chế độ toàn màn hình ngang (landscape)
 
+4. Chia sẻ ảnh và video:
+   - Khi đang xem ảnh hoặc video, nhấn vào nút chia sẻ (icon share) ở góc trên bên phải
+   - Hệ thống sẽ mở hộp thoại cho phép bạn chọn ứng dụng để chia sẻ
+   - Bạn có thể chia sẻ qua các ứng dụng nhắn tin, email, mạng xã hội, v.v.
+   - Tệp tin sẽ được chia sẻ với định dạng gốc của nó
+
 ## Xử lý lỗi và thông báo
 Ứng dụng sẽ hiển thị các thông báo chi tiết trong các trường hợp sau:
 - Khi file không tồn tại
 - Khi không có ứng dụng nào trên thiết bị có thể mở loại file đó
 - Khi có lỗi xảy ra trong quá trình mở file
+- Khi không thể chia sẻ file
+
+## Lưu ý
+- Việc tải thumbnail có thể mất một chút thời gian với file có kích thước lớn
+- Khi xem video trong trình phát tích hợp, video sẽ được phát với chất lượng gốc, có thể tiêu tốn nhiều tài nguyên
+- Một số định dạng file đặc biệt có thể không được hỗ trợ bởi trình xem tích hợp
+- Trong trường hợp file không thể mở bằng ứng dụng mặc định hoặc trình xem tích hợp, bạn có thể thử sử dụng ứng dụng khác từ Google Play
+- Khi chia sẻ tệp tin lớn, quá trình có thể mất nhiều thời gian tùy thuộc vào kết nối mạng của bạn
+
+# Tính năng Khôi phục Ảnh và Video
+
+## Khôi phục Ảnh
+
+Tính năng khôi phục ảnh giúp người dùng tìm và khôi phục các ảnh đã bị xóa trên thiết bị.
+
+### Cách sử dụng:
+
+1. **Quét thiết bị**: 
+   - Màn hình chính hiển thị nút QUÉT màu xanh lá cây
+   - Nhấn vào nút QUÉT để bắt đầu quá trình quét tìm ảnh đã xóa
+   - Trong quá trình quét, màn hình hiển thị thông báo "Đang quét thiết bị..."
+
+2. **Xem kết quả quét**:
+   - Sau khi quét xong, màn hình hiển thị "Đã quét xong" cùng với các thông tin:
+     - Số lượng tệp được tìm thấy
+     - Kích thước tổng cộng
+     - Xem trước một số ảnh đã tìm thấy (tối đa 4 ảnh)
+   - Nhấn nút "Xem kết quả" để hiển thị danh sách đầy đủ các ảnh tìm thấy
+
+3. **Khôi phục ảnh**:
+   - Chọn các ảnh muốn khôi phục bằng cách nhấn vào ảnh
+   - Nhấn nút "Khôi phục đã chọn" để khôi phục các ảnh đã chọn
+   - Sau khi khôi phục thành công, ứng dụng sẽ thông báo số lượng ảnh đã khôi phục thành công
+   - Thông báo khôi phục thành công hiển thị biểu tượng tích xanh, số lượng ảnh đã khôi phục và số ảnh đã được lưu vào thư viện
+   - Người dùng có thể chọn "CONTINUE" để tiếp tục sử dụng ứng dụng hoặc "XEM ẢNH ĐÃ KHÔI PHỤC" để xem các ảnh vừa khôi phục
+   - Cả hai nút đều có cùng kích thước và được thiết kế đồng nhất để tăng tính thẩm mỹ
+
+## Khôi phục Video
+
+Tính năng khôi phục video hoạt động tương tự như khôi phục ảnh, nhưng dành cho các tệp video.
+
+### Cách sử dụng:
+
+1. **Quét thiết bị**: 
+   - Màn hình chính hiển thị nút QUÉT màu xanh lá cây
+   - Nhấn vào nút QUÉT để bắt đầu quá trình quét tìm video đã xóa
+   - Trong quá trình quét, màn hình hiển thị thông báo "Đang quét thiết bị..."
+
+2. **Xem kết quả quét**:
+   - Sau khi quét xong, màn hình hiển thị "Đã quét xong" cùng với các thông tin:
+     - Số lượng tệp được tìm thấy
+     - Kích thước tổng cộng
+     - Xem trước một số video đã tìm thấy (tối đa 4 video)
+   - Nhấn nút "Xem kết quả" để hiển thị danh sách đầy đủ các video tìm thấy
+
+3. **Khôi phục video**:
+   - Chọn các video muốn khôi phục bằng cách nhấn vào video
+   - Nhấn nút "Khôi phục đã chọn" để khôi phục các video đã chọn
+   - Sau khi khôi phục thành công, ứng dụng sẽ thông báo số lượng video đã khôi phục thành công
+
+## Khôi phục File Khác
+
+Tính năng khôi phục file khác giúp người dùng tìm và khôi phục các loại file khác như tài liệu, bảng tính, PDF, v.v.
+
+### Cách sử dụng:
+
+1. **Quét thiết bị**: 
+   - Màn hình chính hiển thị nút QUÉT màu xanh lá cây
+   - Nhấn vào nút QUÉT để bắt đầu quá trình quét tìm file đã xóa
+   - Trong quá trình quét, màn hình hiển thị thông báo "Đang quét thiết bị..."
+
+2. **Xem kết quả quét**:
+   - Sau khi quét xong, màn hình hiển thị "Đã quét xong" cùng với các thông tin:
+     - Số lượng tệp được tìm thấy
+     - Kích thước tổng cộng
+     - Xem trước một số file đã tìm thấy (tối đa 4 file)
+   - Nhấn nút "Xem kết quả" để hiển thị danh sách đầy đủ các file tìm thấy
+
+3. **Khôi phục file**:
+   - Chọn các file muốn khôi phục bằng cách nhấn vào file
+   - Nhấn nút "Khôi phục đã chọn" để khôi phục các file đã chọn
+   - Sau khi khôi phục thành công, ứng dụng sẽ thông báo số lượng file đã khôi phục thành công
+
+4. **Phân loại file**:
+   - Ứng dụng tự động phân loại các file tìm thấy theo loại:
+     - PDF: File PDF
+     - Document: File văn bản (DOC, DOCX)
+     - Spreadsheet: File bảng tính (XLS, XLSX)
+     - Presentation: File trình chiếu (PPT, PPTX)
+     - Text: File văn bản thuần túy (TXT)
+     - Archive: File nén (ZIP, RAR, 7Z)
+     - Other: Các loại file khác
+
+## Lưu ý
+
+- Ứng dụng yêu cầu quyền truy cập bộ nhớ để quét và khôi phục tệp
+- Các tệp sau khi khôi phục sẽ được lưu vào thư mục RecoveredPhotos, RecoveredVideos hoặc RecoveredFiles trong bộ nhớ ứng dụng
+- Tỷ lệ khôi phục thành công phụ thuộc vào thời gian tệp đã bị xóa và liệu dữ liệu có bị ghi đè hay không 
+
+## Tính năng Xem Danh Sách Tệp Tin Đã Khôi Phục
+
+### Mô tả
+Tính năng này cho phép người dùng xem danh sách các tệp tin đã được khôi phục, được phân loại thành 3 nhóm: Ảnh, Video và Tệp tin khác. Người dùng có thể xem chi tiết từng loại tệp tin đã khôi phục.
+
+### Cách hoạt động
+1. Từ màn hình chính, người dùng nhấn vào phần "ĐÃ KHÔI PHỤC" (phần thống kê bên dưới) để mở màn hình danh sách tệp đã khôi phục.
+2. Màn hình hiển thị 3 danh mục: Ảnh, Video và Tệp tin khác.
+3. Mỗi danh mục hiển thị số lượng tệp tin và tổng kích thước.
+4. Người dùng có thể nhấn vào nút "Xem" hoặc nhấn vào cả card để xem chi tiết danh sách các tệp trong danh mục đó.
+5. Khi vào màn hình chi tiết, người dùng có thể thấy danh sách các tệp tin đã được khôi phục với thông tin như: tên tệp, kích thước, ngày tạo.
+
+### Các màn hình
+1. **Màn hình Danh Sách Danh Mục Đã Khôi Phục**:
+   - Hiển thị 3 danh mục: Ảnh, Video và Tệp tin khác.
+   - Mỗi danh mục hiển thị số lượng tệp và kích thước.
+   - Có nút "Xem" để chuyển đến màn hình chi tiết.
+
+2. **Màn hình Chi Tiết Tệp Tin Đã Khôi Phục**:
+   - Hiển thị danh sách các tệp tin trong danh mục được chọn.
+   - Mỗi dòng hiển thị: biểu tượng tệp tin, tên tệp, kích thước và ngày tạo.
+   - Hiển thị thông báo "Không có tệp tin nào" nếu danh mục trống.
+
+### Các thành phần chính
+1. `RecoveredFilesActivity`: Activity hiển thị danh sách các danh mục tệp tin đã khôi phục.
+2. `RecoveredFilesDetailActivity`: Activity hiển thị chi tiết danh sách tệp tin trong một danh mục.
+3. `RecoveredFileAdapter`: Adapter để hiển thị danh sách tệp tin đã khôi phục trong RecyclerView.
+4. `RecoveredFile`: Model lưu trữ thông tin về tệp tin đã khôi phục (tên, đường dẫn, kích thước, ngày tạo).
+
+### Mô hình dữ liệu
+Hiện tại, dữ liệu được mô phỏng bằng các mảng cứng để demo giao diện. Trong ứng dụng thực tế, dữ liệu sẽ được lưu trữ trong cơ sở dữ liệu hoặc bộ nhớ ứng dụng và được cập nhật sau mỗi lần khôi phục thành công.
+
+### Tương tác với các tính năng khác
+- Khi người dùng khôi phục thành công các tệp tin từ các tính năng khôi phục (Ảnh, Video, Tệp tin khác), danh sách tệp tin đã khôi phục sẽ được cập nhật.
+- Thống kê trên màn hình chính sẽ hiển thị tổng số tệp tin và kích thước đã khôi phục.
+
+## Tính năng lưu trữ thông tin tệp tin đã khôi phục
+
+### Mô tả
+Tính năng này sẽ lưu trữ thông tin về các tệp tin đã được khôi phục (ảnh, video, file) vào cơ sở dữ liệu SQLite của ứng dụng. Điều này cho phép người dùng xem lại các tệp đã khôi phục ngay cả khi đã đóng và mở lại ứng dụng.
+
+### Cách hoạt động
+1. Khi một tệp tin được khôi phục thành công, thông tin về tệp tin sẽ được lưu vào cơ sở dữ liệu SQLite.
+2. Thông tin được lưu trữ bao gồm: đường dẫn đến tệp, tên tệp, kích thước, ngày chỉnh sửa, loại tệp và ngày khôi phục.
+3. Dữ liệu từ cơ sở dữ liệu được hiển thị trong màn hình "Đã khôi phục" và cập nhật trạng thái ở màn hình chính.
+4. Thống kê tổng số lượng và kích thước tệp tin đã khôi phục được hiển thị trên màn hình chính.
+
+### Các thành phần chính
+1. **RecoveredFilesDatabase**: Lớp cơ sở dữ liệu SQLite để lưu trữ thông tin về các tệp tin đã khôi phục.
+   - Phương thức `addRecoveredFile`: Thêm một tệp tin đã khôi phục vào cơ sở dữ liệu.
+   - Phương thức `getRecoveredFiles`: Lấy danh sách tệp tin đã khôi phục theo loại.
+   - Phương thức `countRecoveredFiles`: Đếm số lượng tệp tin đã khôi phục theo loại.
+   - Phương thức `getTotalSize`: Tính tổng kích thước tệp tin đã khôi phục theo loại.
+
+2. **Tích hợp với các Activity khôi phục**:
+   - PhotoRecoveryActivity: Lưu thông tin ảnh đã khôi phục vào cơ sở dữ liệu.
+   - VideoRecoveryActivity: Lưu thông tin video đã khôi phục vào cơ sở dữ liệu.
+   - FileRecoveryActivity: Lưu thông tin tệp tin khác đã khôi phục vào cơ sở dữ liệu.
+
+3. **Hiển thị thông tin trên giao diện**:
+   - RecoveredFilesActivity và RecoveredFilesDetailActivity: Đọc dữ liệu từ cơ sở dữ liệu để hiển thị danh sách tệp tin đã khôi phục.
+   - MainActivity: Cập nhật thống kê trên màn hình chính dựa trên dữ liệu từ cơ sở dữ liệu.
+
+### Cấu trúc cơ sở dữ liệu
+Bảng `recovered_files` với các cột:
+- `id`: Khóa chính, tự động tăng
+- `path`: Đường dẫn đến tệp tin (TEXT)
+- `name`: Tên tệp tin (TEXT)
+- `size`: Kích thước tệp tính bằng byte (INTEGER)
+- `modified_date`: Ngày chỉnh sửa tệp (INTEGER - timestamp)
+- `type`: Loại tệp tin (TEXT - "photo", "video", "file")
+- `recovery_date`: Ngày khôi phục tệp (INTEGER - timestamp)
+
+# Hướng dẫn sử dụng tính năng xem file đã khôi phục
+
+## Xem danh sách file đã khôi phục
+
+1. Trên màn hình chính (Home), nhấn vào phần "Đã khôi phục" để xem thống kê về các file đã khôi phục.
+2. Màn hình sẽ hiển thị 3 loại file (Ảnh, Video, Tệp tin khác) với số lượng và dung lượng tương ứng.
+3. Nhấn vào từng mục để xem danh sách chi tiết theo loại.
+
+## Xem thumbnail và chi tiết file đã khôi phục
+
+1. Khi vào xem danh sách file đã khôi phục theo loại, với mỗi mục:
+   - File ảnh: Sẽ hiển thị thumbnail thu nhỏ của ảnh
+   - File video: Sẽ hiển thị thumbnail của frame đầu tiên
+   - File khác: Sẽ hiển thị icon tương ứng với loại file
+
+2. Nhấn vào bất kỳ mục nào trong danh sách để mở file:
+   - Ứng dụng sẽ cố gắng mở file với ứng dụng mặc định trên thiết bị
+   - Nếu không tìm thấy ứng dụng phù hợp, file sẽ được mở trực tiếp trong ứng dụng Easy Recovery
+   - Ảnh sẽ được hiển thị trong trình xem ảnh tích hợp
+   - Video sẽ được phát trong trình phát video tích hợp với các điều khiển cơ bản
+
+3. Cách sử dụng trình xem tích hợp:
+   - Nhấn nút quay lại ở góc trên bên trái để trở về danh sách
+   - Đối với video, sử dụng các điều khiển phát/dừng, thanh tiến trình để điều khiển việc phát
+   - Xoay thiết bị để xem ở chế độ toàn màn hình ngang (landscape)
+
+4. Chia sẻ ảnh và video:
+   - Khi đang xem ảnh hoặc video, nhấn vào nút chia sẻ (icon share) ở góc trên bên phải
+   - Hệ thống sẽ mở hộp thoại cho phép bạn chọn ứng dụng để chia sẻ
+   - Bạn có thể chia sẻ qua các ứng dụng nhắn tin, email, mạng xã hội, v.v.
+   - Tệp tin sẽ được chia sẻ với định dạng gốc của nó
+
+## Xử lý lỗi và thông báo
+Ứng dụng sẽ hiển thị các thông báo chi tiết trong các trường hợp sau:
+- Khi file không tồn tại
+- Khi không có ứng dụng nào trên thiết bị có thể mở loại file đó
+- Khi có lỗi xảy ra trong quá trình mở file
+- Khi không thể chia sẻ file
 
 ## Lưu ý
 - Việc tải thumbnail có thể mất một chút thời gian với file có kích thước lớn

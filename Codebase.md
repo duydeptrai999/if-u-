@@ -168,6 +168,7 @@
   - `setupViews`: Thiết lập các thành phần giao diện
   - `showImage`: Hiển thị ảnh trong ImageView
   - `showVideo`: Thiết lập và phát video trong VideoView
+  - `shareCurrentFile`: Chia sẻ file hiện tại với các ứng dụng khác
   - `showNoPreview`: Hiển thị thông báo khi không thể hiển thị xem trước
   - `showError`: Hiển thị thông báo lỗi và xử lý khi không thể mở file
   - `onPause`/`onDestroy`: Quản lý vòng đời của VideoView

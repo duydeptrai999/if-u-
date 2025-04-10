@@ -1,5 +1,6 @@
 package com.htnguyen.ifu
 
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.MediaPlayer
 import android.net.Uri
@@ -11,6 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import java.io.File
 
 /**
@@ -22,7 +24,11 @@ class FileViewerActivity : AppCompatActivity() {
     private lateinit var videoView: VideoView
     private lateinit var fileNameText: TextView
     private lateinit var backButton: ImageView
+    private lateinit var shareButton: ImageView
     private lateinit var noPreviewText: TextView
+    
+    private var currentFile: File? = null
+    private var currentFileType: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +38,8 @@ class FileViewerActivity : AppCompatActivity() {
         val filePath = intent.getStringExtra("file_path") ?: ""
         val fileName = intent.getStringExtra("file_name") ?: ""
         val fileType = intent.getStringExtra("file_type") ?: "other"
+        
+        currentFileType = fileType
 
         // Khởi tạo các view
         setupViews()
@@ -45,6 +53,8 @@ class FileViewerActivity : AppCompatActivity() {
             showError("File không tồn tại")
             return
         }
+        
+        currentFile = file
 
         // Hiển thị nội dung tương ứng với loại file
         when (fileType) {
@@ -62,11 +72,17 @@ class FileViewerActivity : AppCompatActivity() {
         videoView = findViewById(R.id.videoView)
         fileNameText = findViewById(R.id.fileNameText)
         backButton = findViewById(R.id.ivBack)
+        shareButton = findViewById(R.id.ivShare)
         noPreviewText = findViewById(R.id.noPreviewText)
 
         // Thiết lập nút quay lại
         backButton.setOnClickListener {
             finish()
+        }
+        
+        // Thiết lập nút chia sẻ
+        shareButton.setOnClickListener {
+            shareCurrentFile()
         }
     }
 
@@ -123,6 +139,45 @@ class FileViewerActivity : AppCompatActivity() {
             videoView.start()
         } catch (e: Exception) {
             showError("Không thể phát video: ${e.message}")
+        }
+    }
+    
+    /**
+     * Chia sẻ file hiện tại
+     */
+    private fun shareCurrentFile() {
+        val file = currentFile ?: return
+        
+        try {
+            // Tạo URI cho file sử dụng FileProvider
+            val fileUri = FileProvider.getUriForFile(
+                this,
+                applicationContext.packageName + ".provider",
+                file
+            )
+            
+            // Tạo intent chia sẻ
+            val shareIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_STREAM, fileUri)
+                type = when (currentFileType) {
+                    "image" -> "image/*"
+                    "video" -> "video/*"
+                    else -> "*/*"
+                }
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            
+            // Hiển thị dialog chọn ứng dụng để chia sẻ
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_title)))
+            
+        } catch (e: Exception) {
+            Toast.makeText(
+                this,
+                getString(R.string.share_error) + ": ${e.message}",
+                Toast.LENGTH_LONG
+            ).show()
+            e.printStackTrace()
         }
     }
 

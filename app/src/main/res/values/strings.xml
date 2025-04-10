@@ -90,6 +90,10 @@
     <string name="thumbnail_preview">Xem trước tệp</string>
     <string name="open_file_error">Không thể mở tệp tin này</string>
     <string name="loading_thumbnail">Đang tải...</string>
+    <string name="share">Chia sẻ</string>
+    <string name="share_title">Chia sẻ qua</string>
+    <string name="share_success">Đã chia sẻ thành công</string>
+    <string name="share_error">Không thể chia sẻ tệp tin này</string>
     
     <!-- New strings for recovery features -->
     <string name="settings_app_language">App Language</string>
