@@ -524,7 +524,7 @@
                         android:textColor="@android:color/white"
                         android:textAllCaps="false"
                         android:textSize="14sp"
-                        android:text="@string/view_recovered_button" />
+                        android:text="@string/view_recovered_button_photo" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>

@@ -285,9 +285,9 @@ class VideoRecoveryActivity : AppCompatActivity() {
             resultIcon.setColorFilter(ContextCompat.getColor(this, R.color.green_500))
             
             if (galleryCount > 0) {
-                resultTitleText.text = getString(R.string.recovery_success)
+                resultTitleText.text = getString(R.string.recovery_success_gallery, totalCount, galleryCount)
             } else {
-                resultTitleText.text = getString(R.string.recovery_success)
+                resultTitleText.text = getString(R.string.recovery_success, totalCount)
             }
             
             resultDescriptionText.text = getString(R.string.recovery_success_description)

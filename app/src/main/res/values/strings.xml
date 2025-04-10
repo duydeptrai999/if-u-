@@ -71,13 +71,15 @@
     <string name="deleted_indicator">ĐÃ XÓA</string>
     <string name="trash_folder_indicator">Thùng rác</string>
     <string name="recovery_message">Đây là ảnh đã bị xóa. Nhấn để khôi phục.</string>
-    <string name="file_recovery_success">Đã khôi phục thành công. Các tệp tin đã được lưu vào thư mục Documents và Downloads.</string>
+    <string name="file_recovery_success">Đã khôi phục thành công. Các tệp tin đã được lưu vào thư mục Documents .</string>
     <string name="recovery_failed_description">Không thể khôi phục một số tệp đã chọn. Vui lòng thử lại sau.</string>
     <string name="recovery_in_progress">Đang khôi phục, vui lòng đợi...</string>
     <string name="recovery_progress_description">Ảnh đang được khôi phục, vui lòng đợi...</string>
     <string name="recovery_counting">%1$d/%2$d</string>
     <string name="view_recovered_button">Xem ảnh </string>
-    
+    <string name="view_recovered_button_photo">Xem ảnh</string>
+
+
     <!-- Recovered files screen strings -->
     <string name="recovered_files_title">Tệp tin đã được khôi phục</string>
     <string name="recovered_photos">Ảnh đã khôi phục</string>
@@ -96,6 +98,6 @@
     <string name="recovery_success">Recovery Success</string>
     <string name="recovery_success_description">Đã khôi phục thành công. Các ảnh đã được lưu vào thư viện.</string>
     <string name="continue_button">Continue</string>
-    <string name="view_recovered_files">View Recovered Files</string>
+    <string name="view_recovered_files">View Files</string>
     <string name="scanning_in_progress">Đang quét, vui lòng đợi...</string>
 </resources>
