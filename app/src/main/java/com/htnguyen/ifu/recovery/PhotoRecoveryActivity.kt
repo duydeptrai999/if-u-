@@ -58,8 +58,6 @@ class PhotoRecoveryActivity : AppCompatActivity() {
     // Thêm các thành phần UI cho hiệu ứng quét
     private lateinit var scanningOverlay: FrameLayout
     private lateinit var scanningProgressBar: ProgressBar
-    private lateinit var scanningProgressText: TextView
-    private lateinit var scanningHorizontalProgressBar: ProgressBar
     private lateinit var scanIllustration: ImageView
     
     private val recoveredPhotos = mutableListOf<RecoverableItem>()
@@ -97,8 +95,6 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         // Khởi tạo các thành phần UI cho hiệu ứng quét
         scanningOverlay = findViewById(R.id.scanningOverlay)
         scanningProgressBar = findViewById(R.id.scanningProgressBar)
-        scanningProgressText = findViewById(R.id.scanningProgressText)
-        scanningHorizontalProgressBar = findViewById(R.id.scanningHorizontalProgressBar)
         scanIllustration = findViewById(R.id.scanIllustration)
     }
     
@@ -498,22 +494,11 @@ class PhotoRecoveryActivity : AppCompatActivity() {
     
     // Cập nhật trạng thái đang quét
     private fun updateScanStatus(message: String, progress: Int = -1) {
-        scanningProgressText.text = message
+        // Không cập nhật text vì đã xóa scanningProgressText
+        // Không cập nhật progress vì đã xóa scanningHorizontalProgressBar
         
-        if (progress >= 0) {
-            scanningHorizontalProgressBar.progress = progress
-        }
-        
-        scanningProgressText.animate()
-            .alpha(0.7f)
-            .setDuration(200)
-            .withEndAction {
-                scanningProgressText.animate()
-                    .alpha(1f)
-                    .setDuration(200)
-                    .start()
-            }
-            .start()
+        // Cập nhật statusText để người dùng vẫn thấy thông tin
+        statusText.text = message
     }
     
     // Hiển thị kết quả quét với animation

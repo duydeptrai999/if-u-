@@ -60,6 +60,7 @@
 
 ### Fixed
 - Sửa lỗi các phần tử UI trong màn hình quét (chữ "Đang quét" và thanh tiến trình) bị chồng lên nút "QUÉT" bằng cách thêm khoảng cách 100dp phía trên
+- Xóa hoàn toàn phần chữ "Đang quét" và thanh tiến trình ngang trong màn hình quét để tránh hiển thị chồng lên nút "QUÉT"
 
 ## [1.0.1] - 2024-03-23
 
