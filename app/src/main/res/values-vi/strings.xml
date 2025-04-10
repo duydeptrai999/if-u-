@@ -25,7 +25,10 @@
     <string name="files_found">Tìm thấy %d tệp</string>
     <string name="total_size">Tổng kích thước</string>
     <string name="recovering_status">Đang khôi phục %d mục...</string>
-    <string name="recovery_success">Đã khôi phục thành công %d mục</string>
+    <string name="recovery_success">Đã khôi phục thành công</string>
+    <string name="recovery_success_description">Đã khôi phục %d mục. %d mục đã được lưu vào thư viện.</string>
+    <string name="continue_button">Tiếp tục</string>
+    <string name="view_recovered_button">Xem ảnh đã khôi phục</string>
     <string name="permission_required">Cần quyền truy cập bộ nhớ để khôi phục</string>
     <string name="select_items">Vui lòng chọn các mục để khôi phục</string>
     <string name="photo_recovery">Khôi phục ảnh</string>
@@ -60,10 +63,4 @@
     <string name="share_app">Chia sẻ ứng dụng</string>
     <string name="privacy_policy">Chính sách bảo mật</string>
     <string name="terms_of_use">Điều khoản sử dụng</string>
-    
-    <!-- Thông báo khôi phục -->
-    <string name="recovery_success_description">Đã khôi phục %d file. %d file đã được lưu vào thư viện.</string>
-    <string name="continue_button">Tiếp tục</string>
-    <string name="view_recovered_button">Xem ảnh đã khôi phục</string>
-    <string name="recovering_in_progress">Đang khôi phục...</string>
 </resources> 
