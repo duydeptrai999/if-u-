@@ -67,6 +67,7 @@
 - Làm đẹp hơn giao diện thông báo với padding, kích thước icon và text lớn hơn
 - Giảm kích thước button khôi phục thành công từ 56dp xuống 48dp và giảm cỡ chữ từ 16sp xuống 14sp để làm gọn giao diện
 - Xóa các ký tự lạ (%1$d, %2$d) trong chuỗi thông báo khôi phục thành công và thay bằng thông báo đơn giản
+- Áp dụng cải thiện tương tự cho màn hình thông báo khôi phục video và file thành công để đảm bảo giao diện nhất quán
 
 ## [1.0.1] - 2024-03-23
 

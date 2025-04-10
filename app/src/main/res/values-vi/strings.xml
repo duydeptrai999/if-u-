@@ -47,8 +47,10 @@
     <string name="tap_to_scan_files">Nhấn để quét các tệp tin đã xóa</string>
     <string name="select_files_to_recover">Chọn tệp tin để khôi phục</string>
     <string name="file_icon">Biểu tượng tệp tin</string>
+    <string name="recovery_success_gallery">Đã khôi phục thành công. Các video đã được lưu vào thư viện.</string>
+    <string name="file_recovery_success">Đã khôi phục thành công. Các tệp tin đã được lưu vào thư mục Documents và Downloads.</string>
     <string name="continue_button">Tiếp tục</string>
-    <string name="view_recovered_button">Xem ảnh đã khôi phục</string>
+    <string name="view_recovered_button">Xem video</string>
     
     <!-- Chuỗi mới cho màn hình cài đặt -->
     <string name="back">Quay lại</string>

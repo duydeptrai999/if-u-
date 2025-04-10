@@ -25,7 +25,7 @@
     <string name="files_found">%d files found</string>
     <string name="total_size">Total size</string>
     <string name="recovering_status">Đang khôi phục %d tệp...</string>
-    <string name="recovery_success_gallery">Đã khôi phục %1$d video, trong đó %2$d video đã được thêm vào thư viện</string>
+    <string name="recovery_success_gallery">Đã khôi phục thành công. Các video đã được lưu vào thư viện.</string>
     <string name="recovery_failed">Không thể khôi phục</string>
     <string name="permission_required">Cần quyền truy cập bộ nhớ để tiếp tục</string>
     <string name="select_items">Vui lòng chọn các tệp để khôi phục</string>
@@ -71,12 +71,12 @@
     <string name="deleted_indicator">ĐÃ XÓA</string>
     <string name="trash_folder_indicator">Thùng rác</string>
     <string name="recovery_message">Đây là ảnh đã bị xóa. Nhấn để khôi phục.</string>
-    <string name="file_recovery_success">Đã khôi phục %1$d file, trong đó %2$d file văn bản đã được lưu vào Documents và %3$d file đã được lưu vào Downloads</string>
+    <string name="file_recovery_success">Đã khôi phục thành công. Các tệp tin đã được lưu vào thư mục Documents và Downloads.</string>
     <string name="recovery_failed_description">Không thể khôi phục một số tệp đã chọn. Vui lòng thử lại sau.</string>
     <string name="recovery_in_progress">Đang khôi phục, vui lòng đợi...</string>
     <string name="recovery_progress_description">Ảnh đang được khôi phục, vui lòng đợi...</string>
     <string name="recovery_counting">%1$d/%2$d</string>
-    <string name="view_recovered_button">Xem ảnh đã khôi phục</string>
+    <string name="view_recovered_button">Xem ảnh </string>
     
     <!-- Recovered files screen strings -->
     <string name="recovered_files_title">Tệp tin đã được khôi phục</string>
