@@ -58,6 +58,8 @@ class PhotoRecoveryActivity : AppCompatActivity() {
     // Thêm các thành phần UI cho hiệu ứng quét
     private lateinit var scanningOverlay: FrameLayout
     private lateinit var scanningProgressBar: ProgressBar
+    private lateinit var scanningProgressText: TextView
+    private lateinit var scanningHorizontalProgressBar: ProgressBar
     private lateinit var scanIllustration: ImageView
     
     private val recoveredPhotos = mutableListOf<RecoverableItem>()
@@ -95,6 +97,8 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         // Khởi tạo các thành phần UI cho hiệu ứng quét
         scanningOverlay = findViewById(R.id.scanningOverlay)
         scanningProgressBar = findViewById(R.id.scanningProgressBar)
+        scanningProgressText = findViewById(R.id.scanningProgressText)
+        scanningHorizontalProgressBar = findViewById(R.id.scanningHorizontalProgressBar)
         scanIllustration = findViewById(R.id.scanIllustration)
     }
     
@@ -268,16 +272,18 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         Log.d("PhotoRecovery", "Bắt đầu quét ảnh...")
         println("PhotoRecovery: Bắt đầu quét ảnh...")
         
-        progressBar.visibility = View.VISIBLE
-        statusText.text = getString(R.string.scanning_status)
+        // Ẩn progressBar, không sử dụng nó
+        progressBar.visibility = View.GONE
+        // Không thay đổi statusText để tránh chồng lên UI
+        // statusText.text = getString(R.string.scanning_status)
         scanButton.isEnabled = false
         
-        // Thêm hiệu ứng nhấp nháy và rotating cho trạng thái quét
-        val blinkAnimation = AlphaAnimation(0.5f, 1.0f)
-        blinkAnimation.duration = 800
-        blinkAnimation.repeatMode = Animation.REVERSE
-        blinkAnimation.repeatCount = Animation.INFINITE
-        statusText.startAnimation(blinkAnimation)
+        // Không áp dụng hiệu ứng nhấp nháy cho statusText nữa
+        // val blinkAnimation = AlphaAnimation(0.5f, 1.0f)
+        // blinkAnimation.duration = 800
+        // blinkAnimation.repeatMode = Animation.REVERSE
+        // blinkAnimation.repeatCount = Animation.INFINITE
+        // statusText.startAnimation(blinkAnimation)
 
         // Thêm hiệu ứng xoay cho nút quét
         scanButton.animate()
@@ -373,7 +379,8 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                     Log.d("PhotoRecovery", "Quay lại thread UI để cập nhật giao diện")
                     progressBar.visibility = View.GONE
                     scanButton.isEnabled = true
-                    statusText.clearAnimation() // Dừng hiệu ứng nhấp nháy
+                    // Bỏ phần xóa animation của statusText vì chúng ta không sử dụng nó
+                    // statusText.clearAnimation()
                     hideScanAnimation()
                     
                     // Hiệu ứng hoàn thành
@@ -392,7 +399,8 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                     
                     if (recoveredPhotos.isEmpty()) {
                         Log.d("PhotoRecovery", "Không tìm thấy ảnh nào")
-                        statusText.text = getString(R.string.no_photos_found)
+                        // Không thay đổi text của statusText
+                        // statusText.text = getString(R.string.no_photos_found)
                         Toast.makeText(
                             this@PhotoRecoveryActivity,
                             "Không tìm thấy ảnh nào để khôi phục",
@@ -427,9 +435,10 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     progressBar.visibility = View.GONE
                     scanButton.isEnabled = true
-                    statusText.clearAnimation()
+                    // Không xóa animation hay thay đổi text cho statusText
+                    // statusText.clearAnimation()
+                    // statusText.text = getString(R.string.no_photos_found)
                     hideScanAnimation()
-                    statusText.text = getString(R.string.no_photos_found)
                     Toast.makeText(
                         this@PhotoRecoveryActivity,
                         "Đã xảy ra lỗi khi quét: ${e.message}",
@@ -466,19 +475,19 @@ class PhotoRecoveryActivity : AppCompatActivity() {
             .setDuration(300)
             .start()
             
-        // Hiệu ứng pulse cho status text
-        statusText.animate()
-            .scaleX(1.1f)
-            .scaleY(1.1f)
-            .setDuration(500)
-            .withEndAction {
-                statusText.animate()
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(500)
-                    .start()
-            }
-            .start()
+        // Bỏ phần hiệu ứng pulse cho status text
+        // statusText.animate()
+        //     .scaleX(1.1f)
+        //     .scaleY(1.1f)
+        //     .setDuration(500)
+        //     .withEndAction {
+        //         statusText.animate()
+        //             .scaleX(1f)
+        //             .scaleY(1f)
+        //             .setDuration(500)
+        //             .start()
+        //     }
+        //     .start()
     }
     
     // Ẩn animation quét
@@ -494,11 +503,22 @@ class PhotoRecoveryActivity : AppCompatActivity() {
     
     // Cập nhật trạng thái đang quét
     private fun updateScanStatus(message: String, progress: Int = -1) {
-        // Không cập nhật text vì đã xóa scanningProgressText
-        // Không cập nhật progress vì đã xóa scanningHorizontalProgressBar
+        scanningProgressText.text = message
         
-        // Cập nhật statusText để người dùng vẫn thấy thông tin
-        statusText.text = message
+        if (progress >= 0) {
+            scanningHorizontalProgressBar.progress = progress
+        }
+        
+        scanningProgressText.animate()
+            .alpha(0.7f)
+            .setDuration(200)
+            .withEndAction {
+                scanningProgressText.animate()
+                    .alpha(1f)
+                    .setDuration(200)
+                    .start()
+            }
+            .start()
     }
     
     // Hiển thị kết quả quét với animation
