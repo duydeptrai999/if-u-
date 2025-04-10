@@ -36,7 +36,6 @@
     <string name="view_results">Xem tất cả</string>
     <string name="select_to_recover">Chọn các tệp để khôi phục</string>
     <string name="preview_thumbnail">Preview thumbnail</string>
-    <string name="no_items_selected">Vui lòng chọn ít nhất một tệp</string>
     <string name="video_thumbnail">Video Thumbnail</string>
     <string name="tep_duoc_tim_thay">Tệp được tìm thấy</string>
     <string name="kich_thuoc">Kích thước</string>
@@ -94,6 +93,9 @@
     <string name="share_title">Chia sẻ qua</string>
     <string name="share_success">Đã chia sẻ thành công</string>
     <string name="share_error">Không thể chia sẻ tệp tin này</string>
+    <string name="selected_items_count">%d đã chọn</string>
+    <string name="select_all">Chọn tất cả</string>
+    <string name="no_items_selected">Vui lòng chọn ít nhất một file</string>
     
     <!-- New strings for recovery features -->
     <string name="settings_app_language">App Language</string>

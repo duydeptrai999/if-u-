@@ -45,6 +45,8 @@
 - Thêm FileViewerActivity để hiển thị ảnh và video trực tiếp trong ứng dụng khi không có ứng dụng bên ngoài phù hợp
 - Cải thiện xử lý lỗi khi mở file và thông báo chi tiết cho người dùng
 - Thêm tính năng chia sẻ ảnh và video từ màn hình xem file
+- Thêm chế độ chọn nhiều file trong màn hình danh sách file đã khôi phục
+- Thêm tính năng chia sẻ nhiều file cùng lúc từ màn hình danh sách file đã khôi phục
 
 ### Changed
 
@@ -58,6 +60,8 @@
 - Tích hợp cảnh báo chi phí trong quy trình tạo ảnh DALL-E để tránh chi phí không cần thiết
 - Cải thiện UX của các script DALL-E với giao diện dòng lệnh thân thiện và đầy màu sắc
 - Nâng cấp dalle-workflow.mdc với hướng dẫn chi tiết về tối ưu prompt cho từng loại ảnh
+- Cập nhật giao diện màn hình danh sách file đã khôi phục để hỗ trợ chế độ chọn nhiều
+- Cải thiện cách xử lý loại MIME khi chia sẻ file
 
 ### Deprecated
 
@@ -76,6 +80,9 @@
 - Sửa lỗi không thể mở file ảnh và video khi nhấn vào từ danh sách đã khôi phục
 - Cải thiện xác định MIME type để mở file với ứng dụng phù hợp hơn
 - Thêm phương pháp thay thế để xem file khi không thể mở bằng ứng dụng bên ngoài
+- Sửa lỗi ID không khớp trong RecoveredFilesDetailActivity (tvSelectedCount, ivShareSelected, ivCloseSelection)
+- Thêm nút đóng chế độ chọn trong thanh công cụ chọn nhiều
+- Sửa lỗi ClassCastException khi cố gắng ép kiểu MaterialButton thành ImageView cho shareSelectedButton
 
 ## [1.0.1] - 2024-03-23
 

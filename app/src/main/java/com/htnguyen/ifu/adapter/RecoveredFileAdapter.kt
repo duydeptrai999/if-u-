@@ -9,6 +9,7 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -30,6 +31,10 @@ class RecoveredFileAdapter(private var files: List<RecoveredFile>) :
     // Định dạng ngày giờ
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
     private val thumbnailCoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private var selectionMode = false
+    private var selectedItems = mutableSetOf<Int>()
+    private var itemClickListener: ((RecoveredFile) -> Unit)? = null
+    private var selectionChangeListener: ((Int) -> Unit)? = null
 
     /**
      * Cập nhật danh sách tệp tin và thông báo thay đổi
@@ -37,6 +42,50 @@ class RecoveredFileAdapter(private var files: List<RecoveredFile>) :
     fun updateFiles(newFiles: List<RecoveredFile>) {
         this.files = newFiles
         notifyDataSetChanged()
+    }
+
+    /**
+     * Chuyển đổi chế độ chọn nhiều
+     */
+    fun toggleSelectionMode(enabled: Boolean) {
+        if (!enabled) {
+            selectedItems.clear()
+        }
+        selectionMode = enabled
+        notifyDataSetChanged()
+    }
+
+    /**
+     * Kiểm tra xem có đang ở chế độ chọn nhiều không
+     */
+    fun isInSelectionMode(): Boolean = selectionMode
+
+    /**
+     * Đếm số lượng item đã chọn
+     */
+    fun getSelectedItemCount(): Int = selectedItems.size
+
+    /**
+     * Lấy danh sách file đã chọn
+     */
+    fun getSelectedFiles(): List<RecoveredFile> {
+        return selectedItems.mapNotNull { position ->
+            if (position >= 0 && position < files.size) files[position] else null
+        }
+    }
+
+    /**
+     * Đặt listener cho sự kiện click vào item
+     */
+    fun setOnItemClickListener(listener: (RecoveredFile) -> Unit) {
+        itemClickListener = listener
+    }
+
+    /**
+     * Đặt listener cho sự kiện thay đổi trạng thái chọn
+     */
+    fun setOnSelectionChangeListener(listener: (Int) -> Unit) {
+        selectionChangeListener = listener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileViewHolder {
@@ -47,7 +96,7 @@ class RecoveredFileAdapter(private var files: List<RecoveredFile>) :
 
     override fun onBindViewHolder(holder: FileViewHolder, position: Int) {
         val file = files[position]
-        holder.bind(file)
+        holder.bind(file, position)
     }
 
     override fun getItemCount(): Int = files.size
@@ -65,6 +114,7 @@ class RecoveredFileAdapter(private var files: List<RecoveredFile>) :
      * ViewHolder để hiển thị mỗi mục tệp tin
      */
     inner class FileViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val checkBox: CheckBox = itemView.findViewById(R.id.cbSelect)
         private val fileIcon: ImageView = itemView.findViewById(R.id.ivFileIcon)
         private val fileName: TextView = itemView.findViewById(R.id.tvFileName)
         private val fileDetails: TextView = itemView.findViewById(R.id.tvFileDetails)
@@ -74,13 +124,17 @@ class RecoveredFileAdapter(private var files: List<RecoveredFile>) :
         /**
          * Hiển thị thông tin tệp tin
          */
-        fun bind(file: RecoveredFile) {
+        fun bind(file: RecoveredFile, position: Int) {
             fileName.text = file.name
             
             // Định dạng thông tin chi tiết tệp (kích thước và ngày)
             val sizeFormatted = formatSize(file.size)
             val dateFormatted = dateFormat.format(file.modifiedDate)
             fileDetails.text = "$sizeFormatted • $dateFormatted"
+            
+            // Hiển thị/ẩn checkbox tùy thuộc vào chế độ chọn
+            checkBox.visibility = if (selectionMode) View.VISIBLE else View.GONE
+            checkBox.isChecked = selectedItems.contains(position)
             
             // Thiết lập biểu tượng tương ứng với loại tệp
             when {
@@ -98,10 +152,44 @@ class RecoveredFileAdapter(private var files: List<RecoveredFile>) :
                 }
             }
             
-            // Thiết lập sự kiện click để mở file
-            itemView.setOnClickListener {
-                openFile(file)
+            // Xử lý sự kiện khi nhấn vào checkbox
+            checkBox.setOnClickListener {
+                toggleSelection(position)
             }
+            
+            // Thiết lập sự kiện click để mở file hoặc chọn file
+            itemView.setOnClickListener {
+                if (selectionMode) {
+                    checkBox.isChecked = !checkBox.isChecked
+                    toggleSelection(position)
+                } else {
+                    itemClickListener?.invoke(file)
+                }
+            }
+            
+            // Thiết lập sự kiện long click để bắt đầu chế độ chọn nếu chưa có
+            itemView.setOnLongClickListener {
+                if (!selectionMode) {
+                    toggleSelection(position)
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+
+        /**
+         * Chọn hoặc bỏ chọn một item
+         */
+        private fun toggleSelection(position: Int) {
+            if (selectedItems.contains(position)) {
+                selectedItems.remove(position)
+            } else {
+                selectedItems.add(position)
+            }
+            
+            notifyItemChanged(position)
+            selectionChangeListener?.invoke(selectedItems.size)
         }
         
         /**
