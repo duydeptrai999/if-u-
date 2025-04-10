@@ -1133,7 +1133,7 @@ class FileRecoveryActivity : AppCompatActivity() {
         trashDirs.add(File("/storage/emulated/0/LOST.DIR"))
         trashDirs.add(File("/storage/emulated/0/RECYCLED"))
         trashDirs.add(File("/storage/emulated/0/RECYCLER"))
-        trashDirs.add(File("/storage/emulated/0/$RECYCLE.BIN"))
+        trashDirs.add(File("/storage/emulated/0/RECYCLE.BIN"))
         
         // Thư mục thùng rác Google Files
         val googleFilesDir = File("/storage/emulated/0/Android/data/com.google.android.apps.nbu.files/files/trash")
@@ -1180,32 +1180,6 @@ class FileRecoveryActivity : AppCompatActivity() {
     /**
      * Scan all potential locations for deleted files
      */
-    private fun scanAllPotentialLocations() {
-        try {
-            scanExternalStorage()
-            scanDownloadsDirectory()
-            scanDocumentsDirectory()
-            scanAndroidDataDirectory()
-            scanOldTrashDirectories() // Thêm quét thư mục rác cũ
-            
-            binding.progressBar.visibility = View.GONE
-            binding.tvProgress.visibility = View.GONE
-            
-            if (filesFound.isEmpty()) {
-                binding.tvNoFilesFound.visibility = View.VISIBLE
-                binding.rvFiles.visibility = View.GONE
-            } else {
-                binding.tvNoFilesFound.visibility = View.GONE
-                binding.rvFiles.visibility = View.VISIBLE
-                filesAdapter.updateFiles(filesFound)
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error scanning for deleted files", e)
-            binding.progressBar.visibility = View.GONE
-            binding.tvProgress.visibility = View.GONE
-            Toast.makeText(this, getString(R.string.error_scanning_files), Toast.LENGTH_SHORT).show()
-        }
-    }
 
     /**
      * Quét thư mục đệ quy để tìm các file trong thư mục thùng rác
