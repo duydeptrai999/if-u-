@@ -61,6 +61,7 @@
 ### Fixed
 - Sửa lỗi các phần tử UI trong màn hình quét (chữ "Đang quét" và thanh tiến trình) bị chồng lên nút "QUÉT" bằng cách thêm khoảng cách 100dp phía trên
 - Xóa hiệu ứng và text "Đang quét..." của statusText bị đè lên nút QUÉT trong quá trình quét
+- Ẩn dòng text "Nhấn để quét ảnh" bị chồng lên nút QUÉT
 
 ## [1.0.1] - 2024-03-23
 
