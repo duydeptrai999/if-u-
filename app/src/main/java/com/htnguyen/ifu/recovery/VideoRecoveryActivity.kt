@@ -1017,11 +1017,10 @@ class VideoRecoveryActivity : AppCompatActivity() {
      */
     private fun recoverToGallery(sourceFile: File, recoveredFileName: String): Boolean {
         try {
-            // Khôi phục vào cả hai thư mục Movies và DCIM để tăng khả năng hiển thị trong ứng dụng video
+            // Chỉ khôi phục vào thư mục Movies/Camera (không tạo nhiều bản sao)
             val moviesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
-            val dcimDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
-            
             val cameraDir = File(moviesDir, "Camera")
+            
             if (!cameraDir.exists()) {
                 cameraDir.mkdirs()
             }
@@ -1042,6 +1041,7 @@ class VideoRecoveryActivity : AppCompatActivity() {
             
             // Thêm thông tin về video vào MediaStore để hiển thị trong thư viện
             val values = ContentValues().apply {
+                // Metadata cần thiết để video hiển thị trong các ứng dụng khác nhau
                 put(android.provider.MediaStore.Video.Media.DISPLAY_NAME, recoveredFileName)
                 put(android.provider.MediaStore.Video.Media.TITLE, recoveredFileName.substringBeforeLast('.'))
                 put(android.provider.MediaStore.Video.Media.MIME_TYPE, mimeType)
@@ -1051,93 +1051,37 @@ class VideoRecoveryActivity : AppCompatActivity() {
                 put(android.provider.MediaStore.Video.Media.SIZE, recoveredFile.length())
                 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    // Android 10 trở lên sử dụng RELATIVE_PATH
                     put(android.provider.MediaStore.Video.Media.RELATIVE_PATH, "Movies/Camera")
                     put(android.provider.MediaStore.Video.Media.IS_PENDING, 0)
                 } else {
+                    // Android 9 trở xuống sử dụng DATA
                     put(android.provider.MediaStore.Video.Media.DATA, recoveredFile.absolutePath)
                 }
             }
             
-            // Thêm video vào bộ sưu tập
+            // Thêm video vào MediaStore
             val uri = contentResolver.insert(android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values)
             
-            // Trên Android 10 trở lên, thêm một bản sao vào DCIM để đảm bảo hiển thị trong các ứng dụng khác nhau
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                try {
-                    val dcimValues = ContentValues().apply {
-                        put(android.provider.MediaStore.Video.Media.DISPLAY_NAME, recoveredFileName)
-                        put(android.provider.MediaStore.Video.Media.TITLE, recoveredFileName.substringBeforeLast('.'))
-                        put(android.provider.MediaStore.Video.Media.MIME_TYPE, mimeType)
-                        put(android.provider.MediaStore.Video.Media.DATE_ADDED, currentTime / 1000)
-                        put(android.provider.MediaStore.Video.Media.DATE_MODIFIED, currentTime / 1000)
-                        put(android.provider.MediaStore.Video.Media.DATE_TAKEN, currentTime)
-                        put(android.provider.MediaStore.Video.Media.SIZE, recoveredFile.length())
-                        put(android.provider.MediaStore.Video.Media.RELATIVE_PATH, "DCIM/Camera")
-                        put(android.provider.MediaStore.Video.Media.IS_PENDING, 0)
-                    }
-                    
-                    // Sử dụng URI mới để tránh trùng lặp với bản Movies/Camera
-                    val dcimUri = contentResolver.insert(android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI, dcimValues)
-                    if (dcimUri != null) {
-                        contentResolver.openOutputStream(dcimUri)?.use { output ->
-                            FileInputStream(recoveredFile).use { input ->
-                                input.copyTo(output)
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e("VideoRecovery", "Lỗi khi tạo bản sao trong DCIM: ${e.message}")
-                    // Tiếp tục với một bản sao trong Movies đã thành công
-                }
-            } else {
-                // Với Android 9 trở xuống, thử tạo bản sao trong DCIM theo cách thủ công
-                try {
-                    val dcimCameraDir = File(dcimDir, "Camera")
-                    if (!dcimCameraDir.exists()) {
-                        dcimCameraDir.mkdirs()
-                    }
-                    
-                    val dcimFile = File(dcimCameraDir, recoveredFileName)
-                    if (!dcimFile.exists()) {
-                        FileInputStream(recoveredFile).use { input ->
-                            FileOutputStream(dcimFile).use { output ->
-                                input.copyTo(output)
-                            }
-                        }
-                        
-                        // Thêm thông tin về video trong DCIM vào MediaStore
-                        val dcimValues = ContentValues().apply {
-                            put(android.provider.MediaStore.Video.Media.DISPLAY_NAME, recoveredFileName)
-                            put(android.provider.MediaStore.Video.Media.TITLE, recoveredFileName.substringBeforeLast('.'))
-                            put(android.provider.MediaStore.Video.Media.MIME_TYPE, mimeType)
-                            put(android.provider.MediaStore.Video.Media.DATE_ADDED, currentTime / 1000)
-                            put(android.provider.MediaStore.Video.Media.DATE_MODIFIED, currentTime / 1000)
-                            put(android.provider.MediaStore.Video.Media.DATE_TAKEN, currentTime)
-                            put(android.provider.MediaStore.Video.Media.SIZE, dcimFile.length())
-                            put(android.provider.MediaStore.Video.Media.DATA, dcimFile.absolutePath)
-                        }
-                        
-                        contentResolver.insert(android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI, dcimValues)
-                    }
-                } catch (e: Exception) {
-                    Log.e("VideoRecovery", "Lỗi khi tạo bản sao trong DCIM: ${e.message}")
-                    // Tiếp tục với bản sao trong Movies đã thành công
-                }
-            }
-            
-            // Thông báo hệ thống quét media mới
+            // Thông báo hệ thống quét media mới cho Android 9 trở xuống
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                 val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
                 mediaScanIntent.data = android.net.Uri.fromFile(recoveredFile)
                 sendBroadcast(mediaScanIntent)
                 
-                // Quét cả file DCIM nếu có
-                val dcimCameraDir = File(dcimDir, "Camera")
-                val dcimFile = File(dcimCameraDir, recoveredFileName)
-                if (dcimFile.exists()) {
-                    val dcimScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-                    dcimScanIntent.data = android.net.Uri.fromFile(dcimFile)
-                    sendBroadcast(dcimScanIntent)
+                // Cho Android 9 trở xuống, cập nhật MediaStore để video xuất hiện trong các ứng dụng khác
+                // mà không cần tạo nhiều bản sao
+                try {
+                    // Scan video để cập nhật MediaStore
+                    android.media.MediaScannerConnection.scanFile(
+                        applicationContext,
+                        arrayOf(recoveredFile.absolutePath),
+                        arrayOf(mimeType)
+                    ) { _, _ ->
+                        Log.d("VideoRecovery", "Media scan hoàn tất để cập nhật MediaStore")
+                    }
+                } catch (e: Exception) {
+                    Log.e("VideoRecovery", "Lỗi khi quét file với MediaScannerConnection: ${e.message}")
                 }
             }
             
