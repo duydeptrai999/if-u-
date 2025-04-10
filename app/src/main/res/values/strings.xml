@@ -94,7 +94,7 @@
     <string name="recovering_files">Recovering files…</string>
     <string name="recovering_count">%1$d / %2$d</string>
     <string name="recovery_success">Recovery Success</string>
-    <string name="recovery_success_description">We\'ve recovered %d files. %d files were saved to gallery.</string>
+    <string name="recovery_success_description">Đã khôi phục thành công. Các ảnh đã được lưu vào thư viện.</string>
     <string name="continue_button">Continue</string>
     <string name="view_recovered_files">View Recovered Files</string>
     <string name="scanning_in_progress">Đang quét, vui lòng đợi...</string>
