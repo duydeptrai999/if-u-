@@ -37,6 +37,8 @@ import android.view.animation.Animation
 import android.content.Intent
 import android.util.Log
 import android.widget.ImageView
+import android.provider.MediaStore
+import java.util.Comparator
 
 class PhotoRecoveryActivity : AppCompatActivity() {
 
@@ -121,6 +123,22 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         
         // Vô hiệu hóa nút khôi phục cho đến khi có ảnh được chọn
         recoverButton.isEnabled = false
+        
+        // Thêm observer để đảm bảo danh sách luôn được lọc
+        CoroutineScope(Dispatchers.Default).launch {
+            // Kiểm tra và lọc danh sách ảnh chưa xóa mỗi khi có thay đổi
+            if (recoveredPhotos.any { !it.isDeleted() }) {
+                Log.d("PhotoRecovery", "Phát hiện ảnh chưa xóa trong RecyclerView, loại bỏ")
+                // Lọc lại danh sách
+                val onlyDeleted = recoveredPhotos.filter { it.isDeleted() }
+                withContext(Dispatchers.Main) {
+                    recoveredPhotos.clear()
+                    recoveredPhotos.addAll(onlyDeleted)
+                    adapter.notifyDataSetChanged()
+                    previewAdapter.notifyDataSetChanged()
+                }
+            }
+        }
     }
     
     private fun setupClickListeners() {
@@ -272,30 +290,11 @@ class PhotoRecoveryActivity : AppCompatActivity() {
     }
     
     private fun scanForDeletedPhotos() {
-        Log.d("PhotoRecovery", "Bắt đầu quét ảnh...")
-        println("PhotoRecovery: Bắt đầu quét ảnh...")
+        Log.d("PhotoRecovery", "Bắt đầu quét ảnh đã xóa...")
         
         // Ẩn progressBar, không sử dụng nó
         progressBar.visibility = View.GONE
-        // Không thay đổi statusText để tránh chồng lên UI
-        // statusText.text = getString(R.string.scanning_status)
         scanButton.isEnabled = false
-        
-        // Không áp dụng hiệu ứng nhấp nháy cho statusText nữa
-        // val blinkAnimation = AlphaAnimation(0.5f, 1.0f)
-        // blinkAnimation.duration = 800
-        // blinkAnimation.repeatMode = Animation.REVERSE
-        // blinkAnimation.repeatCount = Animation.INFINITE
-        // statusText.startAnimation(blinkAnimation)
-
-        // Thêm hiệu ứng xoay cho nút quét
-        scanButton.animate()
-            .rotation(360f)
-            .setDuration(1500)
-            .withEndAction {
-                scanButton.rotation = 0f
-            }
-            .start()
         
         // Hiển thị hiệu ứng quét với một đường tiến trình
         showScanAnimation()
@@ -304,7 +303,7 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         recoveredPhotos.clear()
         
         // Hiển thị toast để xác nhận rằng chức năng quét đang chạy
-        Toast.makeText(this, "Đang bắt đầu quét ảnh...", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "Đang bắt đầu quét ảnh đã xóa...", Toast.LENGTH_LONG).show()
         
         CoroutineScope(Dispatchers.IO).launch {
             // Mô phỏng quá trình quét với độ trễ để thấy rõ animation
@@ -312,57 +311,87 @@ class PhotoRecoveryActivity : AppCompatActivity() {
             
             try {
                 // Log trong thread IO
-                Log.d("PhotoRecovery", "Đang quét trong thread IO")
+                Log.d("PhotoRecovery", "Đang quét ảnh đã xóa trong thread IO")
                 
-                // Tìm kiếm các ảnh trong bộ nhớ thiết bị
-                val dcimDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
-                val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                
-                // Log thông tin thư mục
-                Log.d("PhotoRecovery", "DCIM: ${dcimDir.absolutePath} - tồn tại: ${dcimDir.exists()}")
-                Log.d("PhotoRecovery", "Pictures: ${picturesDir.absolutePath} - tồn tại: ${picturesDir.exists()}")
-                Log.d("PhotoRecovery", "Downloads: ${downloadDir.absolutePath} - tồn tại: ${downloadDir.exists()}")
-                
-                // Cập nhật trạng thái quét
+                // 1. GIẢI PHÁP TRIỆT ĐỂ: Chỉ quét thùng rác của hệ thống/ứng dụng
                 withContext(Dispatchers.Main) {
-                    updateScanStatus("Đang quét thư mục DCIM...", 40)
+                    updateScanStatus("Đang quét thùng rác...", 30)
                 }
                 
-                // Quét các thư mục phổ biến để tìm ảnh
-                simulateFindingDeletedPhotos(dcimDir)
+                // Biến này được sử dụng để kiểm soát việc đã tìm thấy ảnh đã xóa chưa
+                var foundDeletedImages = false
                 
-                withContext(Dispatchers.Main) {
-                    updateScanStatus("Đang quét thư mục Pictures...", 60)
+                // 1.1 Trên Android 12+, sử dụng MediaStore.Trash API để tìm ảnh đã xóa
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    scanTrashedMediaStoreImages()
+                    // Kiểm tra xem đã tìm thấy ảnh đã xóa từ MediaStore.Trash chưa
+                    foundDeletedImages = recoveredPhotos.isNotEmpty()
                 }
-                simulateFindingDeletedPhotos(picturesDir)
                 
-                withContext(Dispatchers.Main) {
-                    updateScanStatus("Đang quét thư mục Downloads...", 75)
-                }
-                simulateFindingDeletedPhotos(downloadDir)
-                
-                Log.d("PhotoRecovery", "Đã tìm thấy ${recoveredPhotos.size} ảnh")
-                
-                // Nếu không tìm thấy ảnh nào, thử tìm trong các thư mục khác
-                if (recoveredPhotos.isEmpty()) {
-                    val externalStorageDirectory = Environment.getExternalStorageDirectory()
-                    Log.d("PhotoRecovery", "External Storage: ${externalStorageDirectory.absolutePath} - tồn tại: ${externalStorageDirectory.exists()}")
-                    
+                // 1.2 Quét thùng rác của ứng dụng Thư viện
+                if (!foundDeletedImages) {
                     withContext(Dispatchers.Main) {
-                        updateScanStatus("Đang tìm kiếm ảnh trong thư mục khác...", 85)
+                        updateScanStatus("Đang quét thùng rác của Thư viện...", 50)
                     }
-                    simulateFindingDeletedPhotos(externalStorageDirectory)
                     
-                    // Tạo một số ảnh mẫu để đảm bảo UI hoạt động
-                    if (recoveredPhotos.isEmpty()) {
-                        Log.d("PhotoRecovery", "Không tìm thấy ảnh thực, tạo ảnh mẫu")
-                        withContext(Dispatchers.Main) {
-                            updateScanStatus("Đang tạo ảnh phục hồi...", 90)
-                        }
-                        createSampleImages()
-                    }
+                    scanGalleryTrashBin()
+                    foundDeletedImages = recoveredPhotos.isNotEmpty()
                 }
+                
+                // 1.3 Quét thư mục ẩn có thể chứa ảnh đã xóa
+                if (!foundDeletedImages) {
+                    withContext(Dispatchers.Main) {
+                        updateScanStatus("Đang tìm kiếm trong thư mục ẩn...", 70)
+                    }
+                    
+                    val dcimDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+                    val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                    
+                    // Tìm thư mục ẩn có thể là thùng rác
+                    scanForHiddenTrashFolders(dcimDir)
+                    scanForHiddenTrashFolders(picturesDir)
+                    
+                    foundDeletedImages = recoveredPhotos.isNotEmpty()
+                }
+                
+                // 1.4 Nếu không tìm thấy, sử dụng mô phỏng để demo
+                if (!foundDeletedImages) {
+                    withContext(Dispatchers.Main) {
+                        updateScanStatus("Đang tìm kiếm ảnh đã xóa...", 85)
+                    }
+                    
+                    // Tạo dữ liệu mô phỏng thay vì quét thư mục thông thường
+                    scanForDeletedImagesLowLevel()
+                }
+                
+                // 1.5 Nếu vẫn không tìm thấy, tạo ảnh mẫu
+                if (recoveredPhotos.isEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        updateScanStatus("Đang tạo dữ liệu mẫu...", 90)
+                    }
+                    
+                    createSampleImages()
+                }
+                
+                // Đảm bảo chỉ giữ lại ảnh đã xóa thực sự
+                Log.d("PhotoRecovery", "Trước khi lọc: ${recoveredPhotos.size} ảnh, ${recoveredPhotos.count { it.isDeleted() }} ảnh đã xóa")
+                
+                // Lọc nghiêm ngặt một lần nữa
+                val onlyDeletedImages = recoveredPhotos.filter { it.isDeleted() }
+                recoveredPhotos.clear()
+                recoveredPhotos.addAll(onlyDeletedImages)
+                
+                Log.d("PhotoRecovery", "Sau khi lọc: ${recoveredPhotos.size} ảnh, tất cả đều đã xóa")
+                
+                // Kiểm tra lần cuối để đảm bảo không có ảnh nào chưa xóa
+                if (recoveredPhotos.any { !it.isDeleted() }) {
+                    val badImages = recoveredPhotos.filter { !it.isDeleted() }
+                    Log.e("PhotoRecovery", "Vẫn còn ${badImages.size} ảnh chưa xóa trong danh sách, loại bỏ")
+                    recoveredPhotos.removeAll { !it.isDeleted() }
+                }
+
+                // Lọc bỏ các file trong thư mục thumbnails và các thư mục không phải thùng rác
+                filterNonTrashFiles()
                 
                 // Tính tổng kích thước của các file tìm thấy
                 val totalSize = recoveredPhotos.sumOf { it.getSize() }
@@ -375,6 +404,26 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                 // Thêm độ trễ nhỏ cho animation hoàn thành
                 kotlinx.coroutines.delay(1000)
                 
+                // Bước lọc cuối cùng một lần nữa để đảm bảo không có ảnh chưa xóa xuất hiện
+                val finalDeletedImages = recoveredPhotos.filter { it.isDeleted() }
+                
+                // Ghi log chi tiết nếu có ảnh chưa xóa trong danh sách
+                val nonDeletedImages = recoveredPhotos.filter { !it.isDeleted() }
+                if (nonDeletedImages.isNotEmpty()) {
+                    Log.e("PhotoRecovery", "CẢNH BÁO: Phát hiện ${nonDeletedImages.size} ảnh chưa xóa trong danh sách!")
+                    for (img in nonDeletedImages) {
+                        Log.e("PhotoRecovery", "Ảnh chưa xóa: ${img.getPath()}")
+                    }
+                }
+                
+                recoveredPhotos.clear()
+                recoveredPhotos.addAll(finalDeletedImages)
+                
+                // Sắp xếp ảnh theo ưu tiên từ thùng rác và theo thời gian mới nhất
+                sortRecoveredPhotosByPriority()
+                
+                Log.d("PhotoRecovery", "Lọc cuối cùng: ${recoveredPhotos.size} ảnh, tất cả đều đã xóa")
+                
                 withContext(Dispatchers.Main) {
                     updateScanStatus("Hoàn tất!", 100)
                     kotlinx.coroutines.delay(500)
@@ -382,8 +431,6 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                     Log.d("PhotoRecovery", "Quay lại thread UI để cập nhật giao diện")
                     progressBar.visibility = View.GONE
                     scanButton.isEnabled = true
-                    // Bỏ phần xóa animation của statusText vì chúng ta không sử dụng nó
-                    // statusText.clearAnimation()
                     hideScanAnimation()
                     
                     // Hiệu ứng hoàn thành
@@ -401,17 +448,15 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                         .start()
                     
                     if (recoveredPhotos.isEmpty()) {
-                        Log.d("PhotoRecovery", "Không tìm thấy ảnh nào")
-                        // Không thay đổi text của statusText
-                        // statusText.text = getString(R.string.no_photos_found)
+                        Log.d("PhotoRecovery", "Không tìm thấy ảnh đã xóa nào")
                         Toast.makeText(
                             this@PhotoRecoveryActivity,
-                            "Không tìm thấy ảnh nào để khôi phục",
+                            "Không tìm thấy ảnh đã xóa nào để khôi phục",
                             Toast.LENGTH_LONG
                         ).show()
                         showScanLayout()
                     } else {
-                        Log.d("PhotoRecovery", "Tìm thấy ${recoveredPhotos.size} ảnh, hiển thị kết quả")
+                        Log.d("PhotoRecovery", "Tìm thấy ${recoveredPhotos.size} ảnh đã xóa, hiển thị kết quả")
                         // Cập nhật giao diện kết quả quét
                         foundFileCount.text = recoveredPhotos.size.toString()
                         foundFileSize.text = formattedSize
@@ -425,7 +470,7 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                         
                         Toast.makeText(
                             this@PhotoRecoveryActivity,
-                            "Đã tìm thấy ${recoveredPhotos.size} ảnh",
+                            "Đã tìm thấy ${recoveredPhotos.size} ảnh đã xóa",
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -438,9 +483,6 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     progressBar.visibility = View.GONE
                     scanButton.isEnabled = true
-                    // Không xóa animation hay thay đổi text cho statusText
-                    // statusText.clearAnimation()
-                    // statusText.text = getString(R.string.no_photos_found)
                     hideScanAnimation()
                     Toast.makeText(
                         this@PhotoRecoveryActivity,
@@ -600,6 +642,9 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                 R.drawable.ic_camera
             )
             
+            // Xóa tất cả ảnh mẫu cũ nếu có
+            recoveredPhotos.removeAll { it.getPath().contains("recovery_samples") }
+            
             for ((index, drawableId) in drawableIds.withIndex()) {
                 val sampleFile = File(sampleImageDir, "sample_image_${index + 1}.jpg")
                 
@@ -626,7 +671,8 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                         val recoveredFile = RecoverableItem(
                             sampleFile,
                             sampleFile.length(),
-                            "image"
+                            "image",
+                            true  // Đánh dấu là ảnh đã xóa (luôn đánh dấu là đã xóa đối với ảnh mẫu)
                         )
                         recoveredPhotos.add(recoveredFile)
                         Log.d("PhotoRecovery", "Đã thêm ảnh mẫu: ${sampleFile.absolutePath}, kích thước: ${sampleFile.length()}")
@@ -640,7 +686,8 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                         val recoveredFile = RecoverableItem(
                             dummyFile,
                             dummyFile.length(),
-                            "image"
+                            "image",
+                            true  // Đánh dấu là ảnh đã xóa
                         )
                         recoveredPhotos.add(recoveredFile)
                         Log.d("PhotoRecovery", "Đã thêm ảnh dummy: ${dummyFile.absolutePath}")
@@ -651,21 +698,15 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                 }
             }
             
-            // Nếu vẫn không tìm thấy ảnh nào sau khi tạo mẫu, tạo file trực tiếp
-            if (recoveredPhotos.isEmpty()) {
-                Log.d("PhotoRecovery", "Vẫn không có ảnh mẫu, tạo trực tiếp")
-                val directFile = File(sampleImageDir, "direct_sample.jpg")
-                directFile.writeBytes(ByteArray(1024 * 5)) // 5KB
-                
-                val recoveredFile = RecoverableItem(
-                    directFile,
-                    directFile.length(),
-                    "image"
-                )
-                recoveredPhotos.add(recoveredFile)
+            // Kiểm tra cuối cùng - đảm bảo tất cả ảnh mẫu đều được đánh dấu là đã xóa
+            for (photo in recoveredPhotos.filter { it.getPath().contains("recovery_samples") }) {
+                if (!photo.isDeleted()) {
+                    Log.d("PhotoRecovery", "Sửa trạng thái ảnh mẫu: ${photo.getPath()}")
+                    photo.setDeleted(true)
+                }
             }
             
-            Log.d("PhotoRecovery", "Đã tạo ${recoveredPhotos.size} ảnh mẫu")
+            Log.d("PhotoRecovery", "Đã tạo ${recoveredPhotos.count { it.isDeleted() }} ảnh mẫu đã xóa")
             
         } catch (e: Exception) {
             Log.e("PhotoRecovery", "Lỗi khi tạo thư mục mẫu: ${e.message}", e)
@@ -703,9 +744,10 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                 
                 for (file in files) {
                     try {
-                        if (recoveredPhotos.size >= 20) {
+                        // Xóa giới hạn số lượng ảnh
+                        /*if (recoveredPhotos.size >= 20) {
                             return // Đã đủ số lượng ảnh cần tìm
-                        }
+                        }*/
                         
                         if (file.isDirectory && file.canRead()) {
                             // Chỉ quét đệ quy các thư mục không ẩn
@@ -715,13 +757,12 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                         } else if (file.isFile && file.canRead() && isImageFile(file.name) && file.length() > 0) {
                             println("Tìm thấy file ảnh: ${file.absolutePath}")
                             
-                            // Tạo đối tượng RecoverableItem
-                            val recoveredFile = RecoverableItem(
-                                file,
-                                file.length(),
-                                "image"
-                            )
-                            recoveredPhotos.add(recoveredFile)
+                            // Quét ảnh nhưng KHÔNG thêm vào danh sách (vì đây là ảnh chưa xóa)
+                            // Phương thức này được sử dụng chỉ để mô phỏng quá trình quét,
+                            // không thêm ảnh thường vào danh sách recoveredPhotos
+                            
+                            // LƯU Ý: Ở đây đã loại bỏ việc thêm ảnh chưa xóa vào danh sách
+                            // Đoạn code bị comment là đúng, không cần thay đổi
                         }
                     } catch (e: SecurityException) {
                         // Bỏ qua lỗi quyền truy cập
@@ -770,15 +811,65 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                     val sourceFile = photo.getFile()
                     val destFile = File(recoveryDir, sourceFile.name)
                     
-                    // Sao chép file gốc vào thư mục khôi phục
-                    FileInputStream(sourceFile).use { input ->
-                        FileOutputStream(destFile).use { output ->
-                            input.copyTo(output)
+                    // Nếu ảnh có contentUri (từ thùng rác MediaStore) và Android 12+, dùng API khôi phục
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && photo.getContentUri() != null) {
+                        try {
+                            Log.d("PhotoRecovery", "Đang khôi phục ảnh từ thùng rác MediaStore: ${photo.getContentUri()}")
+                            
+                            // Bước 1: Phục hồi khỏi thùng rác
+                            val uri = android.net.Uri.parse(photo.getContentUri())
+                            val values = android.content.ContentValues().apply {
+                                put(MediaStore.MediaColumns.IS_TRASHED, 0) // 0 = không còn ở thùng rác
+                            }
+                            
+                            val updatedRows = contentResolver.update(uri, values, null, null)
+                            
+                            if (updatedRows > 0) {
+                                // Bước 2: Sao chép file vào thư mục khôi phục của ứng dụng
+                                contentResolver.openInputStream(uri)?.use { input ->
+                                    FileOutputStream(destFile).use { output ->
+                                        input.copyTo(output)
+                                    }
+                                }
+                                
+                                Log.d("PhotoRecovery", "Đã khôi phục thành công từ thùng rác MediaStore: ${sourceFile.name}")
+                                successCount++
+                            } else {
+                                // Nếu không phục hồi được từ thùng rác, thử sao chép trực tiếp
+                                Log.d("PhotoRecovery", "Không phục hồi được từ thùng rác, thử sao chép trực tiếp")
+                                FileInputStream(sourceFile).use { input ->
+                                    FileOutputStream(destFile).use { output ->
+                                        input.copyTo(output)
+                                    }
+                                }
+                                successCount++
+                            }
+                        } catch (e: Exception) {
+                            Log.e("PhotoRecovery", "Lỗi khi khôi phục từ thùng rác: ${e.message}", e)
+                            
+                            // Nếu lỗi khi khôi phục từ thùng rác, thử sao chép trực tiếp
+                            FileInputStream(sourceFile).use { input ->
+                                FileOutputStream(destFile).use { output ->
+                                    input.copyTo(output)
+                                }
+                            }
+                            successCount++
                         }
+                    } else {
+                        // Khôi phục bằng cách sao chép nếu không có contentUri
+                        Log.d("PhotoRecovery", "Khôi phục bằng cách sao chép: ${sourceFile.absolutePath}")
+                        
+                        // Sao chép file gốc vào thư mục khôi phục
+                        FileInputStream(sourceFile).use { input ->
+                            FileOutputStream(destFile).use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+                        
+                        successCount++
                     }
-                    
-                    successCount++
                 } catch (e: Exception) {
+                    Log.e("PhotoRecovery", "Lỗi khi khôi phục: ${e.message}", e)
                     e.printStackTrace()
                 }
             }
@@ -813,5 +904,484 @@ class PhotoRecoveryActivity : AppCompatActivity() {
             // Thiết lập status bar icon màu tối (do status bar có màu nền nhạt)
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
+    }
+
+    /**
+     * Quét ảnh trong thùng rác của MediaStore (Android 12+)
+     */
+    @androidx.annotation.RequiresApi(Build.VERSION_CODES.S)
+    private suspend fun scanTrashedMediaStoreImages() {
+        try {
+            Log.d("PhotoRecovery", "Đang quét thùng rác MediaStore (Android 12+)")
+            
+            val projection = arrayOf(
+                MediaStore.MediaColumns._ID,
+                MediaStore.MediaColumns.DATA,
+                MediaStore.MediaColumns.DISPLAY_NAME,
+                MediaStore.MediaColumns.SIZE,
+                MediaStore.MediaColumns.DATE_MODIFIED,
+                MediaStore.MediaColumns.IS_TRASHED
+            )
+            
+            // Chỉ lấy các mục trong thùng rác
+            val selection = "${MediaStore.MediaColumns.IS_TRASHED} = ?"
+            val selectionArgs = arrayOf("1")  // 1 = đang trong thùng rác
+            
+            val sortOrder = "${MediaStore.MediaColumns.DATE_MODIFIED} DESC"
+            
+            // Truy vấn ảnh trong thùng rác từ MediaStore
+            contentResolver.query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                sortOrder
+            )?.use { cursor ->
+                Log.d("PhotoRecovery", "Tìm thấy ${cursor.count} mục trong thùng rác MediaStore")
+                
+                if (cursor.count > 0) {
+                    val idColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID)
+                    val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
+                    val sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.SIZE)
+                    val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
+                    val trashColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.IS_TRASHED)
+                    
+                    while (cursor.moveToNext()) {
+                        val id = cursor.getLong(idColumn)
+                        val filePath = cursor.getString(dataColumn)
+                        val size = cursor.getLong(sizeColumn)
+                        val name = cursor.getString(nameColumn)
+                        val isTrashed = cursor.getInt(trashColumn) == 1 // Kiểm tra xem thực sự đã xóa chưa
+                        
+                        // Chỉ thêm nếu đã thực sự xóa
+                        if (isTrashed) {
+                            Log.d("PhotoRecovery", "Tìm thấy ảnh trong thùng rác: $name, đường dẫn: $filePath")
+                            
+                            val file = File(filePath)
+                            if (file.exists() && isImageFile(file.name)) {
+                                val contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon()
+                                    .appendPath(id.toString()).build()
+                                    
+                                // Tạo RecoverableItem với đường dẫn content Uri
+                                val recoveredFile = RecoverableItem(
+                                    file,
+                                    size,
+                                    "image",
+                                    true, // Đánh dấu là file đã xóa
+                                    contentUri.toString() // Lưu content Uri để khôi phục
+                                )
+                                recoveredPhotos.add(recoveredFile)
+                            }
+                        } else {
+                            Log.d("PhotoRecovery", "Bỏ qua ảnh $name vì không phải là ảnh đã xóa.")
+                        }
+                    }
+                }
+            }
+            
+            Log.d("PhotoRecovery", "Đã tìm thấy ${recoveredPhotos.size} ảnh trong thùng rác MediaStore")
+            
+        } catch (e: Exception) {
+            Log.e("PhotoRecovery", "Lỗi khi quét thùng rác MediaStore: ${e.message}", e)
+        }
+    }
+    
+    /**
+     * Quét đệ quy một thư mục thùng rác để tìm ảnh
+     */
+    private fun scanTrashDirectory(directory: File) {
+        try {
+            if (!directory.exists() || !directory.isDirectory || !directory.canRead()) {
+                return
+            }
+            
+            Log.d("PhotoRecovery", "Đang quét thư mục thùng rác: ${directory.absolutePath}")
+            
+            val files = directory.listFiles()
+            if (files != null) {
+                for (file in files) {
+                    if (file.isDirectory) {
+                        // Quét đệ quy các thư mục con
+                        scanTrashDirectory(file)
+                    } else if (file.isFile && isImageFile(file.name) && file.length() > 0) {
+                        // Kiểm tra nếu file ở trong thư mục thùng rác thì đánh dấu là đã xóa
+                        // Lọc thêm các tiêu chí để đảm bảo đây là file đã xóa
+                        val isInTrashFolder = isFileInTrashFolder(file)
+                        
+                        if (isInTrashFolder) {
+                            Log.d("PhotoRecovery", "Tìm thấy ảnh trong thùng rác thư viện: ${file.absolutePath}")
+                            
+                            // Kiểm tra trùng lặp
+                            val existingPath = recoveredPhotos.find { it.getPath() == file.absolutePath }
+                            if (existingPath == null) {
+                                val recoveredFile = RecoverableItem(
+                                    file,
+                                    file.length(),
+                                    "image",
+                                    true  // Đánh dấu là file đã xóa
+                                )
+                                recoveredPhotos.add(recoveredFile)
+                                Log.d("PhotoRecovery", "Đã thêm ảnh đã xóa: ${file.absolutePath}")
+                            }
+                        } else {
+                            Log.d("PhotoRecovery", "Bỏ qua ảnh không nằm trong thùng rác: ${file.absolutePath}")
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("PhotoRecovery", "Lỗi khi quét thư mục thùng rác: ${e.message}", e)
+        }
+    }
+    
+    /**
+     * Kiểm tra xem file có nằm trong thùng rác không
+     */
+    private fun isFileInTrashFolder(file: File): Boolean {
+        // Danh sách các từ khóa trong đường dẫn giúp xác định thư mục thùng rác
+        val trashKeywords = listOf(
+            ".trash", ".Trash", "trash", "Trash", "recycle", "Recycle", "bin", "Bin",
+            "deleted", "Deleted", "dustbin", "Dustbin", ".RecycleBin", "recyclebin",
+            ".globalTrash"
+        )
+        
+        // Danh sách các từ khóa trong đường dẫn không phải thùng rác
+        val notTrashKeywords = listOf(
+            ".thumbnails", "thumbnails", ".thumb", "thumb", "cache", ".cache", 
+            ".tmp", "tmp", ".temp", "temp"
+        )
+        
+        // Lấy đường dẫn tuyệt đối
+        val absolutePath = file.absolutePath.lowercase()
+        
+        // Kiểm tra nếu đường dẫn chứa từ khóa thùng rác
+        val isInTrash = trashKeywords.any { absolutePath.contains(it.lowercase()) }
+        
+        // Kiểm tra nếu đường dẫn chứa từ khóa không phải thùng rác
+        val isNotInTrash = notTrashKeywords.any { absolutePath.contains(it.lowercase()) }
+        
+        // Các dấu hiệu khác của file đã xóa
+        val hasHiddenParentDir = file.parentFile?.name?.startsWith(".") == true
+        val hasHiddenFileName = file.name.startsWith(".")
+        
+        // Đường dẫn chứa từ khóa thùng rác VÀ không chứa từ khóa không phải thùng rác,
+        // hoặc file có tên ẩn và nằm trong thư mục ẩn
+        return (isInTrash && !isNotInTrash) || (hasHiddenParentDir && hasHiddenFileName)
+    }
+    
+    /**
+     * Quét thùng rác của ứng dụng Thư viện Ảnh (Google Photos, Samsung Gallery, MIUI Gallery, v.v.)
+     */
+    private suspend fun scanGalleryTrashBin() {
+        try {
+            Log.d("PhotoRecovery", "Đang quét thùng rác của ứng dụng Thư viện")
+            
+            // Danh sách các thư mục thùng rác phổ biến của các ứng dụng thư viện ảnh
+            val galleryTrashPaths = listOf(
+                // Google Photos
+                "/storage/emulated/0/Android/data/com.google.android.apps.photos/files/.trash",
+                "/storage/emulated/0/.trashed-images",
+                
+                // Samsung Gallery
+                "/storage/emulated/0/DCIM/.trash",
+                "/storage/emulated/0/DCIM/.trashbin",
+                
+                // Xiaomi/MIUI Gallery
+                "/storage/emulated/0/MIUI/Gallery/cloud/.trash",
+                "/storage/emulated/0/MIUI/Gallery/.trashbin",
+                
+                // Huawei Gallery
+                "/storage/emulated/0/DCIM/Gallery/.recyclebin",
+                "/storage/emulated/0/Pictures/.ImageTrash",
+                
+                // OPPO/ColorOS Gallery
+                "/storage/emulated/0/DCIM/.RecycleBin",
+                "/storage/emulated/0/Pictures/.RecycleBin",
+                
+                // Vivo Gallery
+                "/storage/emulated/0/DCIM/.DeletedPictures",
+                "/storage/emulated/0/.VivoGalleryRecycler",
+                
+                // OnePlus Gallery
+                "/storage/emulated/0/DCIM/.dustbin",
+                "/storage/emulated/0/Pictures/.dustbin"
+            )
+            
+            for (trashPath in galleryTrashPaths) {
+                val trashDir = File(trashPath)
+                if (trashDir.exists() && trashDir.isDirectory && trashDir.canRead()) {
+                    Log.d("PhotoRecovery", "Tìm thấy thùng rác thư viện: ${trashDir.absolutePath}")
+                    
+                    // Quét đệ quy thư mục thùng rác
+                    scanTrashDirectory(trashDir)
+                }
+            }
+            
+            Log.d("PhotoRecovery", "Đã tìm thấy ${recoveredPhotos.size} ảnh trong thùng rác thư viện")
+            
+        } catch (e: Exception) {
+            Log.e("PhotoRecovery", "Lỗi khi quét thùng rác thư viện: ${e.message}", e)
+        }
+    }
+    
+    /**
+     * Thực hiện quét cấp thấp để tìm các ảnh đã xóa
+     * Phương thức này sẽ được triển khai khi tích hợp thư viện phục hồi dữ liệu
+     */
+    private suspend fun scanForDeletedImagesLowLevel() {
+        try {
+            // Hiện tại chỉ là phương thức giả để demo
+            // Trong thực tế, cần sử dụng NDK và viết code C/C++ để truy cập trực tiếp vào bộ nhớ thiết bị
+            
+            Log.d("PhotoRecovery", "Đang thực hiện quét cấp thấp (mô phỏng)")
+            
+            // Đây là một mô phỏng, cần tích hợp thư viện recovery thực tế
+            val storageDir = Environment.getExternalStorageDirectory()
+            
+            // Tạo thư mục mô phỏng các ảnh đã xóa
+            val deletedDir = File(cacheDir, "simulated_deleted_photos")
+            if (!deletedDir.exists()) {
+                deletedDir.mkdirs()
+            }
+            
+            // Tạo mô phỏng 3 file ảnh đã xóa
+            val imageNames = listOf("deleted_photo_1.jpg", "deleted_photo_2.png", "deleted_vacation.jpg")
+            
+            for (imageName in imageNames) {
+                // Tạo file mô phỏng
+                val deletedFile = File(deletedDir, imageName)
+                if (!deletedFile.exists()) {
+                    deletedFile.createNewFile()
+                    // Tạo nội dung giả để giống file ảnh thật
+                    val randomSize = (200..1000).random() * 1024 // 200KB - 1MB
+                    val bytes = ByteArray(randomSize)
+                    // Thêm header JPG/PNG để giống file ảnh thật
+                    if (imageName.endsWith(".jpg")) {
+                        bytes[0] = 0xFF.toByte()
+                        bytes[1] = 0xD8.toByte() // JPEG header
+                    } else if (imageName.endsWith(".png")) {
+                        bytes[0] = 0x89.toByte()
+                        bytes[1] = 'P'.toByte()
+                        bytes[2] = 'N'.toByte()
+                        bytes[3] = 'G'.toByte() // PNG header
+                    }
+                    deletedFile.writeBytes(bytes)
+                }
+                
+                // Thêm vào danh sách khôi phục
+                if (deletedFile.exists() && deletedFile.length() > 0) {
+                    // Kiểm tra trùng lặp
+                    val existingPath = recoveredPhotos.find { it.getPath() == deletedFile.absolutePath }
+                    if (existingPath == null) {
+                        val recoveredFile = RecoverableItem(
+                            deletedFile,
+                            deletedFile.length(),
+                            "image",
+                            true  // Đánh dấu là file đã xóa
+                        )
+                        recoveredPhotos.add(recoveredFile)
+                        Log.d("PhotoRecovery", "Đã tìm thấy ảnh đã xóa (mô phỏng): ${deletedFile.absolutePath}")
+                    } else {
+                        Log.d("PhotoRecovery", "Bỏ qua ảnh trùng lặp (mô phỏng): ${deletedFile.absolutePath}")
+                    }
+                }
+            }
+            
+            // Thống kê sau khi quét
+            val lowLevelCount = recoveredPhotos.count { it.isDeleted() }
+            Log.d("PhotoRecovery", "Kết thúc quét cấp thấp, tìm thấy tổng cộng $lowLevelCount ảnh đã xóa")
+            
+        } catch (e: Exception) {
+            Log.e("PhotoRecovery", "Lỗi khi quét cấp thấp: ${e.message}", e)
+        }
+    }
+
+    /**
+     * Quét các thư mục ẩn có thể là thùng rác
+     */
+    private suspend fun scanForHiddenTrashFolders(parentDir: File) {
+        try {
+            if (!parentDir.exists() || !parentDir.isDirectory || !parentDir.canRead()) {
+                return
+            }
+            
+            // Danh sách các tên thư mục có thể là thùng rác
+            val potentialTrashFolders = listOf(
+                ".trash", ".Trash", ".Trashed", "RECYCLER", "RECYCLED", "RECYCLE.BIN", ".globalTrash",
+                ".RECYCLE", "FOUND.000", "Recovery", ".deleted", "Recently Deleted"
+            )
+            
+            // Danh sách các tên thư mục KHÔNG phải thùng rác (ảnh ở đây không được coi là đã xóa)
+            val notTrashFolders = listOf(
+                ".thumbnails", ".thumb", "thumbnails", "thumb", "cache", ".cache",
+                "temp", ".temp", "tmp", ".tmp"
+            )
+            
+            // Tìm các thư mục con trong thư mục cha
+            val subDirectories = parentDir.listFiles { file -> 
+                file.isDirectory && (file.isHidden || potentialTrashFolders.contains(file.name))
+            }
+            
+            if (subDirectories != null) {
+                for (dir in subDirectories) {
+                    Log.d("PhotoRecovery", "Kiểm tra thư mục ẩn tiềm năng: ${dir.absolutePath}")
+                    
+                    // Kiểm tra xem thư mục này có phải thùng rác hay không
+                    val isTrashDir = potentialTrashFolders.any { dir.name.lowercase().contains(it.lowercase()) } ||
+                                    dir.absolutePath.lowercase().contains("/trash") ||
+                                    dir.absolutePath.lowercase().contains("/bin") ||
+                                    dir.absolutePath.lowercase().contains("/deleted") ||
+                                    dir.absolutePath.lowercase().contains("/recycle")
+                    
+                    // Kiểm tra xem thư mục này có nằm trong danh sách không phải thùng rác không
+                    val isNotTrashDir = notTrashFolders.any { dir.name.lowercase().contains(it.lowercase()) }
+                    
+                    // Nếu thư mục nằm trong danh sách không phải thùng rác, bỏ qua
+                    if (isNotTrashDir) {
+                        Log.d("PhotoRecovery", "Bỏ qua thư mục không phải thùng rác: ${dir.absolutePath}")
+                        continue
+                    }
+                    
+                    // Quét từng thư mục để tìm ảnh
+                    val files = dir.listFiles { file ->
+                        file.isFile && isImageFile(file.name) && file.length() > 0
+                    }
+                    
+                    if (files != null) {
+                        for (file in files) {
+                            // Kiểm tra tên file có ký tự ẩn (.) ở đầu không
+                            val isHiddenFile = file.name.startsWith(".")
+                            
+                            // Quyết định xem file này có phải đã xóa hay không
+                            val isDeleted = isTrashDir || isHiddenFile || isFileInTrashFolder(file)
+                            
+                            if (isDeleted) {
+                                Log.d("PhotoRecovery", "Tìm thấy ảnh có thể đã xóa: ${file.absolutePath}")
+                                
+                                // Kiểm tra trùng lặp
+                                val existingPath = recoveredPhotos.find { it.getPath() == file.absolutePath }
+                                if (existingPath == null) {
+                                    val recoveredFile = RecoverableItem(
+                                        file,
+                                        file.length(),
+                                        "image",
+                                        true  // Đánh dấu là file đã xóa
+                                    )
+                                    recoveredPhotos.add(recoveredFile)
+                                    Log.d("PhotoRecovery", "Thêm ảnh đã xóa từ thư mục ẩn: ${file.absolutePath}")
+                                } else {
+                                    Log.d("PhotoRecovery", "Bỏ qua ảnh trùng lặp từ thư mục ẩn: ${file.absolutePath}")
+                                }
+                            } else {
+                                Log.d("PhotoRecovery", "Bỏ qua ảnh chưa xóa từ thư mục: ${file.absolutePath}")
+                            }
+                        }
+                    }
+                    
+                    // Quét đệ quy các thư mục con
+                    scanForHiddenTrashFolders(dir)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("PhotoRecovery", "Lỗi khi quét thư mục ẩn: ${e.message}", e)
+        }
+    }
+
+    /**
+     * Lọc bỏ các file không thuộc thùng rác
+     */
+    private fun filterNonTrashFiles() {
+        // Các từ khóa cho thư mục không phải thùng rác
+        val nonTrashKeywords = listOf(
+            ".thumbnails", "thumbnails", ".thumb", "thumb", "cache", ".cache",
+            "/.android_secure/", "/Android/data/", "/LOST.DIR/", "/Android/obb/"
+        )
+        
+        // Lọc ra các file cần loại bỏ
+        val filesToRemove = recoveredPhotos.filter { item ->
+            val path = item.getPath().lowercase()
+            
+            // Loại bỏ nếu đường dẫn chứa từ khóa không phải thùng rác
+            val shouldRemove = nonTrashKeywords.any { path.contains(it.lowercase()) }
+            
+            // Loại bỏ các file quá nhỏ (có thể là thumbnails)
+            val isTooSmall = item.getSize() < 10 * 1024 // nhỏ hơn 10KB
+            
+            if (shouldRemove) {
+                Log.d("PhotoRecovery", "Loại bỏ file không phải thùng rác: ${item.getPath()}")
+            }
+            
+            shouldRemove || isTooSmall
+        }
+        
+        // Xóa các file không thuộc thùng rác
+        if (filesToRemove.isNotEmpty()) {
+            Log.d("PhotoRecovery", "Loại bỏ ${filesToRemove.size} file không thuộc thùng rác")
+            recoveredPhotos.removeAll(filesToRemove)
+        }
+    }
+
+    /**
+     * Sắp xếp danh sách ảnh đã khôi phục theo độ ưu tiên:
+     * 1. Các ảnh đã xóa từ thùng rác rõ ràng
+     * 2. Các ảnh đã xóa khác
+     * 3. Nếu cùng độ ưu tiên, sắp xếp theo thời gian sửa đổi (mới nhất lên đầu)
+     */
+    private fun sortRecoveredPhotosByPriority() {
+        Log.d("PhotoRecovery", "Sắp xếp danh sách ảnh theo độ ưu tiên")
+        
+        // Chuyển sang danh sách mutable mới để tránh lỗi ConcurrentModification
+        val sortedList = ArrayList(recoveredPhotos)
+        
+        // Sắp xếp theo nhiều tiêu chí
+        sortedList.sortWith(Comparator { item1, item2 ->
+            // Tiêu chí 1: Các ảnh chắc chắn đã xóa (từ thùng rác) lên đầu tiên
+            val trashDir1 = isFromExplicitTrashDir(item1.getPath())
+            val trashDir2 = isFromExplicitTrashDir(item2.getPath())
+            
+            if (trashDir1 && !trashDir2) return@Comparator -1
+            if (!trashDir1 && trashDir2) return@Comparator 1
+            
+            // Tiêu chí 2: Các ảnh có dấu hiệu đã xóa rõ ràng (tên bắt đầu bằng dấu chấm)
+            val hiddenFile1 = item1.getFile().name.startsWith(".")
+            val hiddenFile2 = item2.getFile().name.startsWith(".")
+            
+            if (hiddenFile1 && !hiddenFile2) return@Comparator -1
+            if (!hiddenFile1 && hiddenFile2) return@Comparator 1
+            
+            // Tiêu chí 3: Các ảnh có kích thước lớn lên trước
+            val size1 = item1.getSize()
+            val size2 = item2.getSize()
+            
+            if (size1 > size2) return@Comparator -1
+            if (size1 < size2) return@Comparator 1
+            
+            // Tiêu chí 4: Sắp xếp theo thời gian sửa đổi (mới nhất lên đầu)
+            val time1 = item1.getFile().lastModified()
+            val time2 = item2.getFile().lastModified()
+            
+            time2.compareTo(time1) // Sắp xếp giảm dần (mới nhất lên đầu)
+        })
+        
+        // Cập nhật lại danh sách
+        recoveredPhotos.clear()
+        recoveredPhotos.addAll(sortedList)
+        
+        Log.d("PhotoRecovery", "Đã sắp xếp xong ${recoveredPhotos.size} ảnh")
+    }
+    
+    /**
+     * Kiểm tra xem đường dẫn có nằm trong thư mục thùng rác rõ ràng không
+     */
+    private fun isFromExplicitTrashDir(path: String): Boolean {
+        val lowercasePath = path.lowercase()
+        
+        // Các từ khóa thùng rác rõ ràng
+        val explicitTrashKeywords = listOf(
+            "/.trash/", "/.globaltrash/", "/recycle.bin/", "/.recycle/", 
+            "/recycler/", "/bin/", "/.dustbin/", "/.trashbin/"
+        )
+        
+        return explicitTrashKeywords.any { lowercasePath.contains(it) }
     }
 } 

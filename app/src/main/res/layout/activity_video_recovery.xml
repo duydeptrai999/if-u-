@@ -82,6 +82,7 @@
                 android:id="@+id/scanningProgressBar"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
+                android:visibility="invisible"
                 android:indeterminateTint="#4CAF50"/>
 
             <TextView
@@ -101,7 +102,7 @@
                 android:layout_marginTop="8dp"
                 android:progress="0"
                 android:max="100"
-                android:visibility="gone"
+                android:visibility="invisible"
                 android:progressTint="#4CAF50"/>
         </LinearLayout>
     </FrameLayout>

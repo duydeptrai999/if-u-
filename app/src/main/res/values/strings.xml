@@ -61,4 +61,14 @@
     <string name="share_app">Share App</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="terms_of_use">Terms of Use</string>
+    
+    <!-- File access permission dialog -->
+    <string name="storage_permission_title">Quyền truy cập bộ nhớ</string>
+    <string name="storage_permission_message">Ứng dụng cần quyền truy cập tất cả các tệp để có thể quét và khôi phục dữ liệu đã xóa. Vui lòng cho phép truy cập để tiếp tục.</string>
+    <string name="storage_permission_button">Cấp quyền</string>
+    <string name="storage_permission_settings">Cài đặt</string>
+    <string name="storage_permission_denied">Ứng dụng cần quyền này để hoạt động. Vui lòng cấp quyền trong cài đặt.</string>
+    <string name="deleted_indicator">ĐÃ XÓA</string>
+    <string name="trash_folder_indicator">Thùng rác</string>
+    <string name="recovery_message">Đây là ảnh đã bị xóa. Nhấn để khôi phục.</string>
 </resources>

@@ -55,5 +55,25 @@
             android:paddingBottom="4dp"
             android:textSize="10sp"
             tools:text="1.2 MB" />
+
+        <!-- Chỉ báo ảnh đã xóa -->
+        <TextView
+            android:id="@+id/deletedIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/deleted_indicator"
+            android:textColor="#FF5252"
+            android:textStyle="bold"
+            android:background="@drawable/deleted_indicator_background"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:visibility="gone"
+            android:layout_margin="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </LinearLayout>
 </androidx.cardview.widget.CardView> 

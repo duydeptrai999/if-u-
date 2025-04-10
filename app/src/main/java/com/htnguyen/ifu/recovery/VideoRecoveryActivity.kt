@@ -629,9 +629,10 @@ class VideoRecoveryActivity : AppCompatActivity() {
                 
                 for (file in files) {
                     try {
-                        if (recoveredVideos.size >= 20) {
+                        // Xóa giới hạn số lượng video
+                        /*if (recoveredVideos.size >= 20) {
                             return // Đã đủ số lượng video cần tìm
-                        }
+                        }*/
                         
                         if (file.isDirectory && file.canRead()) {
                             // Chỉ quét đệ quy các thư mục không ẩn

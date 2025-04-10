@@ -4,8 +4,19 @@ import java.io.File
 
 /**
  * Lớp đại diện cho một mục có thể khôi phục (video, hình ảnh, v.v.)
+ * @param file File gốc
+ * @param size Kích thước file (bytes)
+ * @param type Loại file ("image", "video", v.v.)
+ * @param isDeleted Đánh dấu liệu file này đã bị xóa (true) hay là file thông thường (false)
+ * @param contentUri Đường dẫn content Uri cho file trong MediaStore (dùng cho khôi phục)
  */
-class RecoverableItem(private val file: File, private val size: Long, private val type: String) {
+class RecoverableItem(
+    private val file: File,
+    private val size: Long,
+    private val type: String,
+    private var isDeleted: Boolean = false,
+    private val contentUri: String? = null
+) {
     
     private var selected: Boolean = false
     
@@ -28,6 +39,23 @@ class RecoverableItem(private val file: File, private val size: Long, private va
      * Trả về loại tập tin (image, video, v.v.)
      */
     fun getType(): String = type
+    
+    /**
+     * Trả về đường dẫn content Uri (nếu có)
+     */
+    fun getContentUri(): String? = contentUri
+    
+    /**
+     * Kiểm tra xem file này đã bị xóa hay chưa
+     */
+    fun isDeleted(): Boolean = isDeleted
+    
+    /**
+     * Đặt trạng thái xóa cho mục này
+     */
+    fun setDeleted(isDeleted: Boolean) {
+        this.isDeleted = isDeleted
+    }
     
     /**
      * Kiểm tra xem mục này có được chọn hay không

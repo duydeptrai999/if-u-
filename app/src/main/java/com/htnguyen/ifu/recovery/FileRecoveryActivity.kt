@@ -625,9 +625,10 @@ class FileRecoveryActivity : AppCompatActivity() {
                 
                 for (file in files) {
                     try {
-                        if (recoveredFiles.size >= 20) {
+                        // Xóa giới hạn số lượng file
+                        /*if (recoveredFiles.size >= 20) {
                             return // Đã đủ số lượng file cần tìm
-                        }
+                        }*/
                         
                         if (file.isDirectory && file.canRead()) {
                             // Chỉ quét đệ quy các thư mục không ẩn

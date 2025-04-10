@@ -3,7 +3,13 @@
 ## Activities
 
 ### MainActivity
-- Chức năng chính: Màn hình chính hiển thị các tùy chọn khôi phục và thống kê
+- **Chức năng chính**: Màn hình chính của ứng dụng, quản lý điều hướng và hiển thị tùy chọn khôi phục
+- **Cập nhật**: Thêm xử lý quyền truy cập tất cả file
+  - `storagePermissionRequest`: ActivityResultLauncher để xử lý kết quả từ màn hình cài đặt quyền
+  - `checkStoragePermission()`: Kiểm tra và yêu cầu quyền truy cập bộ nhớ phù hợp với phiên bản Android
+  - `showStoragePermissionDialog()`: Hiển thị dialog yêu cầu quyền truy cập tất cả file
+  - `showPermissionDeniedDialog()`: Hiển thị dialog khi quyền bị từ chối
+  - `onRequestPermissionsResult()`: Xử lý kết quả yêu cầu quyền (Android 10 trở xuống)
 - Các phương thức:
   - onCreate: Khởi tạo giao diện và các sự kiện click
   - setupCards: Thiết lập các thẻ tùy chọn khôi phục

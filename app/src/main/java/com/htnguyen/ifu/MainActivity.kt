@@ -13,15 +13,130 @@ import com.htnguyen.ifu.recovery.VideoRecoveryActivity
 import android.view.WindowManager
 import android.os.Build
 import android.view.View
+import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Environment
+import android.provider.Settings
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
+
+    private val storagePermissionRequest = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager()) {
+                // Đã cấp quyền truy cập tất cả file
+                setupUI()
+            } else {
+                // Từ chối quyền
+                showPermissionDeniedDialog()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupTransparentStatusBar()
         setContentView(R.layout.activity_main)
 
-        setupUI()
+        // Kiểm tra và yêu cầu quyền truy cập
+        checkStoragePermission()
+    }
+
+    private fun checkStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager()) {
+                // Đã có quyền truy cập tất cả file
+                setupUI()
+            } else {
+                // Hiển thị dialog yêu cầu quyền
+                showStoragePermissionDialog()
+            }
+        } else {
+            // Với Android 10 trở xuống, sử dụng quyền READ/WRITE_EXTERNAL_STORAGE
+            when {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    setupUI()
+                }
+                else -> {
+                    requestPermissions(
+                        arrayOf(
+                            Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        ),
+                        STORAGE_PERMISSION_CODE
+                    )
+                }
+            }
+        }
+    }
+
+    private fun showStoragePermissionDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.storage_permission_title)
+            .setMessage(R.string.storage_permission_message)
+            .setPositiveButton(R.string.storage_permission_button) { _, _ ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    try {
+                        val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                        intent.addCategory("android.intent.category.DEFAULT")
+                        intent.data = Uri.parse("package:$packageName")
+                        storagePermissionRequest.launch(intent)
+                    } catch (e: Exception) {
+                        val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                        storagePermissionRequest.launch(intent)
+                    }
+                }
+            }
+            .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                dialog.dismiss()
+                showPermissionDeniedDialog()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun showPermissionDeniedDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.storage_permission_title)
+            .setMessage(R.string.storage_permission_denied)
+            .setPositiveButton(R.string.storage_permission_settings) { _, _ ->
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = Uri.fromParts("package", packageName, null)
+                intent.data = uri
+                startActivity(intent)
+                finish()
+            }
+            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                finish()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            STORAGE_PERMISSION_CODE -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    setupUI()
+                } else {
+                    showPermissionDeniedDialog()
+                }
+                return
+            }
+        }
     }
 
     private fun setupTransparentStatusBar() {
@@ -113,5 +228,9 @@ class MainActivity : AppCompatActivity() {
             size < mb * 1024 -> String.format("%.2f MB", size.toFloat() / mb)
             else -> String.format("%.2f GB", size.toFloat() / gb)
         }
+    }
+    
+    companion object {
+        private const val STORAGE_PERMISSION_CODE = 100
     }
 } 

@@ -49,11 +49,22 @@ class PhotoAdapter(
             // Cập nhật trạng thái đã chọn
             holder.checkBox.isChecked = photo.isSelected()
             
+            // Thêm hiển thị cho ảnh đã xóa
+            if (photo.isDeleted()) {
+                // Đánh dấu rõ ràng đây là ảnh đã xóa
+                holder.deletedIndicator.visibility = View.VISIBLE
+            } else {
+                holder.deletedIndicator.visibility = View.GONE
+            }
+            
             // Xử lý sự kiện click
             holder.itemView.setOnClickListener {
-                photo.setSelected(!photo.isSelected())
+                photo.toggleSelection()
                 holder.checkBox.isChecked = photo.isSelected()
-                checkIfAnySelected()
+                
+                // Kiểm tra xem có phần tử nào được chọn không
+                val hasSelected = photos.any { it.isSelected() }
+                onSelectionChanged(hasSelected)
             }
             
             holder.checkBox.setOnClickListener {
@@ -81,5 +92,6 @@ class PhotoAdapter(
         val fileName: TextView = itemView.findViewById(R.id.fileName)
         val fileSize: TextView = itemView.findViewById(R.id.fileSize)
         val checkBox: CheckBox = itemView.findViewById(R.id.checkBox)
+        val deletedIndicator: View = itemView.findViewById(R.id.deletedIndicator)
     }
 } 
