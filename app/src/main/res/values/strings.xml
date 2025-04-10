@@ -25,11 +25,10 @@
     <string name="files_found">%d files found</string>
     <string name="total_size">Total size</string>
     <string name="recovering_status">Đang khôi phục %d tệp...</string>
-    <string name="recovery_success">Đã khôi phục %1$d mục</string>
     <string name="recovery_success_gallery">Đã khôi phục %1$d video, trong đó %2$d video đã được thêm vào thư viện</string>
     <string name="recovery_failed">Không thể khôi phục</string>
     <string name="permission_required">Cần quyền truy cập bộ nhớ để tiếp tục</string>
-    <string name="select_items">Please select items to recover</string>
+    <string name="select_items">Vui lòng chọn các tệp để khôi phục</string>
     <string name="photo_recovery">Photo Recovery</string>
     <string name="tap_to_scan_photos">Nhấn để quét ảnh</string>
     <string name="scan_complete">Quét hoàn tất</string>
@@ -73,12 +72,10 @@
     <string name="trash_folder_indicator">Thùng rác</string>
     <string name="recovery_message">Đây là ảnh đã bị xóa. Nhấn để khôi phục.</string>
     <string name="file_recovery_success">Đã khôi phục %1$d file, trong đó %2$d file văn bản đã được lưu vào Documents và %3$d file đã được lưu vào Downloads</string>
-    <string name="recovery_success_description">Các ảnh đã được khôi phục thành công và lưu vào thư mục của ứng dụng.</string>
-    <string name="recovery_failed_description">Không thể khôi phục một số ảnh đã chọn. Vui lòng thử lại.</string>
-    <string name="recovery_in_progress">Đang khôi phục ảnh...</string>
+    <string name="recovery_failed_description">Không thể khôi phục một số tệp đã chọn. Vui lòng thử lại sau.</string>
+    <string name="recovery_in_progress">Đang khôi phục, vui lòng đợi...</string>
     <string name="recovery_progress_description">Ảnh đang được khôi phục, vui lòng đợi...</string>
     <string name="recovery_counting">%1$d/%2$d</string>
-    <string name="continue_button">Tiếp tục</string>
     <string name="view_recovered_button">Xem ảnh đã khôi phục</string>
     
     <!-- Recovered files screen strings -->
@@ -88,4 +85,17 @@
     <string name="recovered_other_files">Tệp khác đã khôi phục</string>
     <string name="no_recovered_files">Không có tệp tin nào đã được khôi phục</string>
     <string name="view">Xem</string>
+    
+    <!-- New strings for recovery features -->
+    <string name="settings_app_language">App Language</string>
+    <string name="settings_select_language">Select Language</string>
+    
+    <!-- Recovery strings -->
+    <string name="recovering_files">Recovering files…</string>
+    <string name="recovering_count">%1$d / %2$d</string>
+    <string name="recovery_success">Recovery Success</string>
+    <string name="recovery_success_description">We\'ve recovered %d files. %d files were saved to gallery.</string>
+    <string name="continue_button">Continue</string>
+    <string name="view_recovered_files">View Recovered Files</string>
+    <string name="scanning_in_progress">Đang quét, vui lòng đợi...</string>
 </resources>
