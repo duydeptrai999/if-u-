@@ -63,6 +63,8 @@
 - Xóa hiệu ứng và text "Đang quét..." của statusText bị đè lên nút QUÉT trong quá trình quét
 - Ẩn dòng text "Nhấn để quét ảnh" bị chồng lên nút QUÉT
 - Ẩn thanh tiến trình ngang (progress bar) nhưng vẫn giữ lại text thông báo trong quá trình quét
+- Cải thiện giao diện thông báo khôi phục thành công với 2 button "CONTINUE" và "XEM ẢNH ĐÃ KHÔI PHỤC" cùng kích thước và style
+- Làm đẹp hơn giao diện thông báo với padding, kích thước icon và text lớn hơn
 
 ## [1.0.1] - 2024-03-23
 
