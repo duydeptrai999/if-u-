@@ -34,3 +34,13 @@
 ### Fixed
 - Sửa lỗi định dạng kích thước file
 - Cập nhật model RecoverableItem để phù hợp với phiên bản Java
+
+## [0.1.1] - 2023-07-02
+### Cập nhật
+- **Yêu cầu**: Cập nhật giao diện màn hình Home theo mẫu.
+- **Thực hiện**: 
+  - Thay đổi gradient header từ tím sang xanh-lục
+  - Điều chỉnh các card layout cho phù hợp với thiết kế mới
+  - Thay đổi font size và padding cho các thành phần
+  - Cập nhật hiển thị thống kê từ "B" sang "bytes"
+  - Loại bỏ các khoảng cách và thuộc tính không cần thiết
