@@ -58,6 +58,9 @@
 
 - Quy trình làm việc cũ không sử dụng cấu trúc "6 Docs"
 
+### Fixed
+- Sửa lỗi các phần tử UI trong màn hình quét (chữ "Đang quét" và thanh tiến trình) bị chồng lên nút "QUÉT" bằng cách thêm khoảng cách 100dp phía trên
+
 ## [1.0.1] - 2024-03-23
 
 ### Added
