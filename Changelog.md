@@ -65,9 +65,8 @@
 - Ẩn thanh tiến trình ngang (progress bar) nhưng vẫn giữ lại text thông báo trong quá trình quét
 - Cải thiện giao diện thông báo khôi phục thành công với 2 button "CONTINUE" và "XEM ẢNH ĐÃ KHÔI PHỤC" cùng kích thước và style
 - Làm đẹp hơn giao diện thông báo với padding, kích thước icon và text lớn hơn
-- Tiếp tục cải thiện giao diện thông báo khôi phục ảnh thành công: giảm kích thước CardView, giảm kích thước text và chiều cao của các nút
-- Sửa lỗi hiển thị các ký tự lạ (%1$d, %2$d) trong thông báo khôi phục thành công
-- Cập nhật file chuỗi ngôn ngữ tiếng Việt cho thông báo khôi phục thành công
+- Giảm kích thước button khôi phục thành công từ 56dp xuống 48dp và giảm cỡ chữ từ 16sp xuống 14sp để làm gọn giao diện
+- Xóa các ký tự lạ (%1$d, %2$d) trong chuỗi thông báo khôi phục thành công và thay bằng thông báo đơn giản
 
 ## [1.0.1] - 2024-03-23
 
