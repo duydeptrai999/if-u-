@@ -47,6 +47,25 @@
         <activity
             android:name=".SettingsActivity"
             android:parentActivityName=".MainActivity" />
+            
+        <activity
+            android:name=".RecoveredFilesActivity"
+            android:parentActivityName=".MainActivity" />
+            
+        <activity
+            android:name=".RecoveredFilesDetailActivity"
+            android:parentActivityName=".RecoveredFilesActivity" />
+            
+        <!-- Thêm FileProvider cho việc chia sẻ ảnh đã khôi phục -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

@@ -160,6 +160,9 @@ class MainActivity : AppCompatActivity() {
         val videoRecoveryCard = findViewById<CardView>(R.id.videoRecoveryCard)
         val fileRecoveryCard = findViewById<CardView>(R.id.fileRecoveryCard)
         
+        // Thêm xử lý khi nhấn vào phần thống kê đã khôi phục
+        val statsCard = findViewById<CardView>(R.id.statsCard)
+        
         // Settings button
         val settingsButton = findViewById<ImageView>(R.id.ivSettings)
 
@@ -179,6 +182,13 @@ class MainActivity : AppCompatActivity() {
         fileRecoveryCard.setOnClickListener {
             // Mở màn hình khôi phục tệp tin khác
             val intent = Intent(this, FileRecoveryActivity::class.java)
+            startActivity(intent)
+        }
+        
+        // Xử lý sự kiện khi nhấn vào phần thống kê đã khôi phục
+        statsCard.setOnClickListener {
+            // Mở màn hình danh sách tệp tin đã khôi phục
+            val intent = Intent(this, RecoveredFilesActivity::class.java)
             startActivity(intent)
         }
 

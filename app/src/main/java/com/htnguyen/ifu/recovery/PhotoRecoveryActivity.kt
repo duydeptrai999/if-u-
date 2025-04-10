@@ -65,13 +65,37 @@ class PhotoRecoveryActivity : AppCompatActivity() {
     private lateinit var scanningHorizontalProgressBar: ProgressBar
     private lateinit var scanIllustration: ImageView
     
+    // Thêm các thành phần cho màn hình đợi khôi phục
+    private lateinit var recoveryProgressLayout: ConstraintLayout
+    private lateinit var recoveryProgressBar: ProgressBar
+    private lateinit var recoveryProgressText: TextView
+    private lateinit var recoveryCountText: TextView
+    private lateinit var recoveryHorizontalProgressBar: ProgressBar
+    
+    // Thêm các thành phần cho màn hình kết quả khôi phục
+    private lateinit var recoveryResultLayout: ConstraintLayout
+    private lateinit var resultIcon: ImageView
+    private lateinit var resultTitleText: TextView
+    private lateinit var resultDescriptionText: TextView
+    private lateinit var continueButton: Button
+    private lateinit var viewRecoveredButton: Button
+    
     private val recoveredPhotos = mutableListOf<RecoverableItem>()
     private val STORAGE_PERMISSION_CODE = 101
+    
+    // Thư mục lưu ảnh khôi phục
+    private lateinit var recoveryDir: File
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupTransparentStatusBar()
         setContentView(R.layout.activity_photo_recovery)
+        
+        // Tạo thư mục khôi phục
+        recoveryDir = File(getExternalFilesDir(null), "RecoveredPhotos")
+        if (!recoveryDir.exists()) {
+            recoveryDir.mkdirs()
+        }
         
         initViews()
         setupRecyclerViews()
@@ -103,6 +127,21 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         scanningProgressText = findViewById(R.id.scanningProgressText)
         scanningHorizontalProgressBar = findViewById(R.id.scanningHorizontalProgressBar)
         scanIllustration = findViewById(R.id.scanIllustration)
+        
+        // Khởi tạo các thành phần cho màn hình đợi khôi phục
+        recoveryProgressLayout = findViewById(R.id.recoveryProgressLayout)
+        recoveryProgressBar = findViewById(R.id.recoveryProgressBar)
+        recoveryProgressText = findViewById(R.id.recoveryProgressText)
+        recoveryCountText = findViewById(R.id.recoveryCountText)
+        recoveryHorizontalProgressBar = findViewById(R.id.recoveryHorizontalProgressBar)
+        
+        // Khởi tạo các thành phần cho màn hình kết quả khôi phục
+        recoveryResultLayout = findViewById(R.id.recoveryResultLayout)
+        resultIcon = findViewById(R.id.resultIcon)
+        resultTitleText = findViewById(R.id.resultTitleText)
+        resultDescriptionText = findViewById(R.id.resultDescriptionText)
+        continueButton = findViewById(R.id.continueButton)
+        viewRecoveredButton = findViewById(R.id.viewRecoveredButton)
         
         // Ẩn statusText ban đầu để tránh chồng lên với nút quét
         statusText.visibility = View.GONE
@@ -184,9 +223,21 @@ class PhotoRecoveryActivity : AppCompatActivity() {
             recoverSelectedPhotos()
         }
         
+        // Thêm click listener cho các nút trên màn hình kết quả
+        continueButton.setOnClickListener {
+            showScanLayout()
+        }
+        
+        viewRecoveredButton.setOnClickListener {
+            openRecoveredPhotosFolder()
+        }
+        
         findViewById<View>(R.id.backButton).setOnClickListener {
             // Kiểm tra đang ở layout nào để quay lại đúng layout trước đó
             when {
+                recoveryResultLayout.visibility == View.VISIBLE -> {
+                    showScanLayout()
+                }
                 recoveryLayout.visibility == View.VISIBLE -> {
                     showScanResultLayout()
                 }
@@ -204,18 +255,101 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         scanLayout.visibility = View.VISIBLE
         scanResultLayout.visibility = View.GONE
         recoveryLayout.visibility = View.GONE
+        recoveryProgressLayout.visibility = View.GONE
+        recoveryResultLayout.visibility = View.GONE
     }
     
     private fun showScanResultLayout() {
         scanLayout.visibility = View.GONE
         scanResultLayout.visibility = View.VISIBLE
         recoveryLayout.visibility = View.GONE
+        recoveryProgressLayout.visibility = View.GONE
+        recoveryResultLayout.visibility = View.GONE
     }
     
     private fun showRecoveryLayout() {
         scanLayout.visibility = View.GONE
         scanResultLayout.visibility = View.GONE
         recoveryLayout.visibility = View.VISIBLE
+        recoveryProgressLayout.visibility = View.GONE
+        recoveryResultLayout.visibility = View.GONE
+    }
+    
+    private fun showRecoveryProgressLayout() {
+        scanLayout.visibility = View.GONE
+        scanResultLayout.visibility = View.GONE
+        recoveryLayout.visibility = View.GONE
+        recoveryProgressLayout.visibility = View.VISIBLE
+        recoveryResultLayout.visibility = View.GONE
+    }
+    
+    private fun showRecoveryResultLayout(success: Boolean, totalCount: Int, galleryCount: Int = 0) {
+        scanLayout.visibility = View.GONE
+        scanResultLayout.visibility = View.GONE
+        recoveryLayout.visibility = View.GONE
+        recoveryProgressLayout.visibility = View.GONE
+        recoveryResultLayout.visibility = View.VISIBLE
+        
+        if (success) {
+            resultIcon.setImageResource(R.drawable.ic_check_circle)
+            resultIcon.setColorFilter(ContextCompat.getColor(this, R.color.green_500))
+            
+            if (galleryCount > 0) {
+                resultTitleText.text = getString(R.string.recovery_success_gallery, totalCount, galleryCount)
+            } else {
+                resultTitleText.text = getString(R.string.recovery_success, totalCount)
+            }
+            
+            resultDescriptionText.text = getString(R.string.recovery_success_description)
+        } else {
+            resultIcon.setImageResource(R.drawable.ic_error_circle)
+            resultIcon.setColorFilter(ContextCompat.getColor(this, R.color.red_500))
+            resultTitleText.text = getString(R.string.recovery_failed)
+            resultDescriptionText.text = getString(R.string.recovery_failed_description)
+        }
+        
+        // Hiệu ứng xuất hiện
+        recoveryResultLayout.alpha = 0f
+        recoveryResultLayout.animate()
+            .alpha(1f)
+            .setDuration(300)
+            .start()
+    }
+    
+    // Phương thức mở thư mục chứa ảnh đã khôi phục
+    private fun openRecoveredPhotosFolder() {
+        try {
+            // Nếu Android 11+ sử dụng MediaStore
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
+                startActivity(intent)
+            } else {
+                // Mở trực tiếp thư mục RecoveredPhotos của ứng dụng
+                val intent = Intent(Intent.ACTION_VIEW)
+                val photoURI = androidx.core.content.FileProvider.getUriForFile(
+                    this,
+                    "${applicationContext.packageName}.provider",
+                    recoveryDir
+                )
+                intent.setDataAndType(photoURI, "image/*")
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                startActivity(intent)
+            }
+        } catch (e: Exception) {
+            Log.e("PhotoRecovery", "Không thể mở thư mục ảnh đã khôi phục: ${e.message}", e)
+            Toast.makeText(this, "Không thể mở thư mục ảnh đã khôi phục", Toast.LENGTH_SHORT).show()
+            
+            // Fallback: Mở màn hình Files hoặc Explorer
+            try {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.setType("image/*")
+                startActivity(intent)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this, "Không thể mở ứng dụng xem ảnh", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
     
     private fun checkPermission(): Boolean {
@@ -796,12 +930,15 @@ class PhotoRecoveryActivity : AppCompatActivity() {
             return
         }
         
-        progressBar.visibility = View.VISIBLE
-        statusText.text = getString(R.string.recovering_status, selectedPhotos.size)
+        // Hiển thị màn hình đợi khôi phục
+        showRecoveryProgressLayout()
+        recoveryProgressText.text = getString(R.string.recovery_in_progress)
+        recoveryCountText.text = getString(R.string.recovery_counting, 0, selectedPhotos.size)
+        recoveryHorizontalProgressBar.max = selectedPhotos.size
+        recoveryHorizontalProgressBar.progress = 0
         
         CoroutineScope(Dispatchers.IO).launch {
-            // Tạo thư mục khôi phục dự phòng trong trường hợp không thể khôi phục vào thư viện
-            val recoveryDir = File(getExternalFilesDir(null), "RecoveredPhotos")
+            // Tạo thư mục khôi phục
             if (!recoveryDir.exists()) {
                 recoveryDir.mkdirs()
             }
@@ -809,8 +946,14 @@ class PhotoRecoveryActivity : AppCompatActivity() {
             var successCount = 0
             var galleryRecoveryCount = 0
             
-            for (photo in selectedPhotos) {
+            for ((index, photo) in selectedPhotos.withIndex()) {
                 try {
+                    // Cập nhật UI với tiến độ hiện tại
+                    withContext(Dispatchers.Main) {
+                        recoveryCountText.text = getString(R.string.recovery_counting, index + 1, selectedPhotos.size)
+                        recoveryHorizontalProgressBar.progress = index + 1
+                    }
+                    
                     val sourceFile = photo.getFile()
                     val destFile = File(recoveryDir, sourceFile.name)
                     
@@ -840,15 +983,37 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                                 Log.d("PhotoRecovery", "Đã khôi phục thành công từ thùng rác MediaStore: ${sourceFile.name}")
                             } else {
                                 // Nếu không phục hồi được từ thùng rác, thử khôi phục vào bộ sưu tập
-                                recoverToGallery(sourceFile, recoveredFileName, destFile)
-                                successCount++
+                                if (recoverToGallery(sourceFile, recoveredFileName, destFile)) {
+                                    galleryRecoveryCount++
+                                    successCount++
+                                } else {
+                                    // Sao chép vào thư mục của ứng dụng
+                                    FileInputStream(sourceFile).use { input ->
+                                        FileOutputStream(destFile).use { output ->
+                                            input.copyTo(output)
+                                        }
+                                    }
+                                    successCount++
+                                    Log.d("PhotoRecovery", "Đã sao chép vào thư mục khôi phục: ${destFile.absolutePath}")
+                                }
                             }
                         } catch (e: Exception) {
                             Log.e("PhotoRecovery", "Lỗi khi khôi phục từ thùng rác: ${e.message}", e)
                             
                             // Nếu lỗi khi khôi phục từ thùng rác, thử khôi phục vào bộ sưu tập
-                            recoverToGallery(sourceFile, recoveredFileName, destFile)
-                            successCount++
+                            if (recoverToGallery(sourceFile, recoveredFileName, destFile)) {
+                                galleryRecoveryCount++
+                                successCount++
+                            } else {
+                                // Sao chép vào thư mục của ứng dụng
+                                FileInputStream(sourceFile).use { input ->
+                                    FileOutputStream(destFile).use { output ->
+                                        input.copyTo(output)
+                                    }
+                                }
+                                successCount++
+                                Log.d("PhotoRecovery", "Đã sao chép vào thư mục khôi phục: ${destFile.absolutePath}")
+                            }
                         }
                     } else {
                         // Thử khôi phục ảnh vào bộ sưu tập trên thiết bị
@@ -868,36 +1033,22 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                             Log.d("PhotoRecovery", "Đã sao chép vào thư mục khôi phục: ${destFile.absolutePath}")
                         }
                     }
+                    
+                    // Thêm độ trễ nhỏ để người dùng thấy tiến trình
+                    kotlinx.coroutines.delay(100)
+                    
                 } catch (e: Exception) {
                     Log.e("PhotoRecovery", "Lỗi khi khôi phục: ${e.message}", e)
                     e.printStackTrace()
                 }
             }
             
+            // Độ trễ cuối cùng để hoàn tất giao diện
+            kotlinx.coroutines.delay(500)
+            
             withContext(Dispatchers.Main) {
-                progressBar.visibility = View.GONE
-                if (successCount > 0) {
-                    val message = if (galleryRecoveryCount > 0) {
-                        getString(R.string.recovery_success_gallery, successCount, galleryRecoveryCount)
-                    } else {
-                        getString(R.string.recovery_success, successCount)
-                    }
-                    
-                    Toast.makeText(
-                        this@PhotoRecoveryActivity,
-                        message,
-                        Toast.LENGTH_LONG
-                    ).show()
-                    
-                    // Quay lại màn hình chính
-                    showScanLayout()
-                } else {
-                    Toast.makeText(
-                        this@PhotoRecoveryActivity,
-                        getString(R.string.recovery_failed),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+                // Hiển thị màn hình kết quả khôi phục
+                showRecoveryResultLayout(successCount > 0, successCount, galleryRecoveryCount)
             }
         }
     }

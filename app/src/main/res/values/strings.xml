@@ -73,4 +73,19 @@
     <string name="trash_folder_indicator">Thùng rác</string>
     <string name="recovery_message">Đây là ảnh đã bị xóa. Nhấn để khôi phục.</string>
     <string name="file_recovery_success">Đã khôi phục %1$d file, trong đó %2$d file văn bản đã được lưu vào Documents và %3$d file đã được lưu vào Downloads</string>
+    <string name="recovery_success_description">Các ảnh đã được khôi phục thành công và lưu vào thư mục của ứng dụng.</string>
+    <string name="recovery_failed_description">Không thể khôi phục một số ảnh đã chọn. Vui lòng thử lại.</string>
+    <string name="recovery_in_progress">Đang khôi phục ảnh...</string>
+    <string name="recovery_progress_description">Ảnh đang được khôi phục, vui lòng đợi...</string>
+    <string name="recovery_counting">%1$d/%2$d</string>
+    <string name="continue_button">Tiếp tục</string>
+    <string name="view_recovered_button">Xem ảnh đã khôi phục</string>
+    
+    <!-- Recovered files screen strings -->
+    <string name="recovered_files_title">Tệp tin đã được khôi phục</string>
+    <string name="recovered_photos">Ảnh đã khôi phục</string>
+    <string name="recovered_videos">Video đã khôi phục</string>
+    <string name="recovered_other_files">Tệp khác đã khôi phục</string>
+    <string name="no_recovered_files">Không có tệp tin nào đã được khôi phục</string>
+    <string name="view">Xem</string>
 </resources>
