@@ -983,7 +983,7 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                                 Log.d("PhotoRecovery", "Đã khôi phục thành công từ thùng rác MediaStore: ${sourceFile.name}")
                             } else {
                                 // Nếu không phục hồi được từ thùng rác, thử khôi phục vào bộ sưu tập
-                                if (recoverToGallery(sourceFile, recoveredFileName, destFile)) {
+                                if (recoverToGallery(sourceFile, recoveredFileName)) {
                                     galleryRecoveryCount++
                                     successCount++
                                 } else {
@@ -1001,7 +1001,7 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                             Log.e("PhotoRecovery", "Lỗi khi khôi phục từ thùng rác: ${e.message}", e)
                             
                             // Nếu lỗi khi khôi phục từ thùng rác, thử khôi phục vào bộ sưu tập
-                            if (recoverToGallery(sourceFile, recoveredFileName, destFile)) {
+                            if (recoverToGallery(sourceFile, recoveredFileName)) {
                                 galleryRecoveryCount++
                                 successCount++
                             } else {
@@ -1019,7 +1019,7 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                         // Thử khôi phục ảnh vào bộ sưu tập trên thiết bị
                         Log.d("PhotoRecovery", "Khôi phục vào bộ sưu tập: ${sourceFile.absolutePath}")
                         
-                        if (recoverToGallery(sourceFile, recoveredFileName, destFile)) {
+                        if (recoverToGallery(sourceFile, recoveredFileName)) {
                             galleryRecoveryCount++
                             successCount++
                         } else {
@@ -1057,9 +1057,9 @@ class PhotoRecoveryActivity : AppCompatActivity() {
      * Khôi phục ảnh vào bộ sưu tập (thư viện) thiết bị
      * @return true nếu khôi phục thành công vào bộ sưu tập
      */
-    private fun recoverToGallery(sourceFile: File, recoveredFileName: String, backupFile: File): Boolean {
+    private fun recoverToGallery(sourceFile: File, recoveredFileName: String): Boolean {
         try {
-            // Thư mục DCIM hoặc Pictures để lưu ảnh khôi phục
+            // Thư mục DCIM là nơi lưu trữ hình ảnh chính
             val dcimDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
             val cameraDir = File(dcimDir, "Camera")
             
@@ -1067,34 +1067,47 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                 cameraDir.mkdirs()
             }
             
-            // Tạo file khôi phục trong thư mục Camera
-            val recoveredFile = File(cameraDir, recoveredFileName)
+            // Tạo thư mục dự phòng trong trường hợp không thể tạo trong DCIM/Camera
+            val appDir = File(applicationContext.getExternalFilesDir(null), "RecoveredPhotos")
+            if (!appDir.exists()) {
+                appDir.mkdirs()
+            }
             
-            // Sao chép file từ nguồn vào thư mục Camera
+            // Tạo file khôi phục trong thư mục DCIM/Camera
+            val recoveredFile = File(cameraDir, recoveredFileName)
+            val backupFile = File(appDir, recoveredFileName)
+            
+            // Sao chép file từ nguồn vào thư mục DCIM/Camera
             FileInputStream(sourceFile).use { input ->
                 FileOutputStream(recoveredFile).use { output ->
                     input.copyTo(output)
                 }
             }
             
+            // Lấy thời gian hiện tại cho metadata
+            val currentTime = System.currentTimeMillis()
+            
             // Thêm thông tin về ảnh vào MediaStore để hiển thị trong thư viện
             val values = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, recoveredFileName)
-                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
-                put(MediaStore.Images.Media.DATE_MODIFIED, System.currentTimeMillis() / 1000)
-                put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+                put(MediaStore.Images.Media.TITLE, recoveredFileName.substringBeforeLast('.'))
+                put(MediaStore.Images.Media.MIME_TYPE, getMimeType(recoveredFileName))
+                put(MediaStore.Images.Media.DATE_ADDED, currentTime / 1000)
+                put(MediaStore.Images.Media.DATE_MODIFIED, currentTime / 1000)
+                put(MediaStore.Images.Media.DATE_TAKEN, currentTime)
                 put(MediaStore.Images.Media.SIZE, recoveredFile.length())
                 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    // Android 10 trở lên sử dụng RELATIVE_PATH
                     put(MediaStore.Images.Media.RELATIVE_PATH, "DCIM/Camera")
                     put(MediaStore.Images.Media.IS_PENDING, 0)
                 } else {
+                    // Android 9 trở xuống sử dụng DATA
                     put(MediaStore.Images.Media.DATA, recoveredFile.absolutePath)
                 }
             }
             
-            // Thêm ảnh vào bộ sưu tập
+            // Thêm ảnh vào MediaStore
             contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
             
             // Thông báo hệ thống quét media mới
@@ -1102,6 +1115,31 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                 val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
                 mediaScanIntent.data = android.net.Uri.fromFile(recoveredFile)
                 sendBroadcast(mediaScanIntent)
+            }
+            
+            // Lưu thông tin ảnh đã khôi phục vào database
+            try {
+                val modifiedDate = Date(recoveredFile.lastModified())
+                val recoveredFileObj = com.htnguyen.ifu.model.RecoveredFile(
+                    recoveredFile.absolutePath,
+                    recoveredFile.name,
+                    recoveredFile.length(),
+                    modifiedDate,
+                    false
+                )
+                
+                // Thêm vào database
+                val db = com.htnguyen.ifu.db.RecoveredFilesDatabase.getInstance(applicationContext)
+                
+                // Kiểm tra xem file đã tồn tại trong database chưa
+                if (!db.fileExists(recoveredFile.absolutePath)) {
+                    val id = db.addRecoveredFile(recoveredFileObj, com.htnguyen.ifu.db.RecoveredFilesDatabase.TYPE_PHOTO)
+                    Log.d("PhotoRecovery", "Đã lưu thông tin ảnh vào database, ID: $id")
+                } else {
+                    Log.d("PhotoRecovery", "Ảnh đã tồn tại trong database")
+                }
+            } catch (e: Exception) {
+                Log.e("PhotoRecovery", "Lỗi khi lưu thông tin ảnh vào database: ${e.message}", e)
             }
             
             Log.d("PhotoRecovery", "Đã khôi phục ảnh vào bộ sưu tập: ${recoveredFile.absolutePath}")
@@ -1112,17 +1150,61 @@ class PhotoRecoveryActivity : AppCompatActivity() {
             
             // Nếu lỗi, sao chép vào thư mục dự phòng
             try {
+                val appDir = File(applicationContext.getExternalFilesDir(null), "RecoveredPhotos")
+                if (!appDir.exists()) {
+                    appDir.mkdirs()
+                }
+                val backupFile = File(appDir, recoveredFileName)
+                
                 FileInputStream(sourceFile).use { input ->
                     FileOutputStream(backupFile).use { output ->
                         input.copyTo(output)
                     }
                 }
+                
+                // Lưu thông tin vào database cho bản sao lưu
+                try {
+                    val modifiedDate = Date(backupFile.lastModified())
+                    val recoveredFileObj = com.htnguyen.ifu.model.RecoveredFile(
+                        backupFile.absolutePath,
+                        backupFile.name,
+                        backupFile.length(),
+                        modifiedDate,
+                        false
+                    )
+                    
+                    // Thêm vào database
+                    val db = com.htnguyen.ifu.db.RecoveredFilesDatabase.getInstance(applicationContext)
+                    
+                    // Kiểm tra xem file đã tồn tại trong database chưa
+                    if (!db.fileExists(backupFile.absolutePath)) {
+                        val id = db.addRecoveredFile(recoveredFileObj, com.htnguyen.ifu.db.RecoveredFilesDatabase.TYPE_PHOTO)
+                        Log.d("PhotoRecovery", "Đã lưu thông tin ảnh sao lưu vào database, ID: $id")
+                    }
+                } catch (e: Exception) {
+                    Log.e("PhotoRecovery", "Lỗi khi lưu thông tin ảnh sao lưu vào database: ${e.message}", e)
+                }
+                
                 Log.d("PhotoRecovery", "Sao chép vào thư mục dự phòng thành công: ${backupFile.absolutePath}")
             } catch (e: Exception) {
                 Log.e("PhotoRecovery", "Lỗi khi sao chép vào thư mục dự phòng: ${e.message}", e)
             }
             
             return false
+        }
+    }
+    
+    /**
+     * Xác định MIME type dựa trên phần mở rộng của file
+     */
+    private fun getMimeType(fileName: String): String {
+        return when (fileName.substringAfterLast('.', "").lowercase()) {
+            "jpg", "jpeg" -> "image/jpeg"
+            "png" -> "image/png"
+            "gif" -> "image/gif"
+            "bmp" -> "image/bmp"
+            "webp" -> "image/webp"
+            else -> "image/jpeg" // Mặc định
         }
     }
     

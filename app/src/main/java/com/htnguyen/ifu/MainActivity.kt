@@ -198,8 +198,27 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Initialize statistics values to zero (in a real app, these would be loaded from storage)
-        updateStatistics(0, 0, 0, 0, 0, 0)
+        // Đọc thông tin từ database và cập nhật giao diện
+        updateStatisticsFromDatabase()
+    }
+
+    /**
+     * Đọc thông tin thống kê từ database và cập nhật giao diện
+     */
+    private fun updateStatisticsFromDatabase() {
+        val db = com.htnguyen.ifu.db.RecoveredFilesDatabase.getInstance(this)
+        
+        // Đếm số lượng và tính tổng kích thước của các loại tệp
+        val photoCount = db.countRecoveredFiles(com.htnguyen.ifu.db.RecoveredFilesDatabase.TYPE_PHOTO)
+        val videoCount = db.countRecoveredFiles(com.htnguyen.ifu.db.RecoveredFilesDatabase.TYPE_VIDEO)
+        val fileCount = db.countRecoveredFiles(com.htnguyen.ifu.db.RecoveredFilesDatabase.TYPE_FILE)
+        
+        val photoSize = db.getTotalSize(com.htnguyen.ifu.db.RecoveredFilesDatabase.TYPE_PHOTO)
+        val videoSize = db.getTotalSize(com.htnguyen.ifu.db.RecoveredFilesDatabase.TYPE_VIDEO)
+        val fileSize = db.getTotalSize(com.htnguyen.ifu.db.RecoveredFilesDatabase.TYPE_FILE)
+        
+        // Cập nhật giao diện
+        updateStatistics(photoCount, photoSize, videoCount, videoSize, fileCount, fileSize)
     }
 
     private fun updateStatistics(

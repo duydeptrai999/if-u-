@@ -1085,6 +1085,31 @@ class VideoRecoveryActivity : AppCompatActivity() {
                 }
             }
             
+            // Lưu thông tin video đã khôi phục vào database
+            try {
+                val modifiedDate = Date(recoveredFile.lastModified())
+                val recoveredFileObj = com.htnguyen.ifu.model.RecoveredFile(
+                    recoveredFile.absolutePath,
+                    recoveredFile.name,
+                    recoveredFile.length(),
+                    modifiedDate,
+                    false
+                )
+                
+                // Thêm vào database
+                val db = com.htnguyen.ifu.db.RecoveredFilesDatabase.getInstance(applicationContext)
+                
+                // Kiểm tra xem file đã tồn tại trong database chưa
+                if (!db.fileExists(recoveredFile.absolutePath)) {
+                    val id = db.addRecoveredFile(recoveredFileObj, com.htnguyen.ifu.db.RecoveredFilesDatabase.TYPE_VIDEO)
+                    Log.d("VideoRecovery", "Đã lưu thông tin video vào database, ID: $id")
+                } else {
+                    Log.d("VideoRecovery", "Video đã tồn tại trong database")
+                }
+            } catch (e: Exception) {
+                Log.e("VideoRecovery", "Lỗi khi lưu thông tin video vào database: ${e.message}")
+            }
+            
             Log.d("VideoRecovery", "Đã khôi phục video vào thư viện và mục video: ${recoveredFile.absolutePath}")
             return true
         } catch (e: Exception) {

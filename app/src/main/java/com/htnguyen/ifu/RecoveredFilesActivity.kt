@@ -7,18 +7,22 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import com.htnguyen.ifu.db.RecoveredFilesDatabase
 import com.htnguyen.ifu.model.RecoveredFile
-import java.util.*
 
 /**
  * Activity hiển thị danh sách các tệp tin đã được khôi phục, được phân loại thành ảnh, video và tệp tin khác.
  */
 class RecoveredFilesActivity : AppCompatActivity() {
 
+    private lateinit var db: RecoveredFilesDatabase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recovered_files)
 
+        db = RecoveredFilesDatabase.getInstance(this)
+        
         setupActionBar()
         setupCategoryViews()
     }
@@ -38,18 +42,22 @@ class RecoveredFilesActivity : AppCompatActivity() {
      * Thiết lập các thành phần hiển thị cho các loại tệp đã khôi phục
      */
     private fun setupCategoryViews() {
-        // Lấy dữ liệu về các tệp đã khôi phục (trong ứng dụng thực tế, dữ liệu sẽ được lấy từ cơ sở dữ liệu hoặc bộ nhớ)
-        val photoFilesList = getRecoveredPhotoFiles()
-        val videoFilesList = getRecoveredVideoFiles()
-        val otherFilesList = getRecoveredOtherFiles()
+        // Lấy dữ liệu về các tệp đã khôi phục từ database
+        val photoCount = db.countRecoveredFiles(RecoveredFilesDatabase.TYPE_PHOTO)
+        val videoCount = db.countRecoveredFiles(RecoveredFilesDatabase.TYPE_VIDEO)
+        val otherCount = db.countRecoveredFiles(RecoveredFilesDatabase.TYPE_FILE)
+        
+        val photoSize = db.getTotalSize(RecoveredFilesDatabase.TYPE_PHOTO)
+        val videoSize = db.getTotalSize(RecoveredFilesDatabase.TYPE_VIDEO)
+        val otherSize = db.getTotalSize(RecoveredFilesDatabase.TYPE_FILE)
 
         // Thiết lập thông tin cho mục ảnh
         setupCategoryItem(
             findViewById(R.id.cardPhotos),
             findViewById(R.id.tvPhotoDetails),
             R.string.photos,
-            photoFilesList.size,
-            calculateTotalSize(photoFilesList)
+            photoCount,
+            photoSize
         )
 
         // Thiết lập thông tin cho mục video
@@ -57,8 +65,8 @@ class RecoveredFilesActivity : AppCompatActivity() {
             findViewById(R.id.cardVideos),
             findViewById(R.id.tvVideoDetails),
             R.string.videos,
-            videoFilesList.size,
-            calculateTotalSize(videoFilesList)
+            videoCount,
+            videoSize
         )
 
         // Thiết lập thông tin cho mục tệp tin khác
@@ -66,8 +74,8 @@ class RecoveredFilesActivity : AppCompatActivity() {
             findViewById(R.id.cardOtherFiles),
             findViewById(R.id.tvOtherDetails),
             R.string.others,
-            otherFilesList.size,
-            calculateTotalSize(otherFilesList)
+            otherCount,
+            otherSize
         )
     }
 
@@ -89,9 +97,9 @@ class RecoveredFilesActivity : AppCompatActivity() {
         cardView.setOnClickListener {
             // Xác định loại mục được chọn
             val category = when (titleResId) {
-                R.string.photos -> "photos"
-                R.string.videos -> "videos"
-                else -> "others"
+                R.string.photos -> RecoveredFilesDatabase.TYPE_PHOTO
+                R.string.videos -> RecoveredFilesDatabase.TYPE_VIDEO
+                else -> RecoveredFilesDatabase.TYPE_FILE
             }
 
             // Chuyển đến màn hình xem chi tiết tương ứng
@@ -106,46 +114,6 @@ class RecoveredFilesActivity : AppCompatActivity() {
         } else {
             cardView.visibility = View.VISIBLE
         }
-    }
-
-    /**
-     * Hàm mô phỏng việc lấy danh sách ảnh đã khôi phục.
-     * Trong ứng dụng thực tế, đây sẽ truy vấn từ cơ sở dữ liệu hoặc bộ nhớ.
-     */
-    private fun getRecoveredPhotoFiles(): List<RecoveredFile> {
-        // Mô phỏng một số ảnh đã khôi phục
-        // Trong ứng dụng thực tế, dữ liệu này sẽ được lấy từ cơ sở dữ liệu
-        return listOf(
-            RecoveredFile("/storage/emulated/0/Pictures/recovered_1.jpg", "recovered_1.jpg", 1024 * 1024, Date(), false),
-            RecoveredFile("/storage/emulated/0/Pictures/recovered_2.jpg", "recovered_2.jpg", 1024 * 1024 * 2, Date(), false),
-            RecoveredFile("/storage/emulated/0/Pictures/recovered_3.jpg", "recovered_3.jpg", 1024 * 1024 * 3, Date(), false),
-            RecoveredFile("/storage/emulated/0/Pictures/recovered_4.jpg", "recovered_4.jpg", 1024 * 1024 * 1, Date(), false)
-        )
-    }
-
-    /**
-     * Hàm mô phỏng việc lấy danh sách video đã khôi phục.
-     * Trong ứng dụng thực tế, đây sẽ truy vấn từ cơ sở dữ liệu hoặc bộ nhớ.
-     */
-    private fun getRecoveredVideoFiles(): List<RecoveredFile> {
-        // Không có video nào đã được khôi phục
-        return emptyList()
-    }
-
-    /**
-     * Hàm mô phỏng việc lấy danh sách tệp tin khác đã khôi phục.
-     * Trong ứng dụng thực tế, đây sẽ truy vấn từ cơ sở dữ liệu hoặc bộ nhớ.
-     */
-    private fun getRecoveredOtherFiles(): List<RecoveredFile> {
-        // Không có tệp tin khác nào đã được khôi phục
-        return emptyList()
-    }
-
-    /**
-     * Tính tổng kích thước của danh sách tệp tin
-     */
-    private fun calculateTotalSize(files: List<RecoveredFile>): Long {
-        return files.sumOf { it.size }
     }
 
     /**

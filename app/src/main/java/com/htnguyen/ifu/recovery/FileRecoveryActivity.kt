@@ -977,22 +977,24 @@ class FileRecoveryActivity : AppCompatActivity() {
         }
     }
     
-    private fun recoverSelectedFiles() {
-        val selectedFiles = recoveredFiles.filter { it.isSelected() }
-        
-        if (selectedFiles.isEmpty()) {
-            Toast.makeText(this, getString(R.string.no_items_selected), Toast.LENGTH_SHORT).show()
-            return
-        }
-        
-        progressBar.visibility = View.VISIBLE
-        statusText.text = getString(R.string.recovering_status, selectedFiles.size)
-        
-        CoroutineScope(Dispatchers.IO).launch {
-            // Tạo thư mục khôi phục dự phòng trong trường hợp không thể khôi phục vào thư mục hệ thống
-            val recoveryDir = File(getExternalFilesDir(null), "RecoveredFiles")
-            if (!recoveryDir.exists()) {
-                recoveryDir.mkdirs()
+    private suspend fun recoverSelectedFiles() {
+        withContext(Dispatchers.IO) {
+            val selectedFiles = recoveredFiles.filter { it.isSelected() }
+            
+            if (selectedFiles.isEmpty()) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@FileRecoveryActivity,
+                        getString(R.string.no_items_selected),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                return@withContext
+            }
+            
+            withContext(Dispatchers.Main) {
+                progressBar.visibility = View.VISIBLE
+                statusText.text = getString(R.string.recovering_status, selectedFiles.size)
             }
             
             var successCount = 0
@@ -1068,6 +1070,31 @@ class FileRecoveryActivity : AppCompatActivity() {
                         }
                     } catch (e: Exception) {
                         Log.e("FileRecovery", "Lỗi khi thông báo MediaStore: ${e.message}")
+                    }
+                    
+                    // Lưu thông tin tệp đã khôi phục vào database
+                    try {
+                        val modifiedDate = Date(finalDestFile.lastModified())
+                        val recoveredFileObj = com.htnguyen.ifu.model.RecoveredFile(
+                            finalDestFile.absolutePath,
+                            finalDestFile.name,
+                            finalDestFile.length(),
+                            modifiedDate,
+                            false
+                        )
+                        
+                        // Thêm vào database
+                        val db = com.htnguyen.ifu.db.RecoveredFilesDatabase.getInstance(applicationContext)
+                        
+                        // Kiểm tra xem file đã tồn tại trong database chưa
+                        if (!db.fileExists(finalDestFile.absolutePath)) {
+                            val id = db.addRecoveredFile(recoveredFileObj, com.htnguyen.ifu.db.RecoveredFilesDatabase.TYPE_FILE)
+                            Log.d("FileRecovery", "Đã lưu thông tin tệp tin vào database, ID: $id")
+                        } else {
+                            Log.d("FileRecovery", "Tệp tin đã tồn tại trong database")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("FileRecovery", "Lỗi khi lưu thông tin tệp tin vào database: ${e.message}")
                     }
                     
                     successCount++

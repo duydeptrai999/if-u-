@@ -7,8 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.htnguyen.ifu.adapter.RecoveredFileAdapter
+import com.htnguyen.ifu.db.RecoveredFilesDatabase
 import com.htnguyen.ifu.model.RecoveredFile
-import java.util.*
 
 /**
  * Activity hiển thị chi tiết các tệp tin đã khôi phục theo từng loại
@@ -19,6 +19,7 @@ class RecoveredFilesDetailActivity : AppCompatActivity() {
     private lateinit var adapter: RecoveredFileAdapter
     private lateinit var categoryTitle: TextView
     private lateinit var emptyView: TextView
+    private lateinit var db: RecoveredFilesDatabase
     private var category: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +27,10 @@ class RecoveredFilesDetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_recovered_files_detail)
 
         // Lấy thông tin loại tệp tin từ intent
-        category = intent.getStringExtra("category") ?: "photos"
+        category = intent.getStringExtra("category") ?: RecoveredFilesDatabase.TYPE_PHOTO
+        
+        // Khởi tạo database
+        db = RecoveredFilesDatabase.getInstance(this)
 
         setupViews()
         setupRecyclerView()
@@ -44,8 +48,8 @@ class RecoveredFilesDetailActivity : AppCompatActivity() {
 
         // Thiết lập tiêu đề tương ứng với loại
         val titleResId = when (category) {
-            "photos" -> R.string.recovered_photos
-            "videos" -> R.string.recovered_videos
+            RecoveredFilesDatabase.TYPE_PHOTO -> R.string.recovered_photos
+            RecoveredFilesDatabase.TYPE_VIDEO -> R.string.recovered_videos
             else -> R.string.recovered_other_files
         }
         categoryTitle.setText(titleResId)
@@ -70,12 +74,8 @@ class RecoveredFilesDetailActivity : AppCompatActivity() {
      * Tải danh sách tệp tin đã khôi phục dựa trên loại
      */
     private fun loadRecoveredFiles() {
-        // Trong ứng dụng thực tế, dữ liệu sẽ được lấy từ cơ sở dữ liệu hoặc bộ nhớ
-        val files = when (category) {
-            "photos" -> getRecoveredPhotoFiles()
-            "videos" -> getRecoveredVideoFiles()
-            else -> getRecoveredOtherFiles()
-        }
+        // Lấy dữ liệu từ database
+        val files = db.getRecoveredFiles(category)
 
         // Cập nhật adapter với danh sách tệp tin
         adapter.updateFiles(files)
@@ -88,34 +88,5 @@ class RecoveredFilesDetailActivity : AppCompatActivity() {
             emptyView.visibility = android.view.View.GONE
             recyclerView.visibility = android.view.View.VISIBLE
         }
-    }
-
-    /**
-     * Hàm mô phỏng việc lấy danh sách ảnh đã khôi phục
-     */
-    private fun getRecoveredPhotoFiles(): List<RecoveredFile> {
-        // Mô phỏng danh sách ảnh đã khôi phục
-        return listOf(
-            RecoveredFile("/storage/emulated/0/Pictures/recovered_1.jpg", "recovered_1.jpg", 1024 * 1024, Date(), false),
-            RecoveredFile("/storage/emulated/0/Pictures/recovered_2.jpg", "recovered_2.jpg", 1024 * 1024 * 2, Date(), false),
-            RecoveredFile("/storage/emulated/0/Pictures/recovered_3.jpg", "recovered_3.jpg", 1024 * 1024 * 3, Date(), false),
-            RecoveredFile("/storage/emulated/0/Pictures/recovered_4.jpg", "recovered_4.jpg", 1024 * 1024 * 1, Date(), false)
-        )
-    }
-
-    /**
-     * Hàm mô phỏng việc lấy danh sách video đã khôi phục
-     */
-    private fun getRecoveredVideoFiles(): List<RecoveredFile> {
-        // Không có video nào đã được khôi phục
-        return emptyList()
-    }
-
-    /**
-     * Hàm mô phỏng việc lấy danh sách tệp tin khác đã khôi phục
-     */
-    private fun getRecoveredOtherFiles(): List<RecoveredFile> {
-        // Không có tệp tin khác nào đã được khôi phục
-        return emptyList()
     }
 } 
