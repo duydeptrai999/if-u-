@@ -70,7 +70,7 @@
 
 - Bổ sung quy trình nâng cấp APK từ project Android nguồn
 - Hỗ trợ build APK trực tiếp từ project Android với key debug
-- Cải tiến quy trình tích hợp package từ APK nguồn sang APK đích
+- Cậi tiến quy trình tích hợp package từ APK nguồn sang APK đích
 - Tài liệu hướng dẫn cho quy trình tích hợp mới
 
 ### Changed
@@ -112,18 +112,20 @@
 - Cải thiện thuật toán phát hiện và phân loại file
 - Bổ sung thêm chuỗi tiếng Việt cho tính năng khôi phục file
 
-## [0.2.0] - 2023-07-05
+## [0.2.0] - 2023-10-25
 
 ### Thêm mới
-- Thêm tính năng Khôi phục Video tương tự như tính năng Khôi phục Ảnh
-- Tạo giao diện người dùng cho tính năng khôi phục video
-- Thêm màn hình hiển thị kết quả quét video
-- Thêm khả năng xem và lựa chọn video để khôi phục
+- Tính năng xem danh sách tệp tin đã khôi phục
+- Giao diện hiển thị danh sách phân loại (Ảnh, Video, Tệp tin khác)
+- Màn hình chi tiết hiển thị từng loại tệp tin đã khôi phục
+- Kết nối từ màn hình chính đến màn hình xem tệp tin đã khôi phục
 
-### Chỉnh sửa
-- Cải thiện giao diện người dùng của chức năng quét và khôi phục ảnh
-- Thay đổi nút quét thành màu xanh lá cây theo yêu cầu
-- Bổ sung thêm chuỗi tiếng Việt cho các tính năng
+### Chi tiết triển khai
+- Tạo `RecoveredFilesActivity` để hiển thị danh sách phân loại các tệp đã khôi phục
+- Tạo `RecoveredFilesDetailActivity` để hiển thị chi tiết tệp tin trong mỗi danh mục
+- Tạo `RecoveredFileAdapter` để hiển thị danh sách tệp tin trong RecyclerView
+- Thêm xử lý sự kiện khi nhấn vào phần "ĐÃ KHÔI PHỤC" ở màn hình chính
+- Thêm mô hình dữ liệu `RecoveredFile` để lưu trữ thông tin tệp tin đã khôi phục
 
 ## [0.1.0] - 2023-07-01
 

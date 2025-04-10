@@ -149,3 +149,39 @@ Tính năng khôi phục file khác giúp người dùng tìm và khôi phục c
 - Ứng dụng yêu cầu quyền truy cập bộ nhớ để quét và khôi phục tệp
 - Các tệp sau khi khôi phục sẽ được lưu vào thư mục RecoveredPhotos, RecoveredVideos hoặc RecoveredFiles trong bộ nhớ ứng dụng
 - Tỷ lệ khôi phục thành công phụ thuộc vào thời gian tệp đã bị xóa và liệu dữ liệu có bị ghi đè hay không 
+
+## Tính năng Xem Danh Sách Tệp Tin Đã Khôi Phục
+
+### Mô tả
+Tính năng này cho phép người dùng xem danh sách các tệp tin đã được khôi phục, được phân loại thành 3 nhóm: Ảnh, Video và Tệp tin khác. Người dùng có thể xem chi tiết từng loại tệp tin đã khôi phục.
+
+### Cách hoạt động
+1. Từ màn hình chính, người dùng nhấn vào phần "ĐÃ KHÔI PHỤC" (phần thống kê bên dưới) để mở màn hình danh sách tệp đã khôi phục.
+2. Màn hình hiển thị 3 danh mục: Ảnh, Video và Tệp tin khác.
+3. Mỗi danh mục hiển thị số lượng tệp tin và tổng kích thước.
+4. Người dùng có thể nhấn vào nút "Xem" hoặc nhấn vào cả card để xem chi tiết danh sách các tệp trong danh mục đó.
+5. Khi vào màn hình chi tiết, người dùng có thể thấy danh sách các tệp tin đã được khôi phục với thông tin như: tên tệp, kích thước, ngày tạo.
+
+### Các màn hình
+1. **Màn hình Danh Sách Danh Mục Đã Khôi Phục**:
+   - Hiển thị 3 danh mục: Ảnh, Video và Tệp tin khác.
+   - Mỗi danh mục hiển thị số lượng tệp và kích thước.
+   - Có nút "Xem" để chuyển đến màn hình chi tiết.
+
+2. **Màn hình Chi Tiết Tệp Tin Đã Khôi Phục**:
+   - Hiển thị danh sách các tệp tin trong danh mục được chọn.
+   - Mỗi dòng hiển thị: biểu tượng tệp tin, tên tệp, kích thước và ngày tạo.
+   - Hiển thị thông báo "Không có tệp tin nào" nếu danh mục trống.
+
+### Các thành phần chính
+1. `RecoveredFilesActivity`: Activity hiển thị danh sách các danh mục tệp tin đã khôi phục.
+2. `RecoveredFilesDetailActivity`: Activity hiển thị chi tiết danh sách tệp tin trong một danh mục.
+3. `RecoveredFileAdapter`: Adapter để hiển thị danh sách tệp tin đã khôi phục trong RecyclerView.
+4. `RecoveredFile`: Model lưu trữ thông tin về tệp tin đã khôi phục (tên, đường dẫn, kích thước, ngày tạo).
+
+### Mô hình dữ liệu
+Hiện tại, dữ liệu được mô phỏng bằng các mảng cứng để demo giao diện. Trong ứng dụng thực tế, dữ liệu sẽ được lưu trữ trong cơ sở dữ liệu hoặc bộ nhớ ứng dụng và được cập nhật sau mỗi lần khôi phục thành công.
+
+### Tương tác với các tính năng khác
+- Khi người dùng khôi phục thành công các tệp tin từ các tính năng khôi phục (Ảnh, Video, Tệp tin khác), danh sách tệp tin đã khôi phục sẽ được cập nhật.
+- Thống kê trên màn hình chính sẽ hiển thị tổng số tệp tin và kích thước đã khôi phục. 

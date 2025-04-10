@@ -115,3 +115,20 @@
 - **Progress Bar**: For indicating scan and recovery progress
 - **Buttons**: For initiating actions
 - **Text Views**: For displaying information
+
+## Danh Sách Tệp Tin Đã Khôi Phục
+
+### Module/Package: com.htnguyen.ifu
+- `RecoveredFilesActivity` (Hiển thị danh sách phân loại các tệp đã khôi phục)
+  setupActionBar, setupCategoryViews, setupCategoryItem, getRecoveredPhotoFiles, getRecoveredVideoFiles, getRecoveredOtherFiles, calculateTotalSize, formatSize
+
+- `RecoveredFilesDetailActivity` (Hiển thị chi tiết danh sách tệp tin đã khôi phục theo loại)
+  setupViews, setupRecyclerView, loadRecoveredFiles, getRecoveredPhotoFiles, getRecoveredVideoFiles, getRecoveredOtherFiles
+
+### Module/Package: com.htnguyen.ifu.adapter
+- `RecoveredFileAdapter` (Hiển thị danh sách các tệp tin đã khôi phục)
+  updateFiles, onCreateViewHolder, onBindViewHolder, getItemCount, FileViewHolder.bind, isImageFile, isVideoFile, formatSize
+
+### Module/Package: com.htnguyen.ifu.model
+- `RecoveredFile` (Mô hình dữ liệu cho tệp tin đã khôi phục)
+  path, name, size, modifiedDate, isSelected
