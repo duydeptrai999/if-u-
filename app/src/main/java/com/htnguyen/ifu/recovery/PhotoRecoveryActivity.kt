@@ -225,18 +225,21 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         
         // Thêm click listener cho các nút trên màn hình kết quả
         continueButton.setOnClickListener {
-            showScanLayout()
+            // Quay lại màn hình kết quả quét để người dùng có thể tiếp tục khôi phục ảnh khác
+            showScanResultLayout()
         }
         
         viewRecoveredButton.setOnClickListener {
-            openRecoveredPhotosFolder()
+            // Mở màn hình RecoveredFilesActivity để xem danh sách các file đã khôi phục
+            val intent = Intent(this, com.htnguyen.ifu.RecoveredFilesActivity::class.java)
+            startActivity(intent)
         }
         
         findViewById<View>(R.id.backButton).setOnClickListener {
             // Kiểm tra đang ở layout nào để quay lại đúng layout trước đó
             when {
                 recoveryResultLayout.visibility == View.VISIBLE -> {
-                    showScanLayout()
+                    showScanResultLayout()
                 }
                 recoveryLayout.visibility == View.VISIBLE -> {
                     showScanResultLayout()
@@ -316,7 +319,7 @@ class PhotoRecoveryActivity : AppCompatActivity() {
             .start()
     }
     
-    // Phương thức mở thư mục chứa ảnh đã khôi phục
+    // Phương thức mở thư mục chứa ảnh đã khôi phục - Không còn được sử dụng, giữ lại để tham khảo
     private fun openRecoveredPhotosFolder() {
         try {
             // Nếu Android 11+ sử dụng MediaStore
