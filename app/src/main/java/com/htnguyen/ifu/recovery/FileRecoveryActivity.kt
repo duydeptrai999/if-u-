@@ -64,6 +64,7 @@ class FileRecoveryActivity : AppCompatActivity() {
     private lateinit var scanIllustration: ImageView
     
     private val recoveredFiles = mutableListOf<RecoverableItem>()
+    private val scannedDirectories = mutableSetOf<String>() // Theo dõi thư mục đã quét
     private val STORAGE_PERMISSION_CODE = 101
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -461,6 +462,8 @@ class FileRecoveryActivity : AppCompatActivity() {
         
         // Xóa danh sách cũ nếu có
         recoveredFiles.clear()
+        // Xóa danh sách thư mục đã quét
+        scannedDirectories.clear()
         
         // Hiển thị toast để xác nhận rằng chức năng quét đang chạy
         Toast.makeText(this, "Đang bắt đầu quét file...", Toast.LENGTH_LONG).show()
@@ -472,6 +475,14 @@ class FileRecoveryActivity : AppCompatActivity() {
             try {
                 // Log trong thread IO
                 Log.d("FileRecovery", "Đang quét trong thread IO")
+                
+                // Trước tiên tìm kiếm trong các thư mục thùng rác
+                withContext(Dispatchers.Main) {
+                    updateScanStatus("Đang quét thùng rác...", 30)
+                }
+                
+                // Quét các thư mục thùng rác phổ biến
+                scanTrashFolders()
                 
                 // Tìm kiếm các file trong bộ nhớ thiết bị
                 val documentsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
@@ -511,6 +522,16 @@ class FileRecoveryActivity : AppCompatActivity() {
                     }
                     createSampleFiles()
                 }
+                
+                // Lọc nghiêm ngặt để chỉ giữ lại file đã xóa thực sự
+                Log.d("FileRecovery", "Trước khi lọc: ${recoveredFiles.size} file")
+                
+                // Lọc nghiêm ngặt để chỉ giữ lại file đã xóa
+                val onlyDeletedFiles = recoveredFiles.filter { isDeletedFile(it.getFile()) }
+                recoveredFiles.clear()
+                recoveredFiles.addAll(onlyDeletedFiles)
+                
+                Log.d("FileRecovery", "Sau khi lọc: ${recoveredFiles.size} file, tất cả đều đã xóa")
                 
                 // Tính tổng kích thước của các file tìm thấy
                 val totalSize = recoveredFiles.sumOf { it.getSize() }
@@ -597,6 +618,152 @@ class FileRecoveryActivity : AppCompatActivity() {
         }
     }
     
+    /**
+     * Quét các thư mục thùng rác phổ biến để tìm file đã xóa
+     */
+    private fun scanTrashFolders() {
+        val trashPaths = listOf(
+            // Google Files và các thùng rác phổ biến khác
+            "/storage/emulated/0/Android/data/com.google.android.apps.nbu.files/files/.trash",
+            "/storage/emulated/0/.trashed-files",
+            
+            // Samsung
+            "/storage/emulated/0/DCIM/.trash", 
+            "/storage/emulated/0/DCIM/.trashbin",
+            "/storage/emulated/0/Documents/.trash",
+            
+            // Xiaomi/MIUI 
+            "/storage/emulated/0/MIUI/Gallery/cloud/.trash",
+            "/storage/emulated/0/MIUI/Files/.trashbin",
+            "/storage/emulated/0/DCIM/.globalTrash",
+            
+            // Huawei
+            "/storage/emulated/0/Documents/.recyclebin",
+            "/storage/emulated/0/Download/.FileTrash",
+            
+            // OPPO/ColorOS
+            "/storage/emulated/0/Documents/.RecycleBin",
+            "/storage/emulated/0/Download/.RecycleBin",
+            
+            // Vivo
+            "/storage/emulated/0/Documents/.DeletedFiles",
+            "/storage/emulated/0/.VivoFilesRecycler",
+            
+            // OnePlus
+            "/storage/emulated/0/Documents/.dustbin",
+            "/storage/emulated/0/Download/.dustbin"
+        )
+        
+        for (path in trashPaths) {
+            val trashDir = File(path)
+            if (trashDir.exists() && trashDir.isDirectory) {
+                Log.d("FileRecovery", "Đang quét thùng rác: $path")
+                // Đánh dấu thư mục này đã được quét
+                scannedDirectories.add(trashDir.absolutePath)
+                scanTrashDirectory(trashDir)
+            }
+        }
+    }
+    
+    /**
+     * Quét một thư mục thùng rác để tìm file đã xóa
+     */
+    private fun scanTrashDirectory(trashDir: File) {
+        try {
+            if (!trashDir.exists() || !trashDir.isDirectory || !trashDir.canRead()) {
+                return
+            }
+            
+            val files = trashDir.listFiles() ?: return
+            
+            for (file in files) {
+                try {
+                    if (file.isDirectory && file.canRead()) {
+                        // Quét đệ quy nếu là thư mục
+                        scanTrashDirectory(file)
+                    } else if (file.isFile && file.canRead() && isOtherFile(file.name) && file.length() > 0) {
+                        Log.d("FileRecovery", "Tìm thấy file trong thùng rác: ${file.absolutePath}")
+                        
+                        // Kiểm tra trùng lặp trước khi thêm vào danh sách
+                        if (!recoveredFiles.any { it.getPath() == file.absolutePath }) {
+                            // Tạo đối tượng RecoverableItem và đánh dấu là đã xóa
+                            val recoveredFile = RecoverableItem(
+                                file,
+                                file.length(),
+                                getFileType(file.name),
+                                true // Đánh dấu là file đã xóa
+                            )
+                            recoveredFiles.add(recoveredFile)
+                            Log.d("FileRecovery", "Đã thêm file vào danh sách phục hồi: ${file.absolutePath}")
+                        } else {
+                            Log.d("FileRecovery", "Bỏ qua file trùng lặp: ${file.absolutePath}")
+                        }
+                    }
+                } catch (e: SecurityException) {
+                    Log.e("FileRecovery", "Lỗi quyền khi xử lý file trong thùng rác: ${e.message}")
+                } catch (e: Exception) {
+                    Log.e("FileRecovery", "Lỗi khi xử lý file trong thùng rác: ${e.message}")
+                }
+            }
+        } catch (e: SecurityException) {
+            Log.e("FileRecovery", "Lỗi quyền khi quét thư mục thùng rác: ${e.message}")
+        } catch (e: Exception) {
+            Log.e("FileRecovery", "Lỗi khi quét thư mục thùng rác: ${e.message}")
+        }
+    }
+    
+    /**
+     * Kiểm tra xem thư mục có phải là thư mục thùng rác không
+     */
+    private fun isTrashDirectory(directory: File): Boolean {
+        val trashKeywords = listOf(
+            ".trash", ".Trash", "trash", "Trash", "recycle", "Recycle", "bin", "Bin",
+            "deleted", "Deleted", "dustbin", "Dustbin", ".RecycleBin", "recyclebin",
+            ".globalTrash"
+        )
+        
+        val dirName = directory.name.lowercase()
+        val dirPath = directory.absolutePath.lowercase()
+        
+        return directory.isHidden || 
+               trashKeywords.any { dirName.contains(it.lowercase()) } ||
+               trashKeywords.any { dirPath.contains(it.lowercase()) }
+    }
+    
+    /**
+     * Kiểm tra xem file có nằm trong thư mục thùng rác không
+     */
+    private fun isFileInTrashFolder(file: File): Boolean {
+        // Danh sách các từ khóa trong đường dẫn giúp xác định thư mục thùng rác
+        val trashKeywords = listOf(
+            ".trash", ".Trash", "trash", "Trash", "recycle", "Recycle", "bin", "Bin",
+            "deleted", "Deleted", "dustbin", "Dustbin", ".RecycleBin", "recyclebin",
+            ".globalTrash"
+        )
+        
+        // Lấy đường dẫn tuyệt đối
+        val absolutePath = file.absolutePath.lowercase()
+        
+        // Kiểm tra nếu đường dẫn chứa từ khóa thùng rác
+        return trashKeywords.any { absolutePath.contains(it.lowercase()) }
+    }
+    
+    /**
+     * Kiểm tra xem file có phải là file đã xóa không
+     */
+    private fun isDeletedFile(file: File): Boolean {
+        // Kiểm tra tên file có bắt đầu bằng dấu chấm (thường là file ẩn/đã xóa)
+        val hasHiddenName = file.name.startsWith(".")
+        
+        // Kiểm tra đường dẫn file có chứa từ khóa thùng rác
+        val inTrashFolder = isFileInTrashFolder(file)
+        
+        // Kiểm tra thư mục cha có phải là thư mục thùng rác
+        val inTrashDirectory = file.parentFile?.let { isTrashDirectory(it) } ?: false
+        
+        return hasHiddenName || inTrashFolder || inTrashDirectory
+    }
+    
     private fun formatFileSize(size: Long): String {
         val df = DecimalFormat("0.00")
         val sizeKb = size / 1024.0f
@@ -613,6 +780,15 @@ class FileRecoveryActivity : AppCompatActivity() {
     
     private fun simulateFindingDeletedFiles(directory: File) {
         try {
+            // Kiểm tra xem thư mục đã được quét chưa
+            if (scannedDirectories.contains(directory.absolutePath)) {
+                Log.d("FileRecovery", "Bỏ qua thư mục đã quét: ${directory.absolutePath}")
+                return
+            }
+            
+            // Đánh dấu thư mục này đã được quét
+            scannedDirectories.add(directory.absolutePath)
+            
             // Kiểm tra thư mục có tồn tại và có thể đọc được không
             if (directory.exists() && directory.isDirectory && directory.canRead()) {
                 Log.d("FileRecovery", "Đang quét thư mục: ${directory.absolutePath}")
@@ -623,36 +799,58 @@ class FileRecoveryActivity : AppCompatActivity() {
                     return
                 }
                 
+                Log.d("FileRecovery", "Tìm thấy ${files.size} file/thư mục trong ${directory.absolutePath}")
+                
                 for (file in files) {
                     try {
-                        // Xóa giới hạn số lượng file
-                        /*if (recoveredFiles.size >= 20) {
-                            return // Đã đủ số lượng file cần tìm
-                        }*/
-                        
                         if (file.isDirectory && file.canRead()) {
-                            // Chỉ quét đệ quy các thư mục không ẩn
-                            if (!file.name.startsWith(".") && !file.name.equals("Android", true)) {
+                            // Kiểm tra nếu đây là thư mục thùng rác
+                            val isTrashDir = isTrashDirectory(file)
+                            
+                            // Quét đệ quy các thư mục, ưu tiên thư mục thùng rác
+                            if (isTrashDir || (!file.name.startsWith(".") && !file.name.equals("Android", true))) {
                                 simulateFindingDeletedFiles(file)
                             }
                         } else if (file.isFile && file.canRead() && isOtherFile(file.name) && file.length() > 0) {
                             Log.d("FileRecovery", "Tìm thấy file: ${file.absolutePath}")
                             
-                            // Tạo đối tượng RecoverableItem
-                            val recoveredFile = RecoverableItem(
-                                file,
-                                file.length(),
-                                getFileType(file.name)
-                            )
-                            recoveredFiles.add(recoveredFile)
+                            // Kiểm tra nếu file này đã xóa
+                            val isDeleted = isDeletedFile(file)
+                            
+                            if (isDeleted) {
+                                Log.d("FileRecovery", "Đây là file đã xóa: ${file.absolutePath}")
+                                
+                                // Kiểm tra trùng lặp trước khi thêm file vào danh sách
+                                if (!recoveredFiles.any { it.getPath() == file.absolutePath }) {
+                                    // Tạo đối tượng RecoverableItem và đánh dấu là đã xóa
+                                    val recoveredFile = RecoverableItem(
+                                        file,
+                                        file.length(),
+                                        getFileType(file.name),
+                                        true // Đánh dấu là file đã xóa
+                                    )
+                                    recoveredFiles.add(recoveredFile)
+                                    Log.d("FileRecovery", "Đã thêm file đã xóa: ${file.absolutePath}")
+                                } else {
+                                    Log.d("FileRecovery", "Bỏ qua file trùng lặp: ${file.absolutePath}")
+                                }
+                            }
                         }
+                    } catch (e: SecurityException) {
+                        // Bỏ qua lỗi quyền truy cập
+                        Log.e("FileRecovery", "Lỗi quyền khi xử lý file ${file.absolutePath}: ${e.message}")
                     } catch (e: Exception) {
-                        Log.e("FileRecovery", "Lỗi khi xử lý file: ${e.message}")
+                        // Bỏ qua các lỗi khác
+                        Log.e("FileRecovery", "Lỗi khi xử lý file ${file.absolutePath}: ${e.message}")
                     }
                 }
+            } else {
+                Log.d("FileRecovery", "Thư mục không tồn tại hoặc không thể đọc: ${directory.absolutePath}")
             }
+        } catch (e: SecurityException) {
+            Log.e("FileRecovery", "Lỗi quyền khi quét thư mục ${directory.absolutePath}: ${e.message}")
         } catch (e: Exception) {
-            Log.e("FileRecovery", "Lỗi khi quét thư mục: ${e.message}")
+            Log.e("FileRecovery", "Lỗi khi quét thư mục ${directory.absolutePath}: ${e.message}")
         }
     }
     
@@ -695,27 +893,92 @@ class FileRecoveryActivity : AppCompatActivity() {
         statusText.text = getString(R.string.recovering_status, selectedFiles.size)
         
         CoroutineScope(Dispatchers.IO).launch {
+            // Tạo thư mục khôi phục dự phòng trong trường hợp không thể khôi phục vào thư mục hệ thống
             val recoveryDir = File(getExternalFilesDir(null), "RecoveredFiles")
             if (!recoveryDir.exists()) {
                 recoveryDir.mkdirs()
             }
             
             var successCount = 0
+            var documentsRecoveryCount = 0
+            var downloadsRecoveryCount = 0
             
             for (file in selectedFiles) {
                 try {
                     val sourceFile = file.getFile()
-                    val destFile = File(recoveryDir, sourceFile.name)
                     
-                    // Sao chép file gốc vào thư mục khôi phục
+                    // Tên file mới sau khi khôi phục (loại bỏ dấu chấm ở đầu nếu có)
+                    val recoveredFileName = if (sourceFile.name.startsWith(".")) {
+                        sourceFile.name.substring(1)
+                    } else {
+                        sourceFile.name
+                    }
+                    
+                    // Xác định thư mục phù hợp dựa trên loại file
+                    val fileType = file.getType()
+                    val destDir = when {
+                        fileType in listOf("document", "pdf", "text", "spreadsheet", "presentation") -> {
+                            // File văn bản -> Documents
+                            val docDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+                            if (!docDir.exists()) {
+                                docDir.mkdirs()
+                            }
+                            documentsRecoveryCount++
+                            docDir
+                        }
+                        else -> {
+                            // Các file khác -> Downloads
+                            val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                            if (!downloadDir.exists()) {
+                                downloadDir.mkdirs()
+                            }
+                            downloadsRecoveryCount++
+                            downloadDir
+                        }
+                    }
+                    
+                    // File đích sau khi khôi phục
+                    val destFile = File(destDir, recoveredFileName)
+                    
+                    // Kiểm tra nếu file đích đã tồn tại, thêm hậu tố thời gian
+                    val finalDestFile = if (destFile.exists()) {
+                        val timestamp = System.currentTimeMillis()
+                        val extension = recoveredFileName.substringAfterLast('.', "")
+                        val baseName = recoveredFileName.substringBeforeLast('.', recoveredFileName)
+                        val newFileName = if (extension.isNotEmpty()) {
+                            "${baseName}_$timestamp.$extension"
+                        } else {
+                            "${baseName}_$timestamp"
+                        }
+                        File(destDir, newFileName)
+                    } else {
+                        destFile
+                    }
+                    
+                    // Sao chép file gốc vào thư mục đích
                     FileInputStream(sourceFile).use { input ->
-                        FileOutputStream(destFile).use { output ->
+                        FileOutputStream(finalDestFile).use { output ->
                             input.copyTo(output)
                         }
                     }
                     
+                    // Thêm file mới vào MediaStore để các ứng dụng khác có thể nhìn thấy
+                    try {
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                            // Thông báo hệ thống quét media mới
+                            val scanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                            scanIntent.data = android.net.Uri.fromFile(finalDestFile)
+                            sendBroadcast(scanIntent)
+                        }
+                    } catch (e: Exception) {
+                        Log.e("FileRecovery", "Lỗi khi thông báo MediaStore: ${e.message}")
+                    }
+                    
                     successCount++
+                    Log.d("FileRecovery", "Đã khôi phục file: ${finalDestFile.absolutePath}")
+                    
                 } catch (e: Exception) {
+                    Log.e("FileRecovery", "Lỗi khi khôi phục file: ${e.message}")
                     e.printStackTrace()
                 }
             }
@@ -723,9 +986,16 @@ class FileRecoveryActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) {
                 progressBar.visibility = View.GONE
                 if (successCount > 0) {
+                    val message = getString(
+                        R.string.file_recovery_success,
+                        successCount,
+                        documentsRecoveryCount,
+                        downloadsRecoveryCount
+                    )
+                    
                     Toast.makeText(
                         this@FileRecoveryActivity,
-                        getString(R.string.recovery_success, successCount),
+                        message,
                         Toast.LENGTH_LONG
                     ).show()
                     
