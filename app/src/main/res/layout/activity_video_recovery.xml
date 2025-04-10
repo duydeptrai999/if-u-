@@ -75,7 +75,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_gravity="center"
-            android:gravity="center">
+            android:gravity="center"
+            android:paddingTop="100dp">
 
             <ProgressBar
                 android:id="@+id/scanningProgressBar"
