@@ -40,6 +40,8 @@
 - Cài đặt cấu trúc ứng dụng với kiến trúc MVVM
 - Chuẩn bị các tài nguyên cần thiết (icon, drawable)
 - Thiết lập hệ thống đa ngôn ngữ (mặc định tiếng Anh)
+- Hiển thị thumbnail cho ảnh và video trong màn hình danh sách file đã khôi phục
+- Thêm tính năng xem trực tiếp file đã khôi phục khi nhấn vào từng mục trong danh sách
 
 ### Changed
 

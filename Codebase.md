@@ -138,3 +138,24 @@
 ### Module/Package: com.htnguyen.ifu.db
 - `RecoveredFilesDatabase` (Lưu trữ thông tin về các tệp tin đã khôi phục)
   onCreate, onUpgrade, addRecoveredFile, getRecoveredFiles, countRecoveredFiles, getTotalSize, fileExists, deleteFile, cursorToRecoveredFile
+
+## Adapter
+
+### RecoveredFileAdapter
+- **Chức năng**: Hiển thị danh sách file đã khôi phục với thumbnail và thông tin chi tiết
+- **Các phương thức chính**:
+  - `updateFiles`: Cập nhật danh sách file
+  - `bind`: Hiển thị thông tin file
+  - `loadThumbnail`: Tải và hiển thị thumbnail cho ảnh và video
+  - `openFile`: Mở file đã khôi phục với ứng dụng mặc định
+  - `onDestroy`: Thu hồi tài nguyên khi adapter không còn được sử dụng
+
+## Activity
+
+### RecoveredFilesDetailActivity
+- **Chức năng**: Hiển thị danh sách chi tiết các file đã khôi phục theo loại
+- **Các phương thức chính**:
+  - `setupViews`: Thiết lập các thành phần giao diện
+  - `setupRecyclerView`: Khởi tạo RecyclerView và adapter
+  - `loadRecoveredFiles`: Tải danh sách file từ database
+  - `onDestroy`: Thu hồi tài nguyên adapter khi activity bị hủy

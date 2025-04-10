@@ -87,6 +87,9 @@
     <string name="recovered_other_files">Tệp khác đã khôi phục</string>
     <string name="no_recovered_files">Không có tệp tin nào đã được khôi phục</string>
     <string name="view">Xem</string>
+    <string name="thumbnail_preview">Xem trước tệp</string>
+    <string name="open_file_error">Không thể mở tệp tin này</string>
+    <string name="loading_thumbnail">Đang tải...</string>
     
     <!-- New strings for recovery features -->
     <string name="settings_app_language">App Language</string>

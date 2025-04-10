@@ -224,4 +224,29 @@ Bảng `recovered_files` với các cột:
 - `size`: Kích thước tệp tính bằng byte (INTEGER)
 - `modified_date`: Ngày chỉnh sửa tệp (INTEGER - timestamp)
 - `type`: Loại tệp tin (TEXT - "photo", "video", "file")
-- `recovery_date`: Ngày khôi phục tệp (INTEGER - timestamp) 
+- `recovery_date`: Ngày khôi phục tệp (INTEGER - timestamp)
+
+# Hướng dẫn sử dụng tính năng xem file đã khôi phục
+
+## Xem danh sách file đã khôi phục
+
+1. Trên màn hình chính (Home), nhấn vào phần "Đã khôi phục" để xem thống kê về các file đã khôi phục.
+2. Màn hình sẽ hiển thị 3 loại file (Ảnh, Video, Tệp tin khác) với số lượng và dung lượng tương ứng.
+3. Nhấn vào từng mục để xem danh sách chi tiết theo loại.
+
+## Xem thumbnail và chi tiết file đã khôi phục
+
+1. Khi vào xem danh sách file đã khôi phục theo loại, với mỗi mục:
+   - File ảnh: Sẽ hiển thị thumbnail thu nhỏ của ảnh
+   - File video: Sẽ hiển thị thumbnail của frame đầu tiên
+   - File khác: Sẽ hiển thị icon tương ứng với loại file
+
+2. Nhấn vào bất kỳ mục nào trong danh sách để mở file với ứng dụng mặc định trên thiết bị:
+   - Ảnh sẽ được mở bằng ứng dụng xem ảnh
+   - Video sẽ được mở bằng ứng dụng xem video
+   - Các file khác sẽ được mở với ứng dụng tương ứng nếu thiết bị có hỗ trợ
+
+## Lưu ý
+- Việc tải thumbnail có thể mất một chút thời gian với file có kích thước lớn
+- Khi xem video, thiết bị sẽ sử dụng ứng dụng mặc định để phát video
+- Đối với một số định dạng file đặc biệt, thiết bị có thể không có ứng dụng hỗ trợ để mở 

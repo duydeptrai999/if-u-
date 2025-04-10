@@ -1,15 +1,23 @@
 package com.htnguyen.ifu.adapter
 
+import android.content.Intent
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.htnguyen.ifu.R
 import com.htnguyen.ifu.model.RecoveredFile
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlinx.coroutines.*
 
 /**
  * Adapter để hiển thị danh sách các tệp tin đã khôi phục
@@ -19,6 +27,7 @@ class RecoveredFileAdapter(private var files: List<RecoveredFile>) :
 
     // Định dạng ngày giờ
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+    private val thumbnailCoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     /**
      * Cập nhật danh sách tệp tin và thông báo thay đổi
@@ -40,6 +49,15 @@ class RecoveredFileAdapter(private var files: List<RecoveredFile>) :
     }
 
     override fun getItemCount(): Int = files.size
+    
+    override fun onViewRecycled(holder: FileViewHolder) {
+        super.onViewRecycled(holder)
+        holder.cancelThumbnailLoading()
+    }
+    
+    fun onDestroy() {
+        thumbnailCoroutineScope.cancel()
+    }
 
     /**
      * ViewHolder để hiển thị mỗi mục tệp tin
@@ -48,6 +66,8 @@ class RecoveredFileAdapter(private var files: List<RecoveredFile>) :
         private val fileIcon: ImageView = itemView.findViewById(R.id.ivFileIcon)
         private val fileName: TextView = itemView.findViewById(R.id.tvFileName)
         private val fileDetails: TextView = itemView.findViewById(R.id.tvFileDetails)
+        private val thumbnailView: ImageView = itemView.findViewById(R.id.ivThumbnail)
+        private var thumbnailJob: Job? = null
 
         /**
          * Hiển thị thông tin tệp tin
@@ -62,9 +82,119 @@ class RecoveredFileAdapter(private var files: List<RecoveredFile>) :
             
             // Thiết lập biểu tượng tương ứng với loại tệp
             when {
-                isImageFile(file.name) -> fileIcon.setImageResource(R.drawable.ic_photo)
-                isVideoFile(file.name) -> fileIcon.setImageResource(R.drawable.ic_video)
-                else -> fileIcon.setImageResource(R.drawable.ic_document)
+                isImageFile(file.name) -> {
+                    fileIcon.setImageResource(R.drawable.ic_photo)
+                    loadThumbnail(file.path, true)
+                }
+                isVideoFile(file.name) -> {
+                    fileIcon.setImageResource(R.drawable.ic_video)
+                    loadThumbnail(file.path, false)
+                }
+                else -> {
+                    fileIcon.setImageResource(R.drawable.ic_document)
+                    thumbnailView.visibility = View.GONE
+                }
+            }
+            
+            // Thiết lập sự kiện click để mở file
+            itemView.setOnClickListener {
+                openFile(file)
+            }
+        }
+        
+        /**
+         * Hủy công việc tải thumbnail khi view bị recycle
+         */
+        fun cancelThumbnailLoading() {
+            thumbnailJob?.cancel()
+            thumbnailJob = null
+        }
+        
+        /**
+         * Tải thumbnail cho ảnh hoặc video
+         */
+        private fun loadThumbnail(filePath: String, isImage: Boolean) {
+            thumbnailView.visibility = View.VISIBLE
+            thumbnailView.setImageResource(R.drawable.ic_photo) // Placeholder
+            
+            cancelThumbnailLoading()
+            
+            thumbnailJob = thumbnailCoroutineScope.launch(Dispatchers.IO) {
+                try {
+                    if (isImage) {
+                        // Tải thumbnail cho ảnh
+                        val options = BitmapFactory.Options().apply {
+                            inSampleSize = 8 // Giảm độ phân giải để tối ưu bộ nhớ
+                        }
+                        val bitmap = BitmapFactory.decodeFile(filePath, options)
+                        
+                        withContext(Dispatchers.Main) {
+                            thumbnailView.setImageBitmap(bitmap)
+                        }
+                    } else {
+                        // Tải thumbnail cho video
+                        val retriever = MediaMetadataRetriever()
+                        retriever.setDataSource(filePath)
+                        val bitmap = retriever.getFrameAtTime(1000000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
+                        retriever.release()
+                        
+                        withContext(Dispatchers.Main) {
+                            if (bitmap != null) {
+                                thumbnailView.setImageBitmap(bitmap)
+                            } else {
+                                // Nếu không thể lấy frame từ video
+                                thumbnailView.setImageResource(R.drawable.ic_video)
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        // Nếu xảy ra lỗi, hiển thị icon mặc định
+                        if (isImage) {
+                            thumbnailView.setImageResource(R.drawable.ic_photo)
+                        } else {
+                            thumbnailView.setImageResource(R.drawable.ic_video)
+                        }
+                    }
+                }
+            }
+        }
+        
+        /**
+         * Mở file để xem
+         */
+        private fun openFile(file: RecoveredFile) {
+            val context = itemView.context
+            val fileObj = File(file.path)
+            
+            if (!fileObj.exists()) {
+                return
+            }
+            
+            val fileUri = FileProvider.getUriForFile(
+                context,
+                context.applicationContext.packageName + ".provider",
+                fileObj
+            )
+            
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(fileUri, getMimeType(file.name))
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            
+            if (intent.resolveActivity(context.packageManager) != null) {
+                context.startActivity(intent)
+            }
+        }
+        
+        /**
+         * Lấy loại MIME dựa trên tên file
+         */
+        private fun getMimeType(fileName: String): String {
+            return when {
+                isImageFile(fileName) -> "image/*"
+                isVideoFile(fileName) -> "video/*"
+                else -> "*/*"
             }
         }
         

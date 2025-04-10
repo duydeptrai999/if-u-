@@ -36,6 +36,14 @@ class RecoveredFilesDetailActivity : AppCompatActivity() {
         setupRecyclerView()
         loadRecoveredFiles()
     }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        // Thu hồi tài nguyên của adapter khi activity bị hủy
+        if (::adapter.isInitialized) {
+            adapter.onDestroy()
+        }
+    }
 
     /**
      * Thiết lập các thành phần giao diện
