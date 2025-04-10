@@ -147,7 +147,9 @@
   - `updateFiles`: Cập nhật danh sách file
   - `bind`: Hiển thị thông tin file
   - `loadThumbnail`: Tải và hiển thị thumbnail cho ảnh và video
-  - `openFile`: Mở file đã khôi phục với ứng dụng mặc định
+  - `openFile`: Mở file đã khôi phục với ứng dụng mặc định hoặc trình xem tích hợp
+  - `openInCurrentApp`: Mở file trong ứng dụng hiện tại khi không có ứng dụng bên ngoài phù hợp
+  - `getMimeType`: Xác định MIME type chính xác cho file dựa trên đuôi file
   - `onDestroy`: Thu hồi tài nguyên khi adapter không còn được sử dụng
 
 ## Activity
@@ -159,3 +161,13 @@
   - `setupRecyclerView`: Khởi tạo RecyclerView và adapter
   - `loadRecoveredFiles`: Tải danh sách file từ database
   - `onDestroy`: Thu hồi tài nguyên adapter khi activity bị hủy
+
+### FileViewerActivity
+- **Chức năng**: Hiển thị nội dung file (ảnh, video) trực tiếp trong ứng dụng
+- **Các phương thức chính**:
+  - `setupViews`: Thiết lập các thành phần giao diện
+  - `showImage`: Hiển thị ảnh trong ImageView
+  - `showVideo`: Thiết lập và phát video trong VideoView
+  - `showNoPreview`: Hiển thị thông báo khi không thể hiển thị xem trước
+  - `showError`: Hiển thị thông báo lỗi và xử lý khi không thể mở file
+  - `onPause`/`onDestroy`: Quản lý vòng đời của VideoView

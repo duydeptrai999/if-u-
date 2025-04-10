@@ -241,12 +241,25 @@ Bảng `recovered_files` với các cột:
    - File video: Sẽ hiển thị thumbnail của frame đầu tiên
    - File khác: Sẽ hiển thị icon tương ứng với loại file
 
-2. Nhấn vào bất kỳ mục nào trong danh sách để mở file với ứng dụng mặc định trên thiết bị:
-   - Ảnh sẽ được mở bằng ứng dụng xem ảnh
-   - Video sẽ được mở bằng ứng dụng xem video
-   - Các file khác sẽ được mở với ứng dụng tương ứng nếu thiết bị có hỗ trợ
+2. Nhấn vào bất kỳ mục nào trong danh sách để mở file:
+   - Ứng dụng sẽ cố gắng mở file với ứng dụng mặc định trên thiết bị
+   - Nếu không tìm thấy ứng dụng phù hợp, file sẽ được mở trực tiếp trong ứng dụng Easy Recovery
+   - Ảnh sẽ được hiển thị trong trình xem ảnh tích hợp
+   - Video sẽ được phát trong trình phát video tích hợp với các điều khiển cơ bản
+
+3. Cách sử dụng trình xem tích hợp:
+   - Nhấn nút quay lại ở góc trên bên trái để trở về danh sách
+   - Đối với video, sử dụng các điều khiển phát/dừng, thanh tiến trình để điều khiển việc phát
+   - Xoay thiết bị để xem ở chế độ toàn màn hình ngang (landscape)
+
+## Xử lý lỗi và thông báo
+Ứng dụng sẽ hiển thị các thông báo chi tiết trong các trường hợp sau:
+- Khi file không tồn tại
+- Khi không có ứng dụng nào trên thiết bị có thể mở loại file đó
+- Khi có lỗi xảy ra trong quá trình mở file
 
 ## Lưu ý
 - Việc tải thumbnail có thể mất một chút thời gian với file có kích thước lớn
-- Khi xem video, thiết bị sẽ sử dụng ứng dụng mặc định để phát video
-- Đối với một số định dạng file đặc biệt, thiết bị có thể không có ứng dụng hỗ trợ để mở 
+- Khi xem video trong trình phát tích hợp, video sẽ được phát với chất lượng gốc, có thể tiêu tốn nhiều tài nguyên
+- Một số định dạng file đặc biệt có thể không được hỗ trợ bởi trình xem tích hợp
+- Trong trường hợp file không thể mở bằng ứng dụng mặc định hoặc trình xem tích hợp, bạn có thể thử sử dụng ứng dụng khác từ Google Play 

@@ -42,6 +42,8 @@
 - Thiết lập hệ thống đa ngôn ngữ (mặc định tiếng Anh)
 - Hiển thị thumbnail cho ảnh và video trong màn hình danh sách file đã khôi phục
 - Thêm tính năng xem trực tiếp file đã khôi phục khi nhấn vào từng mục trong danh sách
+- Thêm FileViewerActivity để hiển thị ảnh và video trực tiếp trong ứng dụng khi không có ứng dụng bên ngoài phù hợp
+- Cải thiện xử lý lỗi khi mở file và thông báo chi tiết cho người dùng
 
 ### Changed
 
@@ -70,6 +72,9 @@
 - Giảm kích thước button khôi phục thành công từ 56dp xuống 48dp và giảm cỡ chữ từ 16sp xuống 14sp để làm gọn giao diện
 - Xóa các ký tự lạ (%1$d, %2$d) trong chuỗi thông báo khôi phục thành công và thay bằng thông báo đơn giản
 - Áp dụng cải thiện tương tự cho màn hình thông báo khôi phục video và file thành công để đảm bảo giao diện nhất quán
+- Sửa lỗi không thể mở file ảnh và video khi nhấn vào từ danh sách đã khôi phục
+- Cải thiện xác định MIME type để mở file với ứng dụng phù hợp hơn
+- Thêm phương pháp thay thế để xem file khi không thể mở bằng ứng dụng bên ngoài
 
 ## [1.0.1] - 2024-03-23
 

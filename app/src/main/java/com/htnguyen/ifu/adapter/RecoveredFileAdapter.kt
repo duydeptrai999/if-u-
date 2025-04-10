@@ -1,6 +1,8 @@
 package com.htnguyen.ifu.adapter
 
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
@@ -167,33 +169,131 @@ class RecoveredFileAdapter(private var files: List<RecoveredFile>) :
             val context = itemView.context
             val fileObj = File(file.path)
             
+            // Kiểm tra file có tồn tại không
             if (!fileObj.exists()) {
+                android.widget.Toast.makeText(
+                    context,
+                    context.getString(R.string.open_file_error) + ": File không tồn tại",
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
                 return
             }
             
-            val fileUri = FileProvider.getUriForFile(
-                context,
-                context.applicationContext.packageName + ".provider",
-                fileObj
-            )
-            
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(fileUri, getMimeType(file.name))
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            // Kiểm tra xem đây có phải là ảnh hoặc video không để sử dụng cách mở tương ứng
+            if (isImageFile(file.name) || isVideoFile(file.name)) {
+                try {
+                    val fileUri = FileProvider.getUriForFile(
+                        context,
+                        context.applicationContext.packageName + ".provider",
+                        fileObj
+                    )
+                    
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(fileUri, getMimeType(file.name))
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    
+                    // Kiểm tra xem có ứng dụng nào có thể xử lý intent này không
+                    val activities = context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+                    if (activities.isNotEmpty()) {
+                        context.startActivity(intent)
+                    } else {
+                        // Nếu không có ứng dụng khác, thử mở trong ứng dụng hiện tại
+                        openInCurrentApp(context, file)
+                    }
+                } catch (e: Exception) {
+                    // Nếu có lỗi, thử mở trong ứng dụng hiện tại
+                    openInCurrentApp(context, file)
+                    e.printStackTrace()
+                }
+            } else {
+                // Đối với các tệp khác, sử dụng cách mở thông thường
+                try {
+                    val fileUri = FileProvider.getUriForFile(
+                        context,
+                        context.applicationContext.packageName + ".provider",
+                        fileObj
+                    )
+                    
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(fileUri, getMimeType(file.name))
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    
+                    if (intent.resolveActivity(context.packageManager) != null) {
+                        context.startActivity(intent)
+                    } else {
+                        android.widget.Toast.makeText(
+                            context,
+                            context.getString(R.string.open_file_error) + ": Không có ứng dụng hỗ trợ loại file này",
+                            android.widget.Toast.LENGTH_LONG
+                        ).show()
+                    }
+                } catch (e: Exception) {
+                    android.widget.Toast.makeText(
+                        context,
+                        context.getString(R.string.open_file_error) + ": ${e.message}",
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                    e.printStackTrace()
+                }
             }
-            
-            if (intent.resolveActivity(context.packageManager) != null) {
-                context.startActivity(intent)
+        }
+        
+        /**
+         * Mở file trong ứng dụng hiện tại
+         */
+        private fun openInCurrentApp(context: Context, file: RecoveredFile) {
+            // Mở intent để xem chi tiết file trong ứng dụng hiện tại
+            val intent = Intent(context, com.htnguyen.ifu.FileViewerActivity::class.java).apply {
+                putExtra("file_path", file.path)
+                putExtra("file_name", file.name)
+                putExtra("file_type", if (isImageFile(file.name)) "image" else if (isVideoFile(file.name)) "video" else "other")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
+            context.startActivity(intent)
         }
         
         /**
          * Lấy loại MIME dựa trên tên file
          */
         private fun getMimeType(fileName: String): String {
+            val lowerCaseName = fileName.lowercase(Locale.ROOT)
+            
             return when {
+                // Ảnh
+                lowerCaseName.endsWith(".jpg") || lowerCaseName.endsWith(".jpeg") -> "image/jpeg"
+                lowerCaseName.endsWith(".png") -> "image/png"
+                lowerCaseName.endsWith(".gif") -> "image/gif"
+                lowerCaseName.endsWith(".webp") -> "image/webp"
+                lowerCaseName.endsWith(".bmp") -> "image/bmp"
                 isImageFile(fileName) -> "image/*"
+                
+                // Video
+                lowerCaseName.endsWith(".mp4") -> "video/mp4"
+                lowerCaseName.endsWith(".3gp") -> "video/3gpp"
+                lowerCaseName.endsWith(".mkv") -> "video/x-matroska"
+                lowerCaseName.endsWith(".webm") -> "video/webm"
+                lowerCaseName.endsWith(".avi") -> "video/x-msvideo"
                 isVideoFile(fileName) -> "video/*"
+                
+                // Văn bản
+                lowerCaseName.endsWith(".txt") -> "text/plain"
+                lowerCaseName.endsWith(".html") || lowerCaseName.endsWith(".htm") -> "text/html"
+                lowerCaseName.endsWith(".pdf") -> "application/pdf"
+                
+                // Tài liệu Office
+                lowerCaseName.endsWith(".doc") || lowerCaseName.endsWith(".docx") -> "application/msword"
+                lowerCaseName.endsWith(".xls") || lowerCaseName.endsWith(".xlsx") -> "application/vnd.ms-excel"
+                lowerCaseName.endsWith(".ppt") || lowerCaseName.endsWith(".pptx") -> "application/vnd.ms-powerpoint"
+                
+                // Nén
+                lowerCaseName.endsWith(".zip") -> "application/zip"
+                lowerCaseName.endsWith(".rar") -> "application/x-rar-compressed"
+                
+                // Mặc định cho các loại tệp khác
                 else -> "*/*"
             }
         }

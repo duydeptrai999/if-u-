@@ -56,6 +56,11 @@
             android:name=".RecoveredFilesDetailActivity"
             android:parentActivityName=".RecoveredFilesActivity" />
             
+        <activity
+            android:name=".FileViewerActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+            
         <!-- Thêm FileProvider cho việc chia sẻ ảnh đã khôi phục -->
         <provider
             android:name="androidx.core.content.FileProvider"
