@@ -98,19 +98,19 @@
 
 - Quy trình làm việc cũ không sử dụng cấu trúc "6 Docs"
 
-## [0.3.0] - 2023-07-10
+## [0.3.0] - 2023-10-27
 
 ### Thêm mới
-- Tính năng khôi phục các file khác (Other Files)
-- Khả năng phân loại file thành nhiều loại (PDF, Document, Spreadsheet, v.v.)
-- Tạo giao diện người dùng cho tính năng khôi phục file
-- Thêm các biểu tượng (icon) cho các loại file khác nhau
-- Thêm màn hình xem trước kết quả quét file
+- Tính năng lưu trữ thông tin tệp tin đã khôi phục trong cơ sở dữ liệu
+- Đồng bộ các tệp đã khôi phục từ cả thư mục hệ thống và ứng dụng
+- Cập nhật thống kê tự động khi có tệp mới được khôi phục
 
-### Cải thiện
-- Thêm tài liệu hướng dẫn sử dụng cho tính năng khôi phục file
-- Cải thiện thuật toán phát hiện và phân loại file
-- Bổ sung thêm chuỗi tiếng Việt cho tính năng khôi phục file
+### Chi tiết triển khai
+- Tạo `RecoveredFilesDatabase` để lưu trữ thông tin về các tệp tin đã khôi phục
+- Cập nhật các activity khôi phục để lưu thông tin tệp tin vào database
+- Cập nhật RecoveredFilesActivity để đọc dữ liệu từ database
+- Cập nhật MainActivity để hiển thị thống kê từ database
+- Thêm phương thức onResume để cập nhật thống kê khi trở về từ các màn hình khôi phục
 
 ## [0.2.0] - 2023-10-25
 

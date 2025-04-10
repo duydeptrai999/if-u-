@@ -132,3 +132,9 @@
 ### Module/Package: com.htnguyen.ifu.model
 - `RecoveredFile` (Mô hình dữ liệu cho tệp tin đã khôi phục)
   path, name, size, modifiedDate, isSelected
+
+## Cơ sở dữ liệu
+
+### Module/Package: com.htnguyen.ifu.db
+- `RecoveredFilesDatabase` (Lưu trữ thông tin về các tệp tin đã khôi phục)
+  onCreate, onUpgrade, addRecoveredFile, getRecoveredFiles, countRecoveredFiles, getTotalSize, fileExists, deleteFile, cursorToRecoveredFile

@@ -184,4 +184,41 @@ Hiện tại, dữ liệu được mô phỏng bằng các mảng cứng để d
 
 ### Tương tác với các tính năng khác
 - Khi người dùng khôi phục thành công các tệp tin từ các tính năng khôi phục (Ảnh, Video, Tệp tin khác), danh sách tệp tin đã khôi phục sẽ được cập nhật.
-- Thống kê trên màn hình chính sẽ hiển thị tổng số tệp tin và kích thước đã khôi phục. 
+- Thống kê trên màn hình chính sẽ hiển thị tổng số tệp tin và kích thước đã khôi phục.
+
+## Tính năng lưu trữ thông tin tệp tin đã khôi phục
+
+### Mô tả
+Tính năng này sẽ lưu trữ thông tin về các tệp tin đã được khôi phục (ảnh, video, file) vào cơ sở dữ liệu SQLite của ứng dụng. Điều này cho phép người dùng xem lại các tệp đã khôi phục ngay cả khi đã đóng và mở lại ứng dụng.
+
+### Cách hoạt động
+1. Khi một tệp tin được khôi phục thành công, thông tin về tệp tin sẽ được lưu vào cơ sở dữ liệu SQLite.
+2. Thông tin được lưu trữ bao gồm: đường dẫn đến tệp, tên tệp, kích thước, ngày chỉnh sửa, loại tệp và ngày khôi phục.
+3. Dữ liệu từ cơ sở dữ liệu được hiển thị trong màn hình "Đã khôi phục" và cập nhật trạng thái ở màn hình chính.
+4. Thống kê tổng số lượng và kích thước tệp tin đã khôi phục được hiển thị trên màn hình chính.
+
+### Các thành phần chính
+1. **RecoveredFilesDatabase**: Lớp cơ sở dữ liệu SQLite để lưu trữ thông tin về các tệp tin đã khôi phục.
+   - Phương thức `addRecoveredFile`: Thêm một tệp tin đã khôi phục vào cơ sở dữ liệu.
+   - Phương thức `getRecoveredFiles`: Lấy danh sách tệp tin đã khôi phục theo loại.
+   - Phương thức `countRecoveredFiles`: Đếm số lượng tệp tin đã khôi phục theo loại.
+   - Phương thức `getTotalSize`: Tính tổng kích thước tệp tin đã khôi phục theo loại.
+
+2. **Tích hợp với các Activity khôi phục**:
+   - PhotoRecoveryActivity: Lưu thông tin ảnh đã khôi phục vào cơ sở dữ liệu.
+   - VideoRecoveryActivity: Lưu thông tin video đã khôi phục vào cơ sở dữ liệu.
+   - FileRecoveryActivity: Lưu thông tin tệp tin khác đã khôi phục vào cơ sở dữ liệu.
+
+3. **Hiển thị thông tin trên giao diện**:
+   - RecoveredFilesActivity và RecoveredFilesDetailActivity: Đọc dữ liệu từ cơ sở dữ liệu để hiển thị danh sách tệp tin đã khôi phục.
+   - MainActivity: Cập nhật thống kê trên màn hình chính dựa trên dữ liệu từ cơ sở dữ liệu.
+
+### Cấu trúc cơ sở dữ liệu
+Bảng `recovered_files` với các cột:
+- `id`: Khóa chính, tự động tăng
+- `path`: Đường dẫn đến tệp tin (TEXT)
+- `name`: Tên tệp tin (TEXT)
+- `size`: Kích thước tệp tính bằng byte (INTEGER)
+- `modified_date`: Ngày chỉnh sửa tệp (INTEGER - timestamp)
+- `type`: Loại tệp tin (TEXT - "photo", "video", "file")
+- `recovery_date`: Ngày khôi phục tệp (INTEGER - timestamp) 

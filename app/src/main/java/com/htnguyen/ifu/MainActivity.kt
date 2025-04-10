@@ -46,6 +46,21 @@ class MainActivity : AppCompatActivity() {
         // Kiểm tra và yêu cầu quyền truy cập
         checkStoragePermission()
     }
+    
+    override fun onResume() {
+        super.onResume()
+        // Cập nhật thống kê mỗi khi trở lại màn hình chính (sau khi khôi phục)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager()) {
+                updateStatisticsFromDatabase()
+            }
+        } else if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED) {
+            updateStatisticsFromDatabase()
+        }
+    }
 
     private fun checkStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
