@@ -87,6 +87,9 @@ Tính năng khôi phục ảnh giúp người dùng tìm và khôi phục các �
    - Chọn các ảnh muốn khôi phục bằng cách nhấn vào ảnh
    - Nhấn nút "Khôi phục đã chọn" để khôi phục các ảnh đã chọn
    - Sau khi khôi phục thành công, ứng dụng sẽ thông báo số lượng ảnh đã khôi phục thành công
+   - Thông báo khôi phục thành công hiển thị biểu tượng tích xanh, số lượng ảnh đã khôi phục và số ảnh đã được lưu vào thư viện
+   - Người dùng có thể chọn "CONTINUE" để tiếp tục sử dụng ứng dụng hoặc "XEM ẢNH ĐÃ KHÔI PHỤC" để xem các ảnh vừa khôi phục
+   - Cả hai nút đều có cùng kích thước và được thiết kế đồng nhất để tăng tính thẩm mỹ
 
 ## Khôi phục Video
 
