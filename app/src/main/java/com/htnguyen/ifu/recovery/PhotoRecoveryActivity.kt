@@ -1,6 +1,7 @@
 package com.htnguyen.ifu.recovery
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -799,17 +800,26 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         statusText.text = getString(R.string.recovering_status, selectedPhotos.size)
         
         CoroutineScope(Dispatchers.IO).launch {
+            // Tạo thư mục khôi phục dự phòng trong trường hợp không thể khôi phục vào thư viện
             val recoveryDir = File(getExternalFilesDir(null), "RecoveredPhotos")
             if (!recoveryDir.exists()) {
                 recoveryDir.mkdirs()
             }
             
             var successCount = 0
+            var galleryRecoveryCount = 0
             
             for (photo in selectedPhotos) {
                 try {
                     val sourceFile = photo.getFile()
                     val destFile = File(recoveryDir, sourceFile.name)
+                    
+                    // Tên file mới sau khi khôi phục (loại bỏ dấu chấm ở đầu nếu có)
+                    val recoveredFileName = if (sourceFile.name.startsWith(".")) {
+                        sourceFile.name.substring(1)
+                    } else {
+                        sourceFile.name
+                    }
                     
                     // Nếu ảnh có contentUri (từ thùng rác MediaStore) và Android 12+, dùng API khôi phục
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && photo.getContentUri() != null) {
@@ -825,48 +835,38 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                             val updatedRows = contentResolver.update(uri, values, null, null)
                             
                             if (updatedRows > 0) {
-                                // Bước 2: Sao chép file vào thư mục khôi phục của ứng dụng
-                                contentResolver.openInputStream(uri)?.use { input ->
-                                    FileOutputStream(destFile).use { output ->
-                                        input.copyTo(output)
-                                    }
-                                }
-                                
-                                Log.d("PhotoRecovery", "Đã khôi phục thành công từ thùng rác MediaStore: ${sourceFile.name}")
+                                galleryRecoveryCount++
                                 successCount++
+                                Log.d("PhotoRecovery", "Đã khôi phục thành công từ thùng rác MediaStore: ${sourceFile.name}")
                             } else {
-                                // Nếu không phục hồi được từ thùng rác, thử sao chép trực tiếp
-                                Log.d("PhotoRecovery", "Không phục hồi được từ thùng rác, thử sao chép trực tiếp")
-                                FileInputStream(sourceFile).use { input ->
-                                    FileOutputStream(destFile).use { output ->
-                                        input.copyTo(output)
-                                    }
-                                }
+                                // Nếu không phục hồi được từ thùng rác, thử khôi phục vào bộ sưu tập
+                                recoverToGallery(sourceFile, recoveredFileName, destFile)
                                 successCount++
                             }
                         } catch (e: Exception) {
                             Log.e("PhotoRecovery", "Lỗi khi khôi phục từ thùng rác: ${e.message}", e)
                             
-                            // Nếu lỗi khi khôi phục từ thùng rác, thử sao chép trực tiếp
+                            // Nếu lỗi khi khôi phục từ thùng rác, thử khôi phục vào bộ sưu tập
+                            recoverToGallery(sourceFile, recoveredFileName, destFile)
+                            successCount++
+                        }
+                    } else {
+                        // Thử khôi phục ảnh vào bộ sưu tập trên thiết bị
+                        Log.d("PhotoRecovery", "Khôi phục vào bộ sưu tập: ${sourceFile.absolutePath}")
+                        
+                        if (recoverToGallery(sourceFile, recoveredFileName, destFile)) {
+                            galleryRecoveryCount++
+                            successCount++
+                        } else {
+                            // Nếu không thể khôi phục vào bộ sưu tập, sao chép vào thư mục khôi phục của ứng dụng
                             FileInputStream(sourceFile).use { input ->
                                 FileOutputStream(destFile).use { output ->
                                     input.copyTo(output)
                                 }
                             }
                             successCount++
+                            Log.d("PhotoRecovery", "Đã sao chép vào thư mục khôi phục: ${destFile.absolutePath}")
                         }
-                    } else {
-                        // Khôi phục bằng cách sao chép nếu không có contentUri
-                        Log.d("PhotoRecovery", "Khôi phục bằng cách sao chép: ${sourceFile.absolutePath}")
-                        
-                        // Sao chép file gốc vào thư mục khôi phục
-                        FileInputStream(sourceFile).use { input ->
-                            FileOutputStream(destFile).use { output ->
-                                input.copyTo(output)
-                            }
-                        }
-                        
-                        successCount++
                     }
                 } catch (e: Exception) {
                     Log.e("PhotoRecovery", "Lỗi khi khôi phục: ${e.message}", e)
@@ -877,9 +877,15 @@ class PhotoRecoveryActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) {
                 progressBar.visibility = View.GONE
                 if (successCount > 0) {
+                    val message = if (galleryRecoveryCount > 0) {
+                        getString(R.string.recovery_success_gallery, successCount, galleryRecoveryCount)
+                    } else {
+                        getString(R.string.recovery_success, successCount)
+                    }
+                    
                     Toast.makeText(
                         this@PhotoRecoveryActivity,
-                        getString(R.string.recovery_success, successCount),
+                        message,
                         Toast.LENGTH_LONG
                     ).show()
                     
@@ -893,6 +899,79 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                     ).show()
                 }
             }
+        }
+    }
+    
+    /**
+     * Khôi phục ảnh vào bộ sưu tập (thư viện) thiết bị
+     * @return true nếu khôi phục thành công vào bộ sưu tập
+     */
+    private fun recoverToGallery(sourceFile: File, recoveredFileName: String, backupFile: File): Boolean {
+        try {
+            // Thư mục DCIM hoặc Pictures để lưu ảnh khôi phục
+            val dcimDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+            val cameraDir = File(dcimDir, "Camera")
+            
+            if (!cameraDir.exists()) {
+                cameraDir.mkdirs()
+            }
+            
+            // Tạo file khôi phục trong thư mục Camera
+            val recoveredFile = File(cameraDir, recoveredFileName)
+            
+            // Sao chép file từ nguồn vào thư mục Camera
+            FileInputStream(sourceFile).use { input ->
+                FileOutputStream(recoveredFile).use { output ->
+                    input.copyTo(output)
+                }
+            }
+            
+            // Thêm thông tin về ảnh vào MediaStore để hiển thị trong thư viện
+            val values = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, recoveredFileName)
+                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+                put(MediaStore.Images.Media.DATE_MODIFIED, System.currentTimeMillis() / 1000)
+                put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+                put(MediaStore.Images.Media.SIZE, recoveredFile.length())
+                
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    put(MediaStore.Images.Media.RELATIVE_PATH, "DCIM/Camera")
+                    put(MediaStore.Images.Media.IS_PENDING, 0)
+                } else {
+                    put(MediaStore.Images.Media.DATA, recoveredFile.absolutePath)
+                }
+            }
+            
+            // Thêm ảnh vào bộ sưu tập
+            contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            
+            // Thông báo hệ thống quét media mới
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                mediaScanIntent.data = android.net.Uri.fromFile(recoveredFile)
+                sendBroadcast(mediaScanIntent)
+            }
+            
+            Log.d("PhotoRecovery", "Đã khôi phục ảnh vào bộ sưu tập: ${recoveredFile.absolutePath}")
+            return true
+        } catch (e: Exception) {
+            Log.e("PhotoRecovery", "Lỗi khi khôi phục vào bộ sưu tập: ${e.message}", e)
+            e.printStackTrace()
+            
+            // Nếu lỗi, sao chép vào thư mục dự phòng
+            try {
+                FileInputStream(sourceFile).use { input ->
+                    FileOutputStream(backupFile).use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                Log.d("PhotoRecovery", "Sao chép vào thư mục dự phòng thành công: ${backupFile.absolutePath}")
+            } catch (e: Exception) {
+                Log.e("PhotoRecovery", "Lỗi khi sao chép vào thư mục dự phòng: ${e.message}", e)
+            }
+            
+            return false
         }
     }
     

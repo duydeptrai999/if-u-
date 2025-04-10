@@ -1,6 +1,7 @@
 package com.htnguyen.ifu.recovery
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -38,6 +39,7 @@ import java.text.DecimalFormat
 import java.util.Date
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
+import java.util.Comparator
 
 class VideoRecoveryActivity : AppCompatActivity() {
 
@@ -64,6 +66,7 @@ class VideoRecoveryActivity : AppCompatActivity() {
     private lateinit var scanIllustration: ImageView
     
     private val recoveredVideos = mutableListOf<RecoverableItem>()
+    private val scannedDirectories = mutableSetOf<String>() // Theo dõi thư mục đã quét
     private val STORAGE_PERMISSION_CODE = 101
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -386,7 +389,7 @@ class VideoRecoveryActivity : AppCompatActivity() {
             
             // Tạo 5 video mẫu
             for (i in 1..5) {
-                val sampleFile = File(sampleVideoDir, "sample_video_$i.mp4")
+                val sampleFile = File(sampleVideoDir, ".sample_video_$i.mp4") // Thêm dấu chấm để biểu thị file đã xóa
                 
                 try {
                     if (!sampleFile.exists() || sampleFile.length() == 0L) {
@@ -403,7 +406,8 @@ class VideoRecoveryActivity : AppCompatActivity() {
                         val recoveredFile = RecoverableItem(
                             sampleFile,
                             sampleFile.length(),
-                            "video"
+                            "video",
+                            true  // Đánh dấu là đã xóa
                         )
                         recoveredVideos.add(recoveredFile)
                         Log.d("VideoRecovery", "Đã thêm video mẫu: ${sampleFile.absolutePath}")
@@ -452,6 +456,8 @@ class VideoRecoveryActivity : AppCompatActivity() {
         
         // Xóa danh sách cũ nếu có
         recoveredVideos.clear()
+        // Xóa danh sách thư mục đã quét
+        scannedDirectories.clear()
         
         // Hiển thị toast để xác nhận rằng chức năng quét đang chạy
         Toast.makeText(this, "Đang bắt đầu quét video...", Toast.LENGTH_LONG).show()
@@ -463,6 +469,14 @@ class VideoRecoveryActivity : AppCompatActivity() {
             try {
                 // Log trong thread IO
                 Log.d("VideoRecovery", "Đang quét trong thread IO")
+                
+                // Trước tiên tìm kiếm trong các thư mục thùng rác
+                withContext(Dispatchers.Main) {
+                    updateScanStatus("Đang quét thùng rác...", 30)
+                }
+                
+                // Quét các thư mục thùng rác phổ biến
+                scanTrashFolders()
                 
                 // Tìm kiếm các video trong bộ nhớ thiết bị
                 val dcimDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
@@ -513,6 +527,19 @@ class VideoRecoveryActivity : AppCompatActivity() {
                         createSampleVideos()
                     }
                 }
+                
+                // Đảm bảo chỉ giữ lại video đã xóa thực sự
+                Log.d("VideoRecovery", "Trước khi lọc: ${recoveredVideos.size} video, ${recoveredVideos.count { it.isDeleted() }} video đã xóa")
+                
+                // Lọc nghiêm ngặt để chỉ giữ lại video đã xóa
+                val onlyDeletedVideos = recoveredVideos.filter { it.isDeleted() }
+                recoveredVideos.clear()
+                recoveredVideos.addAll(onlyDeletedVideos)
+                
+                Log.d("VideoRecovery", "Sau khi lọc: ${recoveredVideos.size} video, tất cả đều đã xóa")
+                
+                // Sắp xếp video theo ưu tiên
+                sortVideosByPriority()
                 
                 // Tính tổng kích thước của các file tìm thấy
                 val totalSize = recoveredVideos.sumOf { it.getSize() }
@@ -599,6 +626,161 @@ class VideoRecoveryActivity : AppCompatActivity() {
         }
     }
     
+    /**
+     * Quét các thư mục thùng rác phổ biến
+     */
+    private fun scanTrashFolders() {
+        val trashPaths = listOf(
+            // Google Files và các thùng rác phổ biến khác
+            "/storage/emulated/0/Android/data/com.google.android.apps.nbu.files/files/.trash",
+            "/storage/emulated/0/.trashed-videos",
+            
+            // Samsung
+            "/storage/emulated/0/DCIM/.trash", 
+            "/storage/emulated/0/DCIM/.trashbin",
+            "/storage/emulated/0/Movies/.trash",
+            
+            // Xiaomi/MIUI 
+            "/storage/emulated/0/MIUI/Gallery/cloud/.trash",
+            "/storage/emulated/0/MIUI/Gallery/.trashbin",
+            "/storage/emulated/0/DCIM/.globalTrash",
+            
+            // Huawei
+            "/storage/emulated/0/DCIM/Gallery/.recyclebin",
+            "/storage/emulated/0/Movies/.VideoTrash",
+            
+            // OPPO/ColorOS
+            "/storage/emulated/0/DCIM/.RecycleBin",
+            "/storage/emulated/0/Movies/.RecycleBin",
+            
+            // Vivo
+            "/storage/emulated/0/DCIM/.DeletedVideos",
+            "/storage/emulated/0/.VivoGalleryRecycler",
+            
+            // OnePlus
+            "/storage/emulated/0/DCIM/.dustbin",
+            "/storage/emulated/0/Movies/.dustbin"
+        )
+        
+        for (path in trashPaths) {
+            val trashDir = File(path)
+            if (trashDir.exists() && trashDir.isDirectory) {
+                Log.d("VideoRecovery", "Đang quét thùng rác: $path")
+                // Đánh dấu thư mục này đã được quét
+                scannedDirectories.add(trashDir.absolutePath)
+                scanTrashDirectory(trashDir)
+            }
+        }
+    }
+    
+    /**
+     * Quét một thư mục thùng rác để tìm video đã xóa
+     */
+    private fun scanTrashDirectory(trashDir: File) {
+        try {
+            if (!trashDir.exists() || !trashDir.isDirectory || !trashDir.canRead()) {
+                return
+            }
+            
+            val files = trashDir.listFiles() ?: return
+            
+            for (file in files) {
+                try {
+                    if (file.isDirectory && file.canRead()) {
+                        // Quét đệ quy nếu là thư mục
+                        scanTrashDirectory(file)
+                    } else if (file.isFile && file.canRead() && isVideoFile(file.name) && file.length() > 0) {
+                        Log.d("VideoRecovery", "Tìm thấy video trong thùng rác: ${file.absolutePath}")
+                        
+                        // Kiểm tra trùng lặp trước khi thêm vào danh sách
+                        if (!recoveredVideos.any { it.getPath() == file.absolutePath }) {
+                            // Tạo đối tượng RecoverableItem và đánh dấu là đã xóa
+                            val recoveredFile = RecoverableItem(
+                                file,
+                                file.length(),
+                                "video",
+                                true // Đánh dấu là video đã xóa
+                            )
+                            recoveredVideos.add(recoveredFile)
+                            Log.d("VideoRecovery", "Đã thêm video vào danh sách phục hồi: ${file.absolutePath}")
+                        } else {
+                            Log.d("VideoRecovery", "Bỏ qua video trùng lặp: ${file.absolutePath}")
+                        }
+                    }
+                } catch (e: SecurityException) {
+                    Log.e("VideoRecovery", "Lỗi quyền khi xử lý file trong thùng rác: ${e.message}")
+                } catch (e: Exception) {
+                    Log.e("VideoRecovery", "Lỗi khi xử lý file trong thùng rác: ${e.message}")
+                }
+            }
+        } catch (e: SecurityException) {
+            Log.e("VideoRecovery", "Lỗi quyền khi quét thư mục thùng rác: ${e.message}")
+        } catch (e: Exception) {
+            Log.e("VideoRecovery", "Lỗi khi quét thư mục thùng rác: ${e.message}")
+        }
+    }
+    
+    /**
+     * Sắp xếp danh sách video theo độ ưu tiên
+     */
+    private fun sortVideosByPriority() {
+        Log.d("VideoRecovery", "Sắp xếp danh sách video theo độ ưu tiên")
+        
+        // Chuyển sang danh sách mutable mới để tránh lỗi ConcurrentModification
+        val sortedList = ArrayList(recoveredVideos)
+        
+        // Sắp xếp theo nhiều tiêu chí
+        sortedList.sortWith(Comparator { item1, item2 ->
+            // Tiêu chí 1: Các video chắc chắn đã xóa (từ thùng rác) lên đầu tiên
+            val trashDir1 = isFromExplicitTrashDir(item1.getPath())
+            val trashDir2 = isFromExplicitTrashDir(item2.getPath())
+            
+            if (trashDir1 && !trashDir2) return@Comparator -1
+            if (!trashDir1 && trashDir2) return@Comparator 1
+            
+            // Tiêu chí 2: Các video có dấu hiệu đã xóa rõ ràng (tên bắt đầu bằng dấu chấm)
+            val hiddenFile1 = item1.getFile().name.startsWith(".")
+            val hiddenFile2 = item2.getFile().name.startsWith(".")
+            
+            if (hiddenFile1 && !hiddenFile2) return@Comparator -1
+            if (!hiddenFile1 && hiddenFile2) return@Comparator 1
+            
+            // Tiêu chí 3: Các video có kích thước lớn lên trước
+            val size1 = item1.getSize()
+            val size2 = item2.getSize()
+            
+            if (size1 > size2) return@Comparator -1
+            if (size1 < size2) return@Comparator 1
+            
+            // Tiêu chí 4: Sắp xếp theo thời gian sửa đổi (mới nhất lên đầu)
+            val time1 = item1.getFile().lastModified()
+            val time2 = item2.getFile().lastModified()
+            
+            time2.compareTo(time1) // Sắp xếp giảm dần (mới nhất lên đầu)
+        })
+        
+        // Cập nhật lại danh sách
+        recoveredVideos.clear()
+        recoveredVideos.addAll(sortedList)
+        
+        Log.d("VideoRecovery", "Đã sắp xếp xong ${recoveredVideos.size} video")
+    }
+    
+    /**
+     * Kiểm tra xem đường dẫn có nằm trong thư mục thùng rác rõ ràng không
+     */
+    private fun isFromExplicitTrashDir(path: String): Boolean {
+        val lowercasePath = path.lowercase()
+        
+        // Các từ khóa thùng rác rõ ràng
+        val explicitTrashKeywords = listOf(
+            "/.trash/", "/.globaltrash/", "/recycle.bin/", "/.recycle/", 
+            "/recycler/", "/bin/", "/.dustbin/", "/.trashbin/"
+        )
+        
+        return explicitTrashKeywords.any { lowercasePath.contains(it) }
+    }
+    
     private fun formatFileSize(size: Long): String {
         val df = DecimalFormat("0.00")
         val sizeKb = size / 1024.0f
@@ -615,6 +797,15 @@ class VideoRecoveryActivity : AppCompatActivity() {
     
     private fun simulateFindingDeletedVideos(directory: File) {
         try {
+            // Kiểm tra xem thư mục đã được quét chưa
+            if (scannedDirectories.contains(directory.absolutePath)) {
+                Log.d("VideoRecovery", "Bỏ qua thư mục đã quét: ${directory.absolutePath}")
+                return
+            }
+            
+            // Đánh dấu thư mục này đã được quét
+            scannedDirectories.add(directory.absolutePath)
+            
             // Kiểm tra thư mục có tồn tại và có thể đọc được không
             if (directory.exists() && directory.isDirectory && directory.canRead()) {
                 Log.d("VideoRecovery", "Đang quét thư mục: ${directory.absolutePath}")
@@ -629,26 +820,38 @@ class VideoRecoveryActivity : AppCompatActivity() {
                 
                 for (file in files) {
                     try {
-                        // Xóa giới hạn số lượng video
-                        /*if (recoveredVideos.size >= 20) {
-                            return // Đã đủ số lượng video cần tìm
-                        }*/
-                        
                         if (file.isDirectory && file.canRead()) {
-                            // Chỉ quét đệ quy các thư mục không ẩn
-                            if (!file.name.startsWith(".") && !file.name.equals("Android", true)) {
+                            // Kiểm tra nếu đây là thư mục thùng rác
+                            val isTrashDir = isTrashDirectory(file)
+                            
+                            // Quét đệ quy các thư mục, ưu tiên thư mục thùng rác
+                            if (isTrashDir || (!file.name.startsWith(".") && !file.name.equals("Android", true))) {
                                 simulateFindingDeletedVideos(file)
                             }
                         } else if (file.isFile && file.canRead() && isVideoFile(file.name) && file.length() > 0) {
                             Log.d("VideoRecovery", "Tìm thấy video: ${file.absolutePath}")
                             
-                            // Tạo đối tượng RecoverableItem
-                            val recoveredFile = RecoverableItem(
-                                file,
-                                file.length(),
-                                "video"
-                            )
-                            recoveredVideos.add(recoveredFile)
+                            // Kiểm tra nếu video này đã xóa
+                            val isDeleted = isDeletedVideo(file)
+                            
+                            if (isDeleted) {
+                                Log.d("VideoRecovery", "Đây là video đã xóa: ${file.absolutePath}")
+                                
+                                // Kiểm tra trùng lặp trước khi thêm video vào danh sách
+                                if (!recoveredVideos.any { it.getPath() == file.absolutePath }) {
+                                    // Tạo đối tượng RecoverableItem và đánh dấu là đã xóa
+                                    val recoveredFile = RecoverableItem(
+                                        file,
+                                        file.length(),
+                                        "video",
+                                        true // Đánh dấu là video đã xóa
+                                    )
+                                    recoveredVideos.add(recoveredFile)
+                                    Log.d("VideoRecovery", "Đã thêm video đã xóa: ${file.absolutePath}")
+                                } else {
+                                    Log.d("VideoRecovery", "Bỏ qua video trùng lặp: ${file.absolutePath}")
+                                }
+                            }
                         }
                     } catch (e: SecurityException) {
                         // Bỏ qua lỗi quyền truy cập
@@ -668,6 +871,58 @@ class VideoRecoveryActivity : AppCompatActivity() {
         }
     }
     
+    /**
+     * Kiểm tra xem thư mục có phải là thư mục thùng rác không
+     */
+    private fun isTrashDirectory(directory: File): Boolean {
+        val trashKeywords = listOf(
+            ".trash", ".Trash", "trash", "Trash", "recycle", "Recycle", "bin", "Bin",
+            "deleted", "Deleted", "dustbin", "Dustbin", ".RecycleBin", "recyclebin",
+            ".globalTrash"
+        )
+        
+        val dirName = directory.name.lowercase()
+        val dirPath = directory.absolutePath.lowercase()
+        
+        return directory.isHidden || 
+               trashKeywords.any { dirName.contains(it.lowercase()) } ||
+               trashKeywords.any { dirPath.contains(it.lowercase()) }
+    }
+    
+    /**
+     * Kiểm tra xem video có phải là video đã xóa không
+     */
+    private fun isDeletedVideo(file: File): Boolean {
+        // Kiểm tra tên file có bắt đầu bằng dấu chấm (thường là file ẩn/đã xóa)
+        val hasHiddenName = file.name.startsWith(".")
+        
+        // Kiểm tra đường dẫn file có chứa từ khóa thùng rác
+        val inTrashFolder = isFileInTrashFolder(file)
+        
+        // Kiểm tra thư mục cha có phải là thư mục thùng rác
+        val inTrashDirectory = file.parentFile?.let { isTrashDirectory(it) } ?: false
+        
+        return hasHiddenName || inTrashFolder || inTrashDirectory
+    }
+    
+    /**
+     * Kiểm tra xem file có nằm trong thư mục thùng rác không
+     */
+    private fun isFileInTrashFolder(file: File): Boolean {
+        // Danh sách các từ khóa trong đường dẫn giúp xác định thư mục thùng rác
+        val trashKeywords = listOf(
+            ".trash", ".Trash", "trash", "Trash", "recycle", "Recycle", "bin", "Bin",
+            "deleted", "Deleted", "dustbin", "Dustbin", ".RecycleBin", "recyclebin",
+            ".globalTrash"
+        )
+        
+        // Lấy đường dẫn tuyệt đối
+        val absolutePath = file.absolutePath.lowercase()
+        
+        // Kiểm tra nếu đường dẫn chứa từ khóa thùng rác
+        return trashKeywords.any { absolutePath.contains(it.lowercase()) }
+    }
+    
     private fun isVideoFile(fileName: String): Boolean {
         val extension = fileName.substringAfterLast('.', "").lowercase()
         return extension in listOf("mp4", "3gp", "mkv", "avi", "mov", "wmv")
@@ -685,27 +940,45 @@ class VideoRecoveryActivity : AppCompatActivity() {
         statusText.text = getString(R.string.recovering_status, selectedVideos.size)
         
         CoroutineScope(Dispatchers.IO).launch {
+            // Tạo thư mục khôi phục dự phòng trong trường hợp không thể khôi phục vào thư viện
             val recoveryDir = File(getExternalFilesDir(null), "RecoveredVideos")
             if (!recoveryDir.exists()) {
                 recoveryDir.mkdirs()
             }
             
             var successCount = 0
+            var galleryRecoveryCount = 0
             
             for (video in selectedVideos) {
                 try {
                     val sourceFile = video.getFile()
                     val destFile = File(recoveryDir, sourceFile.name)
                     
-                    // Sao chép file gốc vào thư mục khôi phục
-                    FileInputStream(sourceFile).use { input ->
-                        FileOutputStream(destFile).use { output ->
-                            input.copyTo(output)
-                        }
+                    // Tên file mới sau khi khôi phục (loại bỏ dấu chấm ở đầu nếu có)
+                    val recoveredFileName = if (sourceFile.name.startsWith(".")) {
+                        sourceFile.name.substring(1)
+                    } else {
+                        sourceFile.name
                     }
                     
-                    successCount++
+                    // Thử khôi phục video vào bộ sưu tập trên thiết bị
+                    Log.d("VideoRecovery", "Đang khôi phục video vào bộ sưu tập: ${sourceFile.absolutePath}")
+                    
+                    if (recoverToGallery(sourceFile, recoveredFileName)) {
+                        galleryRecoveryCount++
+                        successCount++
+                    } else {
+                        // Nếu không thể khôi phục vào bộ sưu tập, sao chép vào thư mục khôi phục của ứng dụng
+                        FileInputStream(sourceFile).use { input ->
+                            FileOutputStream(destFile).use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+                        successCount++
+                        Log.d("VideoRecovery", "Đã sao chép vào thư mục khôi phục: ${destFile.absolutePath}")
+                    }
                 } catch (e: Exception) {
+                    Log.e("VideoRecovery", "Lỗi khi khôi phục: ${e.message}")
                     e.printStackTrace()
                 }
             }
@@ -713,9 +986,15 @@ class VideoRecoveryActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) {
                 progressBar.visibility = View.GONE
                 if (successCount > 0) {
+                    val message = if (galleryRecoveryCount > 0) {
+                        getString(R.string.recovery_success_gallery, successCount, galleryRecoveryCount)
+                    } else {
+                        getString(R.string.recovery_success, successCount)
+                    }
+                    
                     Toast.makeText(
                         this@VideoRecoveryActivity,
-                        getString(R.string.recovery_success, successCount),
+                        message,
                         Toast.LENGTH_LONG
                     ).show()
                     
@@ -729,6 +1008,160 @@ class VideoRecoveryActivity : AppCompatActivity() {
                     ).show()
                 }
             }
+        }
+    }
+    
+    /**
+     * Khôi phục video vào bộ sưu tập (thư viện) thiết bị
+     * @return true nếu khôi phục thành công vào bộ sưu tập
+     */
+    private fun recoverToGallery(sourceFile: File, recoveredFileName: String): Boolean {
+        try {
+            // Khôi phục vào cả hai thư mục Movies và DCIM để tăng khả năng hiển thị trong ứng dụng video
+            val moviesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
+            val dcimDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+            
+            val cameraDir = File(moviesDir, "Camera")
+            if (!cameraDir.exists()) {
+                cameraDir.mkdirs()
+            }
+            
+            // Tạo file khôi phục trong thư mục Movies/Camera
+            val recoveredFile = File(cameraDir, recoveredFileName)
+            
+            // Sao chép file từ nguồn vào thư mục
+            FileInputStream(sourceFile).use { input ->
+                FileOutputStream(recoveredFile).use { output ->
+                    input.copyTo(output)
+                }
+            }
+            
+            // Lấy thời gian hiện tại cho metadata
+            val currentTime = System.currentTimeMillis()
+            val mimeType = getMimeType(recoveredFileName)
+            
+            // Thêm thông tin về video vào MediaStore để hiển thị trong thư viện
+            val values = ContentValues().apply {
+                put(android.provider.MediaStore.Video.Media.DISPLAY_NAME, recoveredFileName)
+                put(android.provider.MediaStore.Video.Media.TITLE, recoveredFileName.substringBeforeLast('.'))
+                put(android.provider.MediaStore.Video.Media.MIME_TYPE, mimeType)
+                put(android.provider.MediaStore.Video.Media.DATE_ADDED, currentTime / 1000)
+                put(android.provider.MediaStore.Video.Media.DATE_MODIFIED, currentTime / 1000)
+                put(android.provider.MediaStore.Video.Media.DATE_TAKEN, currentTime)
+                put(android.provider.MediaStore.Video.Media.SIZE, recoveredFile.length())
+                
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    put(android.provider.MediaStore.Video.Media.RELATIVE_PATH, "Movies/Camera")
+                    put(android.provider.MediaStore.Video.Media.IS_PENDING, 0)
+                } else {
+                    put(android.provider.MediaStore.Video.Media.DATA, recoveredFile.absolutePath)
+                }
+            }
+            
+            // Thêm video vào bộ sưu tập
+            val uri = contentResolver.insert(android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values)
+            
+            // Trên Android 10 trở lên, thêm một bản sao vào DCIM để đảm bảo hiển thị trong các ứng dụng khác nhau
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                try {
+                    val dcimValues = ContentValues().apply {
+                        put(android.provider.MediaStore.Video.Media.DISPLAY_NAME, recoveredFileName)
+                        put(android.provider.MediaStore.Video.Media.TITLE, recoveredFileName.substringBeforeLast('.'))
+                        put(android.provider.MediaStore.Video.Media.MIME_TYPE, mimeType)
+                        put(android.provider.MediaStore.Video.Media.DATE_ADDED, currentTime / 1000)
+                        put(android.provider.MediaStore.Video.Media.DATE_MODIFIED, currentTime / 1000)
+                        put(android.provider.MediaStore.Video.Media.DATE_TAKEN, currentTime)
+                        put(android.provider.MediaStore.Video.Media.SIZE, recoveredFile.length())
+                        put(android.provider.MediaStore.Video.Media.RELATIVE_PATH, "DCIM/Camera")
+                        put(android.provider.MediaStore.Video.Media.IS_PENDING, 0)
+                    }
+                    
+                    // Sử dụng URI mới để tránh trùng lặp với bản Movies/Camera
+                    val dcimUri = contentResolver.insert(android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI, dcimValues)
+                    if (dcimUri != null) {
+                        contentResolver.openOutputStream(dcimUri)?.use { output ->
+                            FileInputStream(recoveredFile).use { input ->
+                                input.copyTo(output)
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("VideoRecovery", "Lỗi khi tạo bản sao trong DCIM: ${e.message}")
+                    // Tiếp tục với một bản sao trong Movies đã thành công
+                }
+            } else {
+                // Với Android 9 trở xuống, thử tạo bản sao trong DCIM theo cách thủ công
+                try {
+                    val dcimCameraDir = File(dcimDir, "Camera")
+                    if (!dcimCameraDir.exists()) {
+                        dcimCameraDir.mkdirs()
+                    }
+                    
+                    val dcimFile = File(dcimCameraDir, recoveredFileName)
+                    if (!dcimFile.exists()) {
+                        FileInputStream(recoveredFile).use { input ->
+                            FileOutputStream(dcimFile).use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+                        
+                        // Thêm thông tin về video trong DCIM vào MediaStore
+                        val dcimValues = ContentValues().apply {
+                            put(android.provider.MediaStore.Video.Media.DISPLAY_NAME, recoveredFileName)
+                            put(android.provider.MediaStore.Video.Media.TITLE, recoveredFileName.substringBeforeLast('.'))
+                            put(android.provider.MediaStore.Video.Media.MIME_TYPE, mimeType)
+                            put(android.provider.MediaStore.Video.Media.DATE_ADDED, currentTime / 1000)
+                            put(android.provider.MediaStore.Video.Media.DATE_MODIFIED, currentTime / 1000)
+                            put(android.provider.MediaStore.Video.Media.DATE_TAKEN, currentTime)
+                            put(android.provider.MediaStore.Video.Media.SIZE, dcimFile.length())
+                            put(android.provider.MediaStore.Video.Media.DATA, dcimFile.absolutePath)
+                        }
+                        
+                        contentResolver.insert(android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI, dcimValues)
+                    }
+                } catch (e: Exception) {
+                    Log.e("VideoRecovery", "Lỗi khi tạo bản sao trong DCIM: ${e.message}")
+                    // Tiếp tục với bản sao trong Movies đã thành công
+                }
+            }
+            
+            // Thông báo hệ thống quét media mới
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                mediaScanIntent.data = android.net.Uri.fromFile(recoveredFile)
+                sendBroadcast(mediaScanIntent)
+                
+                // Quét cả file DCIM nếu có
+                val dcimCameraDir = File(dcimDir, "Camera")
+                val dcimFile = File(dcimCameraDir, recoveredFileName)
+                if (dcimFile.exists()) {
+                    val dcimScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                    dcimScanIntent.data = android.net.Uri.fromFile(dcimFile)
+                    sendBroadcast(dcimScanIntent)
+                }
+            }
+            
+            Log.d("VideoRecovery", "Đã khôi phục video vào thư viện và mục video: ${recoveredFile.absolutePath}")
+            return true
+        } catch (e: Exception) {
+            Log.e("VideoRecovery", "Lỗi khi khôi phục vào bộ sưu tập: ${e.message}")
+            e.printStackTrace()
+            return false
+        }
+    }
+    
+    /**
+     * Xác định MIME type dựa trên phần mở rộng của file
+     */
+    private fun getMimeType(fileName: String): String {
+        return when (fileName.substringAfterLast('.', "").lowercase()) {
+            "mp4" -> "video/mp4"
+            "3gp" -> "video/3gpp"
+            "mkv" -> "video/x-matroska"
+            "avi" -> "video/x-msvideo"
+            "mov" -> "video/quicktime"
+            "wmv" -> "video/x-ms-wmv"
+            else -> "video/mp4" // Mặc định
         }
     }
     

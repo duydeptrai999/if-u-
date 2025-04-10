@@ -25,8 +25,9 @@
     <string name="files_found">%d files found</string>
     <string name="total_size">Total size</string>
     <string name="recovering_status">Đang khôi phục %d tệp...</string>
-    <string name="recovery_success">Đã khôi phục thành công %d tệp</string>
-    <string name="recovery_failed">Khôi phục không thành công</string>
+    <string name="recovery_success">Đã khôi phục thành công %1$d ảnh</string>
+    <string name="recovery_success_gallery">Đã khôi phục thành công %1$d ảnh, trong đó %2$d ảnh đã được khôi phục vào thư viện ảnh</string>
+    <string name="recovery_failed">Không thể khôi phục ảnh</string>
     <string name="permission_required">Cần quyền truy cập bộ nhớ để tiếp tục</string>
     <string name="select_items">Please select items to recover</string>
     <string name="photo_recovery">Photo Recovery</string>
