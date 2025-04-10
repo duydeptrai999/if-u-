@@ -291,3 +291,26 @@ Bảng `recovered_files` với các cột:
 - Trong trường hợp file không thể mở bằng ứng dụng mặc định hoặc trình xem tích hợp, bạn có thể thử sử dụng ứng dụng khác từ Google Play
 - Khi chia sẻ tệp tin lớn, quá trình có thể mất nhiều thời gian tùy thuộc vào kết nối mạng của bạn
 - Khi chia sẻ nhiều file cùng lúc, một số ứng dụng có thể không hỗ trợ và sẽ chỉ nhận file đầu tiên 
+
+## Cải tiến nút quét trong tính năng khôi phục
+
+### Vấn đề đã sửa
+Trước đây, trong tính năng khôi phục ảnh (Video và File), khi người dùng nhấn nút "QUÉT" để bắt đầu quá trình quét tìm dữ liệu đã xóa, đôi khi nút quét không nhận sự kiện quét. Ngoài ra, nếu người dùng nhấn nhiều lần vào nút quét, hệ thống sẽ thực hiện lại quá trình quét, gây lãng phí tài nguyên và lỗi giao diện.
+
+### Cách đã sửa
+- Đã thêm biến trạng thái `isScanning` để theo dõi xem quá trình quét đang diễn ra hay không
+- Khi `isScanning = true`, các nhấn tiếp theo vào nút quét sẽ bị bỏ qua, ngăn chặn việc thực hiện quét lại
+- Đảm bảo biến `isScanning` luôn được đặt lại về `false` sau khi quá trình quét kết thúc hoặc bị lỗi
+- Thêm phương thức `onStop()` để reset trạng thái nếu người dùng thoát khỏi màn hình
+
+### Cách sử dụng
+Với cải tiến này, người dùng chỉ cần:
+1. Nhấn nút "QUÉT" một lần để bắt đầu quét
+2. Chờ quá trình quét hoàn thành
+3. Không cần nhấn nút quét nhiều lần nếu bạn không thấy phản hồi ngay lập tức - hệ thống đã nhận lệnh quét và đang xử lý
+
+### Lợi ích
+- Ngăn chặn việc thực hiện quét lại không cần thiết
+- Cải thiện trải nghiệm người dùng bằng cách ngăn chặn các lỗi giao diện
+- Giảm tải cho hệ thống bằng cách tránh các quá trình quét trùng lặp
+- Đảm bảo người dùng luôn nhận được phản hồi phù hợp về trạng thái quét 

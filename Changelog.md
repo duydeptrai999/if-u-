@@ -83,6 +83,7 @@
 - Sửa lỗi ID không khớp trong RecoveredFilesDetailActivity (tvSelectedCount, ivShareSelected, ivCloseSelection)
 - Thêm nút đóng chế độ chọn trong thanh công cụ chọn nhiều
 - Sửa lỗi ClassCastException khi cố gắng ép kiểu MaterialButton thành ImageView cho shareSelectedButton
+- Sửa lỗi nút quét trong tính năng khôi phục ảnh (PhotoRecoveryActivity) bị miss sự kiện và thực hiện lại việc quét khi nhấn nhiều lần. Thêm biến isScanning để kiểm soát trạng thái quét và ngăn không cho người dùng quét lại khi đang trong quá trình quét.
 
 ## [1.0.1] - 2024-03-23
 

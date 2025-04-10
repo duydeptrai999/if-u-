@@ -86,6 +86,9 @@ class PhotoRecoveryActivity : AppCompatActivity() {
     // Thư mục lưu ảnh khôi phục
     private lateinit var recoveryDir: File
     
+    // Biến để kiểm soát trạng thái đang quét
+    private var isScanning = false
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupTransparentStatusBar()
@@ -188,6 +191,12 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         // Thêm hàm click cho cả container và text bên trong
         val scanClickListener = View.OnClickListener {
             println("Nút quét được nhấn")
+            // Kiểm tra xem có đang trong quá trình quét không
+            if (isScanning) {
+                Log.d("PhotoRecovery", "Đang trong quá trình quét, bỏ qua sự kiện nhấn nút")
+                return@OnClickListener
+            }
+            
             if (checkPermission()) {
                 // Hiệu ứng khi nhấn nút quét
                 scanButton.animate()
@@ -430,6 +439,9 @@ class PhotoRecoveryActivity : AppCompatActivity() {
     private fun scanForDeletedPhotos() {
         Log.d("PhotoRecovery", "Bắt đầu quét ảnh đã xóa...")
         
+        // Đặt trạng thái đang quét thành true
+        isScanning = true
+        
         // Ẩn progressBar, không sử dụng nó
         progressBar.visibility = View.GONE
         scanButton.isEnabled = false
@@ -571,6 +583,9 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                     scanButton.isEnabled = true
                     hideScanAnimation()
                     
+                    // Reset trạng thái quét
+                    isScanning = false
+                    
                     // Hiệu ứng hoàn thành
                     scanButton.animate()
                         .scaleX(1.2f)
@@ -614,14 +629,12 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                     }
                 }
             } catch (e: Exception) {
-                // Xử lý ngoại lệ nếu có
-                e.printStackTrace()
-                Log.e("PhotoRecovery", "Lỗi khi quét: ${e.message}", e)
+                Log.e("PhotoRecovery", "Lỗi khi quét ảnh đã xóa: ${e.message}", e)
                 
                 withContext(Dispatchers.Main) {
-                    progressBar.visibility = View.GONE
-                    scanButton.isEnabled = true
                     hideScanAnimation()
+                    // Reset trạng thái quét
+                    isScanning = false
                     Toast.makeText(
                         this@PhotoRecoveryActivity,
                         "Đã xảy ra lỗi khi quét: ${e.message}",
@@ -675,6 +688,8 @@ class PhotoRecoveryActivity : AppCompatActivity() {
     
     // Ẩn animation quét
     private fun hideScanAnimation() {
+        // Reset trạng thái quét nếu đang ẩn animation quét
+        isScanning = false
         scanningOverlay.animate()
             .alpha(0f)
             .setDuration(300)
@@ -1698,5 +1713,15 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         )
         
         return explicitTrashKeywords.any { lowercasePath.contains(it) }
+    }
+
+    // Thêm hoặc cập nhật phương thức onStop
+    override fun onStop() {
+        super.onStop()
+        
+        // Reset trạng thái quét khi người dùng thoát màn hình
+        isScanning = false
+        hideScanAnimation()
+        scanButton.isEnabled = true
     }
 } 
