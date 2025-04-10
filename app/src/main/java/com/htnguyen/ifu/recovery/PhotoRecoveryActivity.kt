@@ -100,6 +100,9 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         scanningProgressText = findViewById(R.id.scanningProgressText)
         scanningHorizontalProgressBar = findViewById(R.id.scanningHorizontalProgressBar)
         scanIllustration = findViewById(R.id.scanIllustration)
+        
+        // Ẩn statusText ban đầu để tránh chồng lên với nút quét
+        statusText.visibility = View.GONE
     }
     
     private fun setupRecyclerViews() {
