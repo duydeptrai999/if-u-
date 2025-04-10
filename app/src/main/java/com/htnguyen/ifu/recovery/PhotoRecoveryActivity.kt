@@ -40,6 +40,9 @@ import android.util.Log
 import android.widget.ImageView
 import android.provider.MediaStore
 import java.util.Comparator
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.content.res.ColorStateListCompat
+import androidx.core.content.res.ColorStateList
 
 class PhotoRecoveryActivity : AppCompatActivity() {
 
@@ -298,9 +301,9 @@ class PhotoRecoveryActivity : AppCompatActivity() {
             resultIcon.setColorFilter(ContextCompat.getColor(this, R.color.green_500))
             
             if (galleryCount > 0) {
-                resultTitleText.text = getString(R.string.recovery_success_gallery, totalCount, galleryCount)
+                resultTitleText.text = getString(R.string.recovery_success)
             } else {
-                resultTitleText.text = getString(R.string.recovery_success, totalCount)
+                resultTitleText.text = getString(R.string.recovery_success)
             }
             
             resultDescriptionText.text = getString(R.string.recovery_success_description)

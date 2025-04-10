@@ -1,6 +1,7 @@
 package com.htnguyen.ifu.recovery
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -29,6 +30,7 @@ import com.htnguyen.ifu.adapter.PreviewFileAdapter
 import com.htnguyen.ifu.model.RecoverableItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -42,7 +44,7 @@ import android.view.animation.Animation
 class FileRecoveryActivity : AppCompatActivity() {
 
     private lateinit var progressBar: ProgressBar
-    private lateinit var scanButton: CardView
+    private lateinit var scanButton: androidx.cardview.widget.CardView
     private lateinit var recoverButton: Button
     private lateinit var viewResultsButton: Button
     private lateinit var statusText: TextView
@@ -250,6 +252,10 @@ class FileRecoveryActivity : AppCompatActivity() {
         scanLayout.visibility = View.GONE
         scanResultLayout.visibility = View.GONE
         recoveryLayout.visibility = View.VISIBLE
+        
+        // Make sure recovery overlays are hidden
+        recoveryProgressLayout.visibility = View.GONE
+        recoveryResultLayout.visibility = View.GONE
     }
     
     private fun checkPermission(): Boolean {
@@ -418,7 +424,7 @@ class FileRecoveryActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) {
                 updateScanStatus("Đang khởi tạo quét... ${i * 20}%", i * 20)
             }
-            kotlinx.coroutines.delay(300)
+            delay(300)
         }
     }
     
@@ -584,11 +590,11 @@ class FileRecoveryActivity : AppCompatActivity() {
                 }
                 
                 // Thêm độ trễ nhỏ cho animation hoàn thành
-                kotlinx.coroutines.delay(1000)
+                delay(1000)
                 
                 withContext(Dispatchers.Main) {
                     updateScanStatus("Hoàn tất!", 100)
-                    kotlinx.coroutines.delay(500)
+                    delay(500)
                     
                     Log.d("FileRecovery", "Quay lại thread UI để cập nhật giao diện")
                     progressBar.visibility = View.GONE
@@ -1026,206 +1032,194 @@ class FileRecoveryActivity : AppCompatActivity() {
         }
     }
     
+    @SuppressLint("StringFormatInvalid")
     private suspend fun recoverSelectedFiles() {
-        showRecoveryProgressLayout()
+        Log.d("FileRecovery", "Bắt đầu khôi phục file được chọn")
         
-        withContext(Dispatchers.IO) {
-            val selectedFiles = recoveredFiles.filter { it.isSelected() }
-            
-            if (selectedFiles.isEmpty()) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        this@FileRecoveryActivity,
-                        getString(R.string.no_items_selected),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    // Quay lại màn hình trước
-                    showRecoveryLayout()
-                }
-                return@withContext
+        // Collect all selected files from the adapter
+        val selectedFiles = mutableListOf<RecoverableItem>()
+        for (item in recoveredFiles) {
+            if (item.isSelected()) {
+                selectedFiles.add(item)
             }
-            
+        }
+        
+        if (selectedFiles.isEmpty()) {
             withContext(Dispatchers.Main) {
-                // Cập nhật UI cho thông tin khôi phục
-                recoveryCountText.text = "0/${selectedFiles.size}"
-                recoveryHorizontalProgressBar.max = selectedFiles.size
-                recoveryHorizontalProgressBar.progress = 0
+                Toast.makeText(this@FileRecoveryActivity, getString(R.string.select_items), Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
+        
+        // Show recovery progress layout
+        withContext(Dispatchers.Main) {
+            showRecoveryProgressLayout()
+        }
+        
+        try {
+            val recoveryFolder = File(getExternalFilesDir(null), "RecoveredFiles")
+            if (!recoveryFolder.exists()) {
+                recoveryFolder.mkdirs()
             }
             
             var successCount = 0
-            var documentsRecoveryCount = 0
-            var downloadsRecoveryCount = 0
+            val totalCount = selectedFiles.size
             
-            for ((index, file) in selectedFiles.withIndex()) {
+            // Database for storing recovered files
+            val database = com.htnguyen.ifu.db.RecoveredFilesDatabase.getInstance(this@FileRecoveryActivity)
+            
+            for (index in selectedFiles.indices) {
+                val item = selectedFiles[index]
+                val file = item.getFile()
+                val destFile = File(recoveryFolder, file.name)
+                
                 try {
-                    val sourceFile = file.getFile()
-                    
-                    // Cập nhật thông tin tiến trình
+                    // Update UI with current progress
                     withContext(Dispatchers.Main) {
-                        recoveryProgressText.text = getString(R.string.recovering_file, sourceFile.name)
-                        recoveryCountText.text = "${index + 1}/${selectedFiles.size}"
-                        recoveryHorizontalProgressBar.progress = index + 1
+                        recoveryCountText.text = getString(R.string.recovering_count, index + 1, totalCount)
+                        recoveryHorizontalProgressBar.progress = ((index + 1) * 100) / totalCount
                     }
                     
-                    // Tên file mới sau khi khôi phục (loại bỏ dấu chấm ở đầu nếu có)
-                    val recoveredFileName = if (sourceFile.name.startsWith(".")) {
-                        sourceFile.name.substring(1)
-                    } else {
-                        sourceFile.name
-                    }
+                    // Copy file to recovery folder
+                    val inputStream = FileInputStream(file)
+                    val outputStream = FileOutputStream(destFile)
+                    val buffer = ByteArray(8 * 1024)
+                    var read: Int
                     
-                    // Xác định thư mục phù hợp dựa trên loại file
-                    val fileType = file.getType()
-                    val destDir = when {
-                        fileType in listOf("document", "pdf", "text", "spreadsheet", "presentation") -> {
-                            // File văn bản -> Documents
-                            val docDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
-                            if (!docDir.exists()) {
-                                docDir.mkdirs()
-                            }
-                            documentsRecoveryCount++
-                            docDir
-                        }
-                        else -> {
-                            // Các file khác -> Downloads
-                            val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                            if (!downloadDir.exists()) {
-                                downloadDir.mkdirs()
-                            }
-                            downloadsRecoveryCount++
-                            downloadDir
-                        }
-                    }
-                    
-                    // File đích sau khi khôi phục
-                    val destFile = File(destDir, recoveredFileName)
-                    
-                    // Kiểm tra nếu file đích đã tồn tại, thêm hậu tố thời gian
-                    val finalDestFile = if (destFile.exists()) {
-                        val timestamp = System.currentTimeMillis()
-                        val extension = recoveredFileName.substringAfterLast('.', "")
-                        val baseName = recoveredFileName.substringBeforeLast('.', recoveredFileName)
-                        val newFileName = if (extension.isNotEmpty()) {
-                            "${baseName}_$timestamp.$extension"
-                        } else {
-                            "${baseName}_$timestamp"
-                        }
-                        File(destDir, newFileName)
-                    } else {
-                        destFile
-                    }
-                    
-                    // Sao chép file gốc vào thư mục đích
-                    FileInputStream(sourceFile).use { input ->
-                        FileOutputStream(finalDestFile).use { output ->
-                            input.copyTo(output)
-                        }
-                    }
-                    
-                    // Thêm file mới vào MediaStore để các ứng dụng khác có thể nhìn thấy
                     try {
-                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                            // Thông báo hệ thống quét media mới
-                            val scanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-                            scanIntent.data = android.net.Uri.fromFile(finalDestFile)
-                            sendBroadcast(scanIntent)
+                        while (inputStream.read(buffer).also { read = it } != -1) {
+                            outputStream.write(buffer, 0, read)
                         }
-                    } catch (e: Exception) {
-                        Log.e("FileRecovery", "Lỗi khi thông báo MediaStore: ${e.message}")
+                        outputStream.flush()
+                    } finally {
+                        try {
+                            inputStream.close()
+                        } catch (e: Exception) {
+                            Log.e("FileRecovery", "Error closing input stream: ${e.message}")
+                        }
+                        
+                        try {
+                            outputStream.close()
+                        } catch (e: Exception) {
+                            Log.e("FileRecovery", "Error closing output stream: ${e.message}")
+                        }
                     }
                     
-                    // Lưu thông tin tệp đã khôi phục vào database
-                    try {
-                        val modifiedDate = Date(finalDestFile.lastModified())
-                        val recoveredFileObj = com.htnguyen.ifu.model.RecoveredFile(
-                            finalDestFile.absolutePath,
-                            finalDestFile.name,
-                            finalDestFile.length(),
-                            modifiedDate,
-                            false
-                        )
-                        
-                        // Thêm vào database
-                        val db = com.htnguyen.ifu.db.RecoveredFilesDatabase.getInstance(applicationContext)
-                        
-                        // Kiểm tra xem file đã tồn tại trong database chưa
-                        if (!db.fileExists(finalDestFile.absolutePath)) {
-                            val id = db.addRecoveredFile(recoveredFileObj, com.htnguyen.ifu.db.RecoveredFilesDatabase.TYPE_FILE)
-                            Log.d("FileRecovery", "Đã lưu thông tin tệp tin vào database, ID: $id")
-                        } else {
-                            Log.d("FileRecovery", "Tệp tin đã tồn tại trong database")
-                        }
-                    } catch (e: Exception) {
-                        Log.e("FileRecovery", "Lỗi khi lưu thông tin tệp tin vào database: ${e.message}")
-                    }
+                    // Add to recovered files database
+                    val recoveredFile = com.htnguyen.ifu.model.RecoveredFile(
+                        path = destFile.absolutePath,
+                        name = destFile.name,
+                        size = destFile.length(),
+                        modifiedDate = Date(Date().time),
+                        isSelected = false
+                    )
+                    database.addRecoveredFile(recoveredFile, "file")
                     
                     successCount++
-                    Log.d("FileRecovery", "Đã khôi phục file: ${finalDestFile.absolutePath}")
-                    
-                    // Thêm độ trễ nhỏ để người dùng có thể thấy tiến trình
-                    kotlinx.coroutines.delay(100)
-                    
+                    Log.d("FileRecovery", "Khôi phục thành công: ${file.name}")
                 } catch (e: Exception) {
-                    Log.e("FileRecovery", "Lỗi khi khôi phục file: ${e.message}")
+                    Log.e("FileRecovery", "Lỗi khôi phục file ${file.name}: ${e.message}")
                     e.printStackTrace()
                 }
+                
+                // Simulate some processing time
+                delay(100)
             }
             
+            // Show recovery result
             withContext(Dispatchers.Main) {
-                // Ẩn progress bar
-                progressBar.visibility = View.GONE
+                showRecoveryResultLayout(successCount > 0, totalCount, successCount)
                 
+                // Show toast with result
                 if (successCount > 0) {
-                    // Hiển thị kết quả khôi phục thành công
-                    showRecoveryResultLayout(true, successCount, documentsRecoveryCount + downloadsRecoveryCount)
-                    
-                    Log.d("FileRecovery", "Đã khôi phục $successCount file, $documentsRecoveryCount trong Documents, $downloadsRecoveryCount trong Downloads")
+                    Toast.makeText(
+                        this@FileRecoveryActivity,
+                        getString(R.string.recovery_success, successCount, totalCount),
+                        Toast.LENGTH_LONG
+                    ).show()
                 } else {
-                    // Hiển thị kết quả khôi phục thất bại
-                    showRecoveryResultLayout(false, 0, 0)
-                    
-                    Log.d("FileRecovery", "Không khôi phục được file nào")
+                    Toast.makeText(
+                        this@FileRecoveryActivity,
+                        getString(R.string.recovery_failed),
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
+            }
+        } catch (e: Exception) {
+            Log.e("FileRecovery", "Lỗi trong quá trình khôi phục: ${e.message}")
+            e.printStackTrace()
+            
+            withContext(Dispatchers.Main) {
+                showRecoveryResultLayout(false, 0, 0)
+                Toast.makeText(
+                    this@FileRecoveryActivity,
+                    getString(R.string.recovery_failed) + ": " + e.message,
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
     
-    // Phương thức hiển thị màn hình đợi khôi phục
     private fun showRecoveryProgressLayout() {
-        scanLayout.visibility = View.GONE
-        scanResultLayout.visibility = View.GONE
-        recoveryLayout.visibility = View.GONE
-        recoveryProgressLayout.visibility = View.VISIBLE
+        scanningOverlay.visibility = View.GONE
         recoveryResultLayout.visibility = View.GONE
         
-        // Thiết lập giá trị ban đầu
-        recoveryProgressBar.isIndeterminate = true
-        recoveryProgressText.text = getString(R.string.recovery_in_progress)
-        recoveryCountText.text = "0/0"
+        recoveryProgressLayout.visibility = View.VISIBLE
+        recyclerView.visibility = View.GONE
+        recoverButton.visibility = View.GONE
+        
+        // Reset progress
         recoveryHorizontalProgressBar.progress = 0
+        recoveryCountText.text = getString(R.string.recovering_files)
     }
     
-    // Phương thức hiển thị màn hình kết quả khôi phục
     private fun showRecoveryResultLayout(success: Boolean, totalCount: Int, galleryCount: Int) {
-        scanLayout.visibility = View.GONE
-        scanResultLayout.visibility = View.GONE
-        recoveryLayout.visibility = View.GONE
+        scanningOverlay.visibility = View.GONE
         recoveryProgressLayout.visibility = View.GONE
+        
         recoveryResultLayout.visibility = View.VISIBLE
+        recyclerView.visibility = View.GONE
+        recoverButton.visibility = View.GONE
         
         if (success) {
-            resultIcon.setImageResource(R.drawable.ic_check_circle)
-            resultIcon.setColorFilter(ContextCompat.getColor(this, R.color.green_500))
+            resultIcon.setImageResource(R.drawable.ic_success)
             resultTitleText.text = getString(R.string.recovery_success)
-            resultDescriptionText.text = getString(R.string.recovery_success_description, totalCount, galleryCount)
+            resultDescriptionText.text = getString(R.string.file_recovery_success)
         } else {
             resultIcon.setImageResource(R.drawable.ic_error)
-            resultIcon.setColorFilter(ContextCompat.getColor(this, R.color.red_500))
             resultTitleText.text = getString(R.string.recovery_failed)
             resultDescriptionText.text = getString(R.string.recovery_failed_description)
         }
     }
     
+    private fun showScanWithRecoveryLayout() {
+        scanningOverlay.visibility = View.GONE
+        recoveryProgressLayout.visibility = View.GONE
+        recoveryResultLayout.visibility = View.GONE
+        
+        recyclerView.visibility = View.VISIBLE
+        recoverButton.visibility = View.VISIBLE
+    }
+
+    override fun onBackPressed() {
+        when {
+            recoveryResultLayout.visibility == View.VISIBLE -> {
+                showScanWithRecoveryLayout()
+            }
+            recoveryProgressLayout.visibility == View.VISIBLE -> {
+                // Do not allow going back during recovery
+                Toast.makeText(this, getString(R.string.recovery_in_progress), Toast.LENGTH_SHORT).show()
+            }
+            scanningOverlay.visibility == View.VISIBLE -> {
+                // Do not allow going back during scanning
+                Toast.makeText(this, getString(R.string.scanning_in_progress), Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                super.onBackPressed()
+            }
+        }
+    }
+
     private fun setupTransparentStatusBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // Xóa cờ FLAG_LAYOUT_NO_LIMITS để tránh view bị kéo lên phía trên

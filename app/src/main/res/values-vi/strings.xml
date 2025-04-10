@@ -25,7 +25,7 @@
     <string name="files_found">Tìm thấy %d tệp</string>
     <string name="total_size">Tổng kích thước</string>
     <string name="recovering_status">Đang khôi phục %d mục...</string>
-    <string name="recovery_success">Đã khôi phục thành công %d mục</string>
+    <string name="recovery_success">Đã khôi phục thành công</string>
     <string name="recovery_success_description">Đã khôi phục thành công. Các ảnh đã được lưu vào thư viện.</string>
     <string name="permission_required">Cần quyền truy cập bộ nhớ để khôi phục</string>
     <string name="select_items">Vui lòng chọn các mục để khôi phục</string>

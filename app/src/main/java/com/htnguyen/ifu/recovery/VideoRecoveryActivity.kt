@@ -65,14 +65,38 @@ class VideoRecoveryActivity : AppCompatActivity() {
     private lateinit var scanningHorizontalProgressBar: ProgressBar
     private lateinit var scanIllustration: ImageView
     
+    // Thêm các thành phần cho màn hình đợi khôi phục
+    private lateinit var recoveryProgressLayout: ConstraintLayout
+    private lateinit var recoveryProgressBar: ProgressBar
+    private lateinit var recoveryProgressText: TextView
+    private lateinit var recoveryCountText: TextView
+    private lateinit var recoveryHorizontalProgressBar: ProgressBar
+    
+    // Thêm các thành phần cho màn hình kết quả khôi phục
+    private lateinit var recoveryResultLayout: ConstraintLayout
+    private lateinit var resultIcon: ImageView
+    private lateinit var resultTitleText: TextView
+    private lateinit var resultDescriptionText: TextView
+    private lateinit var continueButton: Button
+    private lateinit var viewRecoveredButton: Button
+    
     private val recoveredVideos = mutableListOf<RecoverableItem>()
     private val scannedDirectories = mutableSetOf<String>() // Theo dõi thư mục đã quét
     private val STORAGE_PERMISSION_CODE = 101
+    
+    // Thư mục lưu video khôi phục
+    private lateinit var recoveryDir: File
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupTransparentStatusBar()
         setContentView(R.layout.activity_video_recovery)
+        
+        // Tạo thư mục khôi phục
+        recoveryDir = File(getExternalFilesDir(null), "RecoveredVideos")
+        if (!recoveryDir.exists()) {
+            recoveryDir.mkdirs()
+        }
         
         initViews()
         setupRecyclerViews()
@@ -104,6 +128,21 @@ class VideoRecoveryActivity : AppCompatActivity() {
         scanningProgressText = findViewById(R.id.scanningProgressText)
         scanningHorizontalProgressBar = findViewById(R.id.scanningHorizontalProgressBar)
         scanIllustration = findViewById(R.id.scanIllustration)
+        
+        // Khởi tạo các thành phần cho màn hình đợi khôi phục
+        recoveryProgressLayout = findViewById(R.id.recoveryProgressLayout)
+        recoveryProgressBar = findViewById(R.id.recoveryProgressBar)
+        recoveryProgressText = findViewById(R.id.recoveryProgressText)
+        recoveryCountText = findViewById(R.id.recoveryCountText)
+        recoveryHorizontalProgressBar = findViewById(R.id.recoveryHorizontalProgressBar)
+        
+        // Khởi tạo các thành phần cho màn hình kết quả khôi phục
+        recoveryResultLayout = findViewById(R.id.recoveryResultLayout)
+        resultIcon = findViewById(R.id.resultIcon)
+        resultTitleText = findViewById(R.id.resultTitleText)
+        resultDescriptionText = findViewById(R.id.resultDescriptionText)
+        continueButton = findViewById(R.id.continueButton)
+        viewRecoveredButton = findViewById(R.id.viewRecoveredButton)
         
         // Ẩn statusText ban đầu để tránh chồng lên với nút quét
         statusText.visibility = View.GONE
@@ -171,9 +210,24 @@ class VideoRecoveryActivity : AppCompatActivity() {
             recoverSelectedVideos()
         }
         
+        // Thêm click listener cho các nút trên màn hình kết quả
+        continueButton.setOnClickListener {
+            // Quay lại màn hình kết quả quét để người dùng có thể tiếp tục khôi phục video khác
+            showScanResultLayout()
+        }
+        
+        viewRecoveredButton.setOnClickListener {
+            // Mở màn hình RecoveredFilesActivity để xem danh sách các file đã khôi phục
+            val intent = Intent(this, com.htnguyen.ifu.RecoveredFilesActivity::class.java)
+            startActivity(intent)
+        }
+        
         findViewById<View>(R.id.backButton).setOnClickListener {
             // Kiểm tra đang ở layout nào để quay lại đúng layout trước đó
             when {
+                recoveryResultLayout.visibility == View.VISIBLE -> {
+                    showScanResultLayout()
+                }
                 recoveryLayout.visibility == View.VISIBLE -> {
                     showScanResultLayout()
                 }
@@ -191,18 +245,65 @@ class VideoRecoveryActivity : AppCompatActivity() {
         scanLayout.visibility = View.VISIBLE
         scanResultLayout.visibility = View.GONE
         recoveryLayout.visibility = View.GONE
+        recoveryProgressLayout.visibility = View.GONE
+        recoveryResultLayout.visibility = View.GONE
     }
     
     private fun showScanResultLayout() {
         scanLayout.visibility = View.GONE
         scanResultLayout.visibility = View.VISIBLE
         recoveryLayout.visibility = View.GONE
+        recoveryProgressLayout.visibility = View.GONE
+        recoveryResultLayout.visibility = View.GONE
     }
     
     private fun showRecoveryLayout() {
         scanLayout.visibility = View.GONE
         scanResultLayout.visibility = View.GONE
         recoveryLayout.visibility = View.VISIBLE
+        recoveryProgressLayout.visibility = View.GONE
+        recoveryResultLayout.visibility = View.GONE
+    }
+    
+    private fun showRecoveryProgressLayout() {
+        scanLayout.visibility = View.GONE
+        scanResultLayout.visibility = View.GONE
+        recoveryLayout.visibility = View.GONE
+        recoveryProgressLayout.visibility = View.VISIBLE
+        recoveryResultLayout.visibility = View.GONE
+    }
+    
+    private fun showRecoveryResultLayout(success: Boolean, totalCount: Int, galleryCount: Int = 0) {
+        scanLayout.visibility = View.GONE
+        scanResultLayout.visibility = View.GONE
+        recoveryLayout.visibility = View.GONE
+        recoveryProgressLayout.visibility = View.GONE
+        recoveryResultLayout.visibility = View.VISIBLE
+        
+        if (success) {
+            resultIcon.setImageResource(R.drawable.ic_check_circle)
+            resultIcon.setColorFilter(ContextCompat.getColor(this, R.color.green_500))
+            
+            if (galleryCount > 0) {
+                resultTitleText.text = getString(R.string.recovery_success)
+            } else {
+                resultTitleText.text = getString(R.string.recovery_success)
+            }
+            
+            resultDescriptionText.text = getString(R.string.recovery_success_description)
+        } else {
+            resultIcon.setImageResource(R.drawable.ic_error_circle)
+            resultIcon.setColorFilter(ContextCompat.getColor(this, R.color.red_500))
+            resultTitleText.text = getString(R.string.recovery_failed)
+            resultDescriptionText.text = getString(R.string.recovery_failed_description)
+        }
+        
+        // Hiệu ứng xuất hiện
+        recoveryResultLayout.alpha = 0f
+        recoveryResultLayout.animate()
+            .alpha(1f)
+            .setDuration(300)
+            .start()
     }
     
     private fun checkPermission(): Boolean {
@@ -434,13 +535,6 @@ class VideoRecoveryActivity : AppCompatActivity() {
         // Không thay đổi statusText để tránh chồng lên UI
         // statusText.text = getString(R.string.scanning_status)
         scanButton.isEnabled = false
-        
-        // Không áp dụng hiệu ứng nhấp nháy cho statusText nữa
-        // val blinkAnimation = AlphaAnimation(0.5f, 1.0f)
-        // blinkAnimation.duration = 800
-        // blinkAnimation.repeatMode = Animation.REVERSE
-        // blinkAnimation.repeatCount = Animation.INFINITE
-        // statusText.startAnimation(blinkAnimation)
         
         // Thêm hiệu ứng xoay cho nút quét
         scanButton.animate()
@@ -936,12 +1030,15 @@ class VideoRecoveryActivity : AppCompatActivity() {
             return
         }
         
-        progressBar.visibility = View.VISIBLE
-        statusText.text = getString(R.string.recovering_status, selectedVideos.size)
+        // Hiển thị màn hình đợi khôi phục
+        showRecoveryProgressLayout()
+        recoveryProgressText.text = getString(R.string.recovery_in_progress)
+        recoveryCountText.text = getString(R.string.recovery_counting, 0, selectedVideos.size)
+        recoveryHorizontalProgressBar.max = selectedVideos.size
+        recoveryHorizontalProgressBar.progress = 0
         
         CoroutineScope(Dispatchers.IO).launch {
-            // Tạo thư mục khôi phục dự phòng trong trường hợp không thể khôi phục vào thư viện
-            val recoveryDir = File(getExternalFilesDir(null), "RecoveredVideos")
+            // Tạo thư mục khôi phục
             if (!recoveryDir.exists()) {
                 recoveryDir.mkdirs()
             }
@@ -949,10 +1046,15 @@ class VideoRecoveryActivity : AppCompatActivity() {
             var successCount = 0
             var galleryRecoveryCount = 0
             
-            for (video in selectedVideos) {
+            for ((index, video) in selectedVideos.withIndex()) {
                 try {
+                    // Cập nhật UI với tiến độ hiện tại
+                    withContext(Dispatchers.Main) {
+                        recoveryCountText.text = getString(R.string.recovery_counting, index + 1, selectedVideos.size)
+                        recoveryHorizontalProgressBar.progress = index + 1
+                    }
+                    
                     val sourceFile = video.getFile()
-                    val destFile = File(recoveryDir, sourceFile.name)
                     
                     // Tên file mới sau khi khôi phục (loại bỏ dấu chấm ở đầu nếu có)
                     val recoveredFileName = if (sourceFile.name.startsWith(".")) {
@@ -969,44 +1071,55 @@ class VideoRecoveryActivity : AppCompatActivity() {
                         successCount++
                     } else {
                         // Nếu không thể khôi phục vào bộ sưu tập, sao chép vào thư mục khôi phục của ứng dụng
+                        val destFile = File(recoveryDir, recoveredFileName)
                         FileInputStream(sourceFile).use { input ->
                             FileOutputStream(destFile).use { output ->
                                 input.copyTo(output)
                             }
                         }
+                        
+                        // Lưu thông tin vào database cho bản sao lưu
+                        try {
+                            val modifiedDate = Date(destFile.lastModified())
+                            val recoveredFileObj = com.htnguyen.ifu.model.RecoveredFile(
+                                destFile.absolutePath,
+                                destFile.name,
+                                destFile.length(),
+                                modifiedDate,
+                                false
+                            )
+                            
+                            // Thêm vào database
+                            val db = com.htnguyen.ifu.db.RecoveredFilesDatabase.getInstance(applicationContext)
+                            
+                            // Kiểm tra xem file đã tồn tại trong database chưa
+                            if (!db.fileExists(destFile.absolutePath)) {
+                                val id = db.addRecoveredFile(recoveredFileObj, com.htnguyen.ifu.db.RecoveredFilesDatabase.TYPE_VIDEO)
+                                Log.d("VideoRecovery", "Đã lưu thông tin video sao lưu vào database, ID: $id")
+                            }
+                        } catch (e: Exception) {
+                            Log.e("VideoRecovery", "Lỗi khi lưu thông tin video sao lưu vào database: ${e.message}", e)
+                        }
+                        
                         successCount++
                         Log.d("VideoRecovery", "Đã sao chép vào thư mục khôi phục: ${destFile.absolutePath}")
                     }
+                    
+                    // Thêm độ trễ nhỏ để người dùng thấy tiến trình
+                    kotlinx.coroutines.delay(100)
+                    
                 } catch (e: Exception) {
                     Log.e("VideoRecovery", "Lỗi khi khôi phục: ${e.message}")
                     e.printStackTrace()
                 }
             }
             
+            // Độ trễ cuối cùng để hoàn tất giao diện
+            kotlinx.coroutines.delay(500)
+            
             withContext(Dispatchers.Main) {
-                progressBar.visibility = View.GONE
-                if (successCount > 0) {
-                    val message = if (galleryRecoveryCount > 0) {
-                        getString(R.string.recovery_success_gallery, successCount, galleryRecoveryCount)
-                    } else {
-                        getString(R.string.recovery_success, successCount)
-                    }
-                    
-                    Toast.makeText(
-                        this@VideoRecoveryActivity,
-                        message,
-                        Toast.LENGTH_LONG
-                    ).show()
-                    
-                    // Quay lại màn hình chính
-                    showScanLayout()
-                } else {
-                    Toast.makeText(
-                        this@VideoRecoveryActivity,
-                        getString(R.string.recovery_failed),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+                // Hiển thị màn hình kết quả khôi phục
+                showRecoveryResultLayout(successCount > 0, successCount, galleryRecoveryCount)
             }
         }
     }
