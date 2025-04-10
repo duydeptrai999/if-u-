@@ -73,19 +73,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <ImageView
-                android:id="@+id/ivCameraIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_camera"
-                android:background="@drawable/bg_circle_white"
-                android:padding="3dp"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/ivPhotoIcon"
-                app:layout_constraintEnd_toEndOf="@id/ivPhotoIcon"
-                android:layout_marginEnd="-5dp"
-                android:layout_marginBottom="-5dp" />
-
             <TextView
                 android:id="@+id/tvPhotoRecovery"
                 android:layout_width="wrap_content"
@@ -122,17 +109,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:layout_margin="5dp"
-
             style="@style/CustomCardView">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingTop="32dp"
-                android:paddingBottom="24dp"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp">
+                android:paddingTop="24dp"
+                android:paddingBottom="16dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
 
                 <ImageView
                     android:id="@+id/ivVideoIcon"
@@ -154,8 +139,7 @@
                     android:text="@string/recover_videos"
                     android:textAlignment="center"
                     android:textColor="#000000"
-                    android:textSize="12sp"
-                    android:lineSpacingExtra="2dp"
+                    android:textSize="14sp"
                     app:layout_constraintTop_toBottomOf="@id/ivVideoIcon"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
@@ -169,16 +153,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:layout_margin="5dp"
             style="@style/CustomCardView">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingTop="32dp"
-                android:paddingBottom="24dp"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp">
+                android:paddingTop="24dp"
+                android:paddingBottom="16dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
 
                 <ImageView
                     android:id="@+id/ivFileIcon"
@@ -199,8 +182,7 @@
                     android:text="@string/recover_other_files"
                     android:textAlignment="center"
                     android:textColor="#000000"
-                    android:textSize="12sp"
-                    android:lineSpacingExtra="2dp"
+                    android:textSize="14sp"
                     app:layout_constraintTop_toBottomOf="@id/ivFileIcon"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"  />
@@ -214,13 +196,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:text="@string/recovered"
         android:textColor="#000000"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:letterSpacing="0.1"
-        android:lineSpacingExtra="2dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/recoveryOptionsLayout" />
 
@@ -245,11 +225,10 @@
                 android:id="@+id/tvTotalBytes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0 B"
+                android:text="0 bytes"
                 android:textColor="#000000"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:lineSpacingExtra="2dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -259,9 +238,8 @@
                 android:layout_height="wrap_content"
                 android:text="0 files"
                 android:textColor="#000000"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:lineSpacingExtra="2dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -296,8 +274,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/photos"
                         android:textColor="#4285F4"
-                        android:textSize="16sp"
-                        android:lineSpacingExtra="2dp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:id="@+id/tvPhotoCount"
@@ -305,17 +282,15 @@
                         android:layout_height="wrap_content"
                         android:text="0 files"
                         android:textColor="#000000"
-                        android:textSize="14sp"
-                        android:lineSpacingExtra="2dp" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/tvPhotoSize"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0 B"
+                        android:text="0 bytes"
                         android:textColor="#000000"
-                        android:textSize="14sp"
-                        android:lineSpacingExtra="2dp" />
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -330,8 +305,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/videos"
                         android:textColor="#DB4437"
-                        android:textSize="16sp"
-                        android:lineSpacingExtra="2dp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:id="@+id/tvVideoCount"
@@ -339,17 +313,15 @@
                         android:layout_height="wrap_content"
                         android:text="0 files"
                         android:textColor="#000000"
-                        android:textSize="14sp"
-                        android:lineSpacingExtra="2dp" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/tvVideoSize"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0 B"
+                        android:text="0 bytes"
                         android:textColor="#000000"
-                        android:textSize="14sp"
-                        android:lineSpacingExtra="2dp" />
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -364,8 +336,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/others"
                         android:textColor="#F4B400"
-                        android:textSize="16sp"
-                        android:lineSpacingExtra="2dp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:id="@+id/tvOthersCount"
@@ -373,19 +344,17 @@
                         android:layout_height="wrap_content"
                         android:text="0 files"
                         android:textColor="#000000"
-                        android:textSize="14sp"
-                        android:lineSpacingExtra="2dp" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/tvOthersSize"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0 B"
+                        android:text="0 bytes"
                         android:textColor="#000000"
-                        android:textSize="14sp"
-                        android:lineSpacingExtra="2dp" />
+                        android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
-</androidx.constraintlayout.widget.ConstraintLayout> 
+</androidx.constraintlayout.widget.ConstraintLayout>
