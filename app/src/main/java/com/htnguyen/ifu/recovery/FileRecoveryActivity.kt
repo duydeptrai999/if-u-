@@ -166,7 +166,9 @@ class FileRecoveryActivity : AppCompatActivity() {
         }
         
         recoverButton.setOnClickListener {
-            recoverSelectedFiles()
+            CoroutineScope(Dispatchers.IO).launch {
+                recoverSelectedFiles()
+            }
         }
         
         findViewById<View>(R.id.backButton).setOnClickListener {
