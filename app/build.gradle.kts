@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.htnguyen.ifu"
+    namespace = "com.restore.trashfiles"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.htnguyen.ifu"
+        applicationId = "com.restore.trashfiles"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

@@ -22,7 +22,7 @@
         android:layout_marginBottom="24dp">
         
         <!-- Đây là container cho custom indicator -->
-        <com.htnguyen.ifu.intro.WormDotsIndicator
+        <com.restore.trashfiles.intro.WormDotsIndicator
             android:id="@+id/wormDotsIndicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

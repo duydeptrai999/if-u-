@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.htnguyen.ifu">
+    package="com.restore.trashfiles">
 
     <!-- Storage permissions for file recovery -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -24,7 +24,7 @@
         android:requestLegacyExternalStorage="true"
         tools:targetApi="31">
         <activity
-            android:name="com.htnguyen.ifu.LanguageSelectionActivity"
+            android:name="com.restore.trashfiles.LanguageSelectionActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,26 +33,26 @@
         </activity>
         
         <activity
-            android:name="com.htnguyen.ifu.IntroActivity"
+            android:name="com.restore.trashfiles.IntroActivity"
             android:exported="false" />
         
         <activity
-            android:name="com.htnguyen.ifu.MainActivity"
+            android:name="com.restore.trashfiles.MainActivity"
             android:exported="true">
         </activity>
         
         <activity
-            android:name="com.htnguyen.ifu.recovery.PhotoRecoveryActivity"
+            android:name="com.restore.trashfiles.recovery.PhotoRecoveryActivity"
             android:exported="true"
-            android:parentActivityName="com.htnguyen.ifu.MainActivity" />
+            android:parentActivityName="com.restore.trashfiles.MainActivity" />
             
         <activity
-            android:name="com.htnguyen.ifu.recovery.VideoRecoveryActivity"
-            android:parentActivityName="com.htnguyen.ifu.MainActivity" />
+            android:name="com.restore.trashfiles.recovery.VideoRecoveryActivity"
+            android:parentActivityName="com.restore.trashfiles.MainActivity" />
             
         <activity
-            android:name="com.htnguyen.ifu.recovery.FileRecoveryActivity"
-            android:parentActivityName="com.htnguyen.ifu.MainActivity" />
+            android:name="com.restore.trashfiles.recovery.FileRecoveryActivity"
+            android:parentActivityName="com.restore.trashfiles.MainActivity" />
             
         <activity
             android:name=".SettingsActivity"

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Easy Recovery</string>
+    <string name="app_name">If U</string>
     <string name="recover_photos">Khôi phục ảnh</string>
-    <string name="recover_videos">Khôi phục Video</string>
+    <string name="recover_videos">Khôi phục video</string>
     <string name="recover_other_files">Khôi phục tệp</string>
-    <string name="recovered">ĐÃ KHÔI PHỤC</string>
-    <string name="bytes">B</string>
-    <string name="files">files</string>
+    <string name="recovered">Đã khôi phục</string>
+    <string name="bytes">byte</string>
+    <string name="files">tệp</string>
     <string name="photos">Ảnh</string>
-    <string name="videos">Videos</string>
-    <string name="others">Khác</string>
+    <string name="videos">Video</string>
+    <string name="others">Tệp khác</string>
     <string name="settings">Cài đặt</string>
     
     <!-- Language selection screen -->
-    <string name="select_language">Chọn ngôn ngữ / Select Language</string>
+    <string name="select_language">Chọn ngôn ngữ</string>
     <string name="choose_language">Chọn Ngôn Ngữ Của Bạn</string>
     <string name="select_preferred_language">Chọn ngôn ngữ bạn ưa thích</string>
     <string name="english">Tiếng Anh</string>
@@ -40,30 +40,28 @@
     <!-- Chuỗi mới cho tính năng khôi phục -->
     <string name="scan_button">Bắt đầu quét</string>
     <string name="scan_button_short">QUÉT</string>
-    <string name="recover_button">Khôi phục đã chọn</string>
-    <string name="scanning_status">Đang quét thiết bị...</string>
-    <string name="no_photos_found">Không tìm thấy ảnh để khôi phục</string>
+    <string name="recover_button">Khôi phục</string>
+    <string name="scanning_status">Đang quét...</string>
+    <string name="no_photos_found">Không tìm thấy ảnh đã xóa</string>
     <string name="photos_found">Tìm thấy %d ảnh để khôi phục</string>
-    <string name="no_videos_found">Không tìm thấy video để khôi phục</string>
+    <string name="no_videos_found">Không tìm thấy video đã xóa</string>
     <string name="videos_found">Tìm thấy %d video để khôi phục</string>
-    <string name="no_files_found">Không tìm thấy tệp nào để khôi phục</string>
+    <string name="no_files_found">Không tìm thấy tệp đã xóa</string>
     <string name="files_found">Tìm thấy %d tệp</string>
     <string name="total_size">Tổng kích thước</string>
     <string name="recovering_status">Đang khôi phục %d mục...</string>
-    <string name="recovery_success">Đã khôi phục thành công</string>
-    <string name="recovery_success_description">Đã khôi phục thành công. Các ảnh đã được lưu vào thư viện.</string>
-    <string name="permission_required">Cần quyền truy cập bộ nhớ để khôi phục</string>
-    <string name="select_items">Vui lòng chọn các mục để khôi phục</string>
+    <string name="recovery_success_gallery">Đã khôi phục thành công. Các video đã được lưu vào thư viện.</string>
+    <string name="recovery_failed">Không thể khôi phục</string>
+    <string name="permission_required">Cần quyền truy cập bộ nhớ để tiếp tục</string>
+    <string name="select_items">Vui lòng chọn các tệp để khôi phục</string>
     <string name="photo_recovery">Khôi phục ảnh</string>
     <string name="tap_to_scan_photos">Nhấn để quét ảnh</string>
-    <string name="scan_complete">Đã quét xong</string>
+    <string name="scan_complete">Quét hoàn tất</string>
     <string name="preview">Xem trước</string>
-    <string name="view_results">Xem kết quả</string>
-    <string name="select_to_recover">Chọn ảnh để khôi phục</string>
+    <string name="view_results">Xem tất cả</string>
+    <string name="select_to_recover">Chọn các tệp để khôi phục</string>
     <string name="preview_thumbnail">Hình thu nhỏ xem trước</string>
     <string name="video_thumbnail">Hình thu nhỏ video</string>
-    <string name="recovery_failed">Không thể khôi phục các mục đã chọn</string>
-    <string name="no_items_selected">Chưa chọn mục nào để khôi phục</string>
     <string name="tep_duoc_tim_thay">Tệp được tìm thấy</string>
     <string name="kich_thuoc">Kích thước</string>
     <string name="tap_to_scan_videos">Nhấn để quét video đã xóa</string>
@@ -72,20 +70,64 @@
     <string name="tap_to_scan_files">Nhấn để quét các tệp tin đã xóa</string>
     <string name="select_files_to_recover">Chọn tệp tin để khôi phục</string>
     <string name="file_icon">Biểu tượng tệp tin</string>
-    <string name="recovery_success_gallery">Đã khôi phục thành công. Các video đã được lưu vào thư viện.</string>
-    <string name="file_recovery_success">Đã khôi phục thành công. Các tệp tin đã được lưu vào thư mục Documents và Downloads.</string>
-    <string name="view_recovered_button">Xem video</string>
-    <string name="view_recovered_button_photo">Xem ảnh</string>
-
-    <!-- Chuỗi mới cho màn hình cài đặt -->
+    <string name="photo_recovery_desc">Ứng dụng sẽ quét bộ nhớ thiết bị để tìm kiếm và khôi phục các ảnh đã bị xóa. Quá trình này có thể mất vài phút tùy thuộc vào dung lượng bộ nhớ.</string>
+    
+    <!-- Settings screen strings -->
     <string name="back">Quay lại</string>
     <string name="premium">Premium</string>
     <string name="upgrade_to_premium">Nâng cấp lên Premium</string>
     <string name="premium_benefits">Loại bỏ quảng cáo và tận hưởng nhiều lợi ích hơn.</string>
     <string name="upgrade">Nâng cấp</string>
-    <string name="language">Đổi ngôn ngữ</string>
+    <string name="language">Ngôn ngữ</string>
     <string name="rate_app">Đánh giá ứng dụng</string>
     <string name="share_app">Chia sẻ ứng dụng</string>
     <string name="privacy_policy">Chính sách bảo mật</string>
     <string name="terms_of_use">Điều khoản sử dụng</string>
+    
+    <!-- File access permission dialog -->
+    <string name="storage_permission_title">Quyền truy cập bộ nhớ</string>
+    <string name="storage_permission_message">Ứng dụng cần quyền truy cập tất cả các tệp để có thể quét và khôi phục dữ liệu đã xóa. Vui lòng cho phép truy cập để tiếp tục.</string>
+    <string name="storage_permission_button">Cấp quyền</string>
+    <string name="storage_permission_settings">Cài đặt</string>
+    <string name="storage_permission_denied">Ứng dụng cần quyền này để hoạt động. Vui lòng cấp quyền trong cài đặt.</string>
+    <string name="deleted_indicator">ĐÃ XÓA</string>
+    <string name="trash_folder_indicator">Thùng rác</string>
+    <string name="recovery_message">Đây là ảnh đã bị xóa. Nhấn để khôi phục.</string>
+    <string name="file_recovery_success">Đã khôi phục thành công. Các tệp tin đã được lưu vào thư mục Documents.</string>
+    <string name="recovery_failed_description">Không thể khôi phục một số tệp đã chọn. Vui lòng thử lại sau.</string>
+    <string name="recovery_in_progress">Đang khôi phục, vui lòng đợi...</string>
+    <string name="recovery_progress_description">Ảnh đang được khôi phục, vui lòng đợi...</string>
+    <string name="recovery_counting">%1$d/%2$d</string>
+    <string name="view_recovered_button">Xem tệp</string>
+    <string name="view_recovered_button_photo">Xem ảnh</string>
+
+    <!-- Recovered files screen strings -->
+    <string name="recovered_files_title">Tệp tin đã được khôi phục</string>
+    <string name="recovered_photos">Ảnh đã khôi phục</string>
+    <string name="recovered_videos">Video đã khôi phục</string>
+    <string name="recovered_other_files">Tệp khác đã khôi phục</string>
+    <string name="no_recovered_files">Không có tệp tin nào đã được khôi phục</string>
+    <string name="view">Xem</string>
+    <string name="thumbnail_preview">Xem trước tệp</string>
+    <string name="open_file_error">Không thể mở tệp tin này</string>
+    <string name="loading_thumbnail">Đang tải...</string>
+    <string name="share">Chia sẻ</string>
+    <string name="share_title">Chia sẻ qua</string>
+    <string name="share_success">Đã chia sẻ thành công</string>
+    <string name="share_error">Không thể chia sẻ tệp tin này</string>
+    <string name="selected_items_count">%d đã chọn</string>
+    <string name="select_all">Chọn tất cả</string>
+    <string name="no_items_selected">Vui lòng chọn ít nhất một file</string>
+    
+    <!-- New strings for recovery features -->
+    <string name="settings_app_language">Ngôn ngữ ứng dụng</string>
+    <string name="settings_select_language">Chọn ngôn ngữ</string>
+    
+    <!-- Recovery strings -->
+    <string name="recovering_files">Đang khôi phục tệp...</string>
+    <string name="recovering_count">%1$d / %2$d</string>
+    <string name="recovery_success">Khôi phục thành công</string>
+    <string name="recovery_success_description">Đã khôi phục thành công. Các ảnh đã được lưu vào thư viện.</string>
+    <string name="view_recovered_files">Xem tệp</string>
+    <string name="scanning_in_progress">Đang quét, vui lòng đợi...</string>
 </resources> 
