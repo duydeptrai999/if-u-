@@ -40,6 +40,7 @@ import java.text.DecimalFormat
 import java.util.Date
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
+import com.restore.trashfiles.ads.AdHelper
 
 class FileRecoveryActivity : AppCompatActivity() {
 
@@ -92,6 +93,9 @@ class FileRecoveryActivity : AppCompatActivity() {
         initViews()
         setupRecyclerViews()
         setupClickListeners()
+        
+        // Hiển thị quảng cáo banner
+        setupAds()
         
         // Kiểm tra quyền truy cập bộ nhớ ngay khi mở ứng dụng
         if (!checkPermission()) {
@@ -1145,6 +1149,9 @@ class FileRecoveryActivity : AppCompatActivity() {
                     ).show()
                 }
             }
+            
+            // Hiển thị quảng cáo interstitial sau khi khôi phục thành công
+            AdHelper.showInterstitialAd(this)
         } catch (e: Exception) {
             Log.e("FileRecovery", "Lỗi trong quá trình khôi phục: ${e.message}")
             e.printStackTrace()
@@ -1330,5 +1337,11 @@ class FileRecoveryActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("FileRecovery", "Lỗi khi quét thư mục thùng rác: ${directory.absolutePath}")
         }
+    }
+
+    private fun setupAds() {
+        // Hiển thị banner ad
+        val adContainer = findViewById<FrameLayout>(R.id.adViewContainer)
+        AdHelper.showBannerAd(this, adContainer)
     }
 } 

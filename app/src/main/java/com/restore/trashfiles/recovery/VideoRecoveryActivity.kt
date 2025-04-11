@@ -40,6 +40,7 @@ import java.util.Date
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import java.util.Comparator
+import com.restore.trashfiles.ads.AdHelper
 
 class VideoRecoveryActivity : AppCompatActivity() {
 
@@ -101,6 +102,9 @@ class VideoRecoveryActivity : AppCompatActivity() {
         initViews()
         setupRecyclerViews()
         setupClickListeners()
+        
+        // Hiển thị quảng cáo banner
+        setupAds()
         
         // Kiểm tra quyền truy cập bộ nhớ ngay khi mở ứng dụng
         if (!checkPermission()) {
@@ -1022,6 +1026,12 @@ class VideoRecoveryActivity : AppCompatActivity() {
         return extension in listOf("mp4", "3gp", "mkv", "avi", "mov", "wmv")
     }
     
+    private fun setupAds() {
+        // Hiển thị banner ad
+        val adContainer = findViewById<FrameLayout>(R.id.adViewContainer)
+        AdHelper.showBannerAd(this, adContainer)
+    }
+    
     private fun recoverSelectedVideos() {
         val selectedVideos = recoveredVideos.filter { it.isSelected() }
         
@@ -1121,6 +1131,9 @@ class VideoRecoveryActivity : AppCompatActivity() {
                 // Hiển thị màn hình kết quả khôi phục
                 showRecoveryResultLayout(successCount > 0, successCount, galleryRecoveryCount)
             }
+            
+            // Hiển thị quảng cáo interstitial sau khi khôi phục thành công
+            AdHelper.showInterstitialAd(this@VideoRecoveryActivity)
         }
     }
     

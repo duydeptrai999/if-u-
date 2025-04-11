@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.restore.trashfiles.R
 import com.restore.trashfiles.adapter.PhotoAdapter
 import com.restore.trashfiles.adapter.PreviewPhotoAdapter
+import com.restore.trashfiles.ads.AdHelper
 import com.restore.trashfiles.model.RecoverableItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -104,10 +105,19 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         setupRecyclerViews()
         setupClickListeners()
         
+        // Hiển thị quảng cáo banner
+        setupAds()
+        
         // Kiểm tra quyền truy cập bộ nhớ ngay khi mở ứng dụng
         if (!checkPermission()) {
             Toast.makeText(this, getString(R.string.permission_required), Toast.LENGTH_SHORT).show()
         }
+    }
+    
+    private fun setupAds() {
+        // Hiển thị banner ad
+        val adContainer = findViewById<FrameLayout>(R.id.adViewContainer)
+        AdHelper.showBannerAd(this, adContainer)
     }
     
     private fun initViews() {
@@ -1069,6 +1079,9 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                 showRecoveryResultLayout(successCount > 0, successCount, galleryRecoveryCount)
             }
         }
+        
+        // Hiển thị quảng cáo interstitial sau khi khôi phục thành công
+        AdHelper.showInterstitialAd(this)
     }
     
     /**

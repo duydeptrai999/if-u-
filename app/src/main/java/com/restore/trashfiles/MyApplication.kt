@@ -3,6 +3,7 @@ package com.restore.trashfiles
 import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
+import com.restore.trashfiles.ads.AdManager
 import java.util.Locale
 
 class MyApplication : Application() {
@@ -12,6 +13,9 @@ class MyApplication : Application() {
         
         // Khởi tạo ngôn ngữ cho ứng dụng từ SharedPreferences
         applyLanguage()
+        
+        // Khởi tạo Firebase và AdMob
+        initializeAds()
     }
     
     override fun attachBaseContext(base: Context) {
@@ -44,5 +48,12 @@ class MyApplication : Application() {
         val configuration = resources.configuration
         configuration.setLocale(locale)
         resources.updateConfiguration(configuration, resources.displayMetrics)
+    }
+    
+    /**
+     * Khởi tạo Firebase và AdMob
+     */
+    private fun initializeAds() {
+        AdManager.getInstance().initialize(this)
     }
 } 

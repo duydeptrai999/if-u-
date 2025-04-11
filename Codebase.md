@@ -269,3 +269,22 @@
 - strings.xml: Chuỗi tiếng Anh
 - strings.xml (values-vi): Chuỗi tiếng Việt
 - (Các resource khác)...
+
+## Quảng cáo
+### Module: com.restore.trashfiles.ads
+
+- **AdManager** (Singleton quản lý quảng cáo Firebase AdMob)
+  - getInstance
+  - initialize
+  - createBannerAd
+  - loadInterstitialAd
+  - showInterstitialAd
+  - loadRewardedAd
+  - showRewardedAd
+
+- **AdHelper** (Helper class cung cấp API đơn giản hóa để hiển thị quảng cáo)
+  - showBannerAd
+  - showInterstitialAd
+  - showRewardedAd
+  - preloadRewardedAd
+  - shouldShowInterstitial

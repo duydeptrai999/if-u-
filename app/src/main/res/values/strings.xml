@@ -131,4 +131,13 @@
     <string name="recovery_success_description">Recovery successful. Photos have been saved to your gallery.</string>
     <string name="view_recovered_files">View Files</string>
     <string name="scanning_in_progress">Scanning in progress, please wait...</string>
+
+    <!-- Ad related strings -->
+    <string name="ad_loading">Loading ad...</string>
+    <string name="ad_failed_to_load">Ad failed to load</string>
+    <string name="remove_ads">Remove Ads</string>
+    <string name="watch_ad_to_continue">Watch ad to continue</string>
+    <string name="ad_banner_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_interstitial_id">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="ad_rewarded_id">ca-app-pub-3940256099942544/5224354917</string>
 </resources>

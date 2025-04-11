@@ -452,3 +452,52 @@ Luồng điều hướng hiện tại của ứng dụng:
 4. **MainActivity**: Màn hình chính của ứng dụng, hiển thị các tính năng khôi phục dữ liệu
 
 Lưu ý: Trạng thái "đã chọn ngôn ngữ" và "đã xem intro" được lưu trong SharedPreferences để đảm bảo hiển thị phù hợp mỗi khi khởi động ứng dụng.
+
+## Tính năng Quảng cáo (Firebase AdMob)
+
+### Mô tả
+Ứng dụng đã tích hợp Firebase AdMob để hiển thị quảng cáo, bao gồm banner ads, interstitial ads và rewarded ads.
+
+### Các loại quảng cáo
+1. **Banner Ads**: Quảng cáo dạng banner hiển thị ở dưới màn hình trong các trang chính.
+2. **Interstitial Ads**: Quảng cáo toàn màn hình hiển thị tại các thời điểm chuyển đổi trong ứng dụng (khi hoàn thành khôi phục, khi chuyển giữa các màn hình chính).
+3. **Rewarded Ads**: Quảng cáo thưởng cung cấp phần thưởng cho người dùng sau khi xem hoàn thành.
+
+### Cấu trúc quản lý quảng cáo
+- `AdManager`: Singleton class quản lý việc tải và hiển thị quảng cáo, giao tiếp trực tiếp với AdMob SDK.
+- `AdHelper`: Helper class cung cấp các phương thức đơn giản để hiển thị quảng cáo từ các activity.
+- `ad_banner_layout.xml`: Layout chung cho banner ads có thể sử dụng lại trong các màn hình khác nhau.
+
+### Cách sử dụng
+1. **Hiển thị Banner Ad**:
+   ```kotlin
+   val adContainer = findViewById<FrameLayout>(R.id.adViewContainer)
+   AdHelper.showBannerAd(this, adContainer)
+   ```
+
+2. **Hiển thị Interstitial Ad**:
+   ```kotlin
+   AdHelper.showInterstitialAd(this)
+   ```
+
+3. **Hiển thị Rewarded Ad**:
+   ```kotlin
+   AdHelper.showRewardedAd(this) {
+       // Xử lý khi người dùng hoàn thành xem quảng cáo
+       unlockPremiumFeature()
+   }
+   ```
+
+### Test IDs
+Ứng dụng hiện sử dụng test IDs của Google cho việc phát triển:
+- Banner Ad: ca-app-pub-3940256099942544/6300978111
+- Interstitial Ad: ca-app-pub-3940256099942544/1033173712
+- Rewarded Ad: ca-app-pub-3940256099942544/5224354917
+
+### Tùy chỉnh
+- Tần suất hiển thị interstitial ads có thể điều chỉnh bằng cách sửa đổi `AD_FREQUENCY` trong `AdManager`.
+- Các chuỗi liên quan đến quảng cáo được định nghĩa trong `strings.xml`.
+- Ad unit IDs có thể được thay đổi trong `strings.xml` để sử dụng IDs thực tế khi xuất bản.
+
+### Chức năng "Remove Ads"
+Có thể phát triển thêm tính năng premium để loại bỏ quảng cáo, sử dụng Google Play Billing Library.

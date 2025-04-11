@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "123456789000",
+    "project_id": "trash-files-recovery",
+    "storage_bucket": "trash-files-recovery.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123456789000:android:0123456789abcdef",
+        "android_client_info": {
+          "package_name": "com.restore.trashfiles"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-example-key-for-setup"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+} 

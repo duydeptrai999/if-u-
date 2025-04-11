@@ -17,9 +17,11 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
 import android.provider.Settings
+import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import com.restore.trashfiles.ads.AdHelper
 
 class MainActivity : BaseActivity() {
 
@@ -44,6 +46,18 @@ class MainActivity : BaseActivity() {
 
         // Kiểm tra và yêu cầu quyền truy cập
         checkStoragePermission()
+        
+        // Hiển thị quảng cáo banner
+        setupAds()
+    }
+    
+    private fun setupAds() {
+        // Hiển thị banner ads
+        val adContainer = findViewById<FrameLayout>(R.id.adViewContainer)
+        AdHelper.showBannerAd(this, adContainer)
+        
+        // Preload rewarded ads để có thể sử dụng sau này
+        AdHelper.preloadRewardedAd(this)
     }
     
     override fun onResume() {
@@ -185,18 +199,27 @@ class MainActivity : BaseActivity() {
             // Mở màn hình khôi phục ảnh
             val intent = Intent(this, PhotoRecoveryActivity::class.java)
             startActivity(intent)
+            
+            // Hiển thị interstitial ad khi chuyển màn hình
+            AdHelper.showInterstitialAd(this)
         }
 
         videoRecoveryCard.setOnClickListener {
             // Mở màn hình khôi phục video
             val intent = Intent(this, VideoRecoveryActivity::class.java)
             startActivity(intent)
+            
+            // Hiển thị interstitial ad khi chuyển màn hình
+            AdHelper.showInterstitialAd(this)
         }
 
         fileRecoveryCard.setOnClickListener {
             // Mở màn hình khôi phục tệp tin khác
             val intent = Intent(this, FileRecoveryActivity::class.java)
             startActivity(intent)
+            
+            // Hiển thị interstitial ad khi chuyển màn hình
+            AdHelper.showInterstitialAd(this)
         }
         
         // Xử lý sự kiện khi nhấn vào phần thống kê đã khôi phục

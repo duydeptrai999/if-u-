@@ -53,6 +53,12 @@
 - Cải thiện hệ thống quản lý ngôn ngữ với BaseActivity và MyApplication
 - Thêm tính năng thay đổi ngôn ngữ trong cài đặt
 - Đảm bảo cơ chế thay đổi ngôn ngữ mượt mà và nhất quán
+- Tích hợp quảng cáo Firebase AdMob
+  - Thêm banner ads vào tất cả các màn hình chính
+  - Thêm interstitial ads khi chuyển màn hình và hoàn thành khôi phục
+  - Chuẩn bị rewarded ads cho tính năng premium
+- Cấu trúc AdManager và AdHelper để quản lý quảng cáo dễ dàng
+- Test IDs cho việc phát triển và kiểm thử quảng cáo
 
 ### Changed
 
