@@ -46,9 +46,10 @@ class AdManager private constructor() {
 
     // Banner Ads
     fun createBannerAd(context: Context, adContainer: ViewGroup) {
-        val adView = AdView(context)
-        adView.adUnitId = context.getString(R.string.ad_banner_id)
-        adView.adSize = AdSize.BANNER
+        val adView = AdView(context).apply {
+            setAdSize(AdSize.BANNER)
+            adUnitId = context.getString(R.string.ad_banner_id)
+        }
         
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
