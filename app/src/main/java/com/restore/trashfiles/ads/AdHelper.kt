@@ -2,13 +2,17 @@ package com.restore.trashfiles.ads
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
+import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import com.restore.trashfiles.R
 
 /**
  * Helper class to manage ads in activities
  */
 object AdHelper {
+    private const val TAG = "AdHelper"
     
     /**
      * Shows a banner ad in the provided container
@@ -71,5 +75,46 @@ object AdHelper {
     fun shouldShowInterstitial(): Boolean {
         // This can be expanded with more sophisticated rules
         return true
+    }
+    
+    /**
+     * Toggle expandable text in native ad
+     */
+    fun setupExpandableAdText(adView: View) {
+        val bodyTextView = adView.findViewById<TextView>(R.id.ad_body)
+        val hintTextView = adView.findViewById<TextView>(R.id.ad_body_hint)
+        
+        bodyTextView?.let { textView ->
+            // Ban đầu hiển thị tối đa 3 dòng
+            textView.maxLines = 3
+            
+            // Tính toán số dòng thực tế sau khi layout hoàn tất
+            textView.post {
+                val lineCount = textView.lineCount
+                // Nếu text ngắn (dưới 3 dòng), ẩn hint đi
+                if (lineCount <= 3) {
+                    hintTextView?.visibility = View.GONE
+                }
+            }
+            
+            // Thêm sự kiện click để mở rộng/thu gọn text
+            textView.setOnClickListener {
+                if (textView.maxLines == 3) {
+                    // Mở rộng để hiển thị toàn bộ text
+                    textView.maxLines = Integer.MAX_VALUE
+                    hintTextView?.text = "Nhấn để thu gọn"
+                } else {
+                    // Thu gọn về 3 dòng
+                    textView.maxLines = 3
+                    hintTextView?.text = "Nhấn để xem thêm"
+                }
+            }
+            
+            // Hint cũng có thể được click
+            hintTextView?.setOnClickListener {
+                // Kích hoạt cùng hành động với bodyTextView
+                textView.performClick()
+            }
+        }
     }
 } 

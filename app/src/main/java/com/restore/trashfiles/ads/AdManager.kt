@@ -39,8 +39,8 @@ class AdManager private constructor() {
     private val AD_FREQUENCY = 3 // Show interstitial ad every 3 actions
 
     companion object {
-        const val LAYOUT_DEFAULT = R.layout.ad_unified
-        const val LAYOUT_INTRO = R.layout.ad_unified_intro
+        val LAYOUT_DEFAULT = R.layout.ad_unified
+        val LAYOUT_INTRO = R.layout.ad_unified_intro
         
         @Volatile
         private var instance: AdManager? = null
@@ -102,6 +102,9 @@ class AdManager private constructor() {
                 val adView = inflater.inflate(layoutResId, adContainer, false) as NativeAdView
                 populateNativeAdView(ad, adView)
                 
+                // Thiết lập chức năng mở rộng text
+                AdHelper.setupExpandableAdText(adView)
+                
                 adContainer.removeAllViews()
                 adContainer.addView(adView)
             }
@@ -134,7 +137,12 @@ class AdManager private constructor() {
         
         // Body
         adView.findViewById<TextView>(R.id.ad_body)?.let {
-            it.text = nativeAd.body
+            if (nativeAd.body != null) {
+                it.visibility = View.VISIBLE
+                it.text = nativeAd.body
+            } else {
+                it.visibility = View.GONE
+            }
             adView.bodyView = it
         }
         
@@ -166,7 +174,7 @@ class AdManager private constructor() {
                 it.visibility = View.VISIBLE
                 it.text = nativeAd.price
             } else {
-                it.visibility = View.INVISIBLE
+                it.visibility = View.GONE
             }
             adView.priceView = it
         }
@@ -177,7 +185,7 @@ class AdManager private constructor() {
                 it.visibility = View.VISIBLE
                 it.text = nativeAd.store
             } else {
-                it.visibility = View.INVISIBLE
+                it.visibility = View.GONE
             }
             adView.storeView = it
         }
@@ -188,7 +196,7 @@ class AdManager private constructor() {
                 it.visibility = View.VISIBLE
                 it.rating = nativeAd.starRating!!.toFloat()
             } else {
-                it.visibility = View.INVISIBLE
+                it.visibility = View.GONE
             }
             adView.starRatingView = it
         }
@@ -199,7 +207,7 @@ class AdManager private constructor() {
                 it.visibility = View.VISIBLE
                 it.text = nativeAd.advertiser
             } else {
-                it.visibility = View.INVISIBLE
+                it.visibility = View.GONE
             }
             adView.advertiserView = it
         }

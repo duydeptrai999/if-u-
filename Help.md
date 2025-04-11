@@ -511,3 +511,27 @@ Lưu ý: Trạng thái "đã chọn ngôn ngữ" và "đã xem intro" được l
 
 ### Chức năng "Remove Ads"
 Có thể phát triển thêm tính năng premium để loại bỏ quảng cáo, sử dụng Google Play Billing Library.
+
+# Tính năng mở rộng text trong quảng cáo native
+
+Chức năng này giúp hiển thị nội dung mô tả của quảng cáo native một cách tối ưu:
+
+1. **Cách hoạt động**:
+   - Mặc định, phần mô tả của quảng cáo được giới hạn ở 3 dòng với dấu ba chấm nếu dài hơn
+   - Người dùng có thể nhấn vào phần text hoặc chỉ dẫn "Nhấn để xem thêm" để mở rộng toàn bộ nội dung
+   - Khi đã mở rộng, phần chỉ dẫn đổi thành "Nhấn để thu gọn"
+   - Nếu mô tả ngắn (dưới 3 dòng), phần chỉ dẫn sẽ tự động ẩn đi
+
+2. **Cài đặt**:
+   - Được tự động áp dụng cho tất cả quảng cáo native trong ứng dụng
+   - Không cần thêm code nào khi sử dụng AdHelper.showNativeAd()
+
+3. **Điều chỉnh**:
+   - Số dòng mặc định có thể thay đổi trong AdHelper.setupExpandableAdText()
+   - Màu sắc và kiểu hiển thị có thể tùy chỉnh trong layouts ad_unified.xml và ad_unified_intro.xml
+
+4. **Ưu điểm**:
+   - Giúp hiển thị thêm thông tin quảng cáo khi người dùng quan tâm
+   - Giữ giao diện gọn gàng bằng cách thu gọn mặc định
+   - Tăng khả năng tương tác với quảng cáo
+   - Cải thiện tỷ lệ click quảng cáo

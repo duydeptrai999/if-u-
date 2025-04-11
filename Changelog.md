@@ -59,6 +59,12 @@
   - Chuẩn bị rewarded ads cho tính năng premium
 - Cấu trúc AdManager và AdHelper để quản lý quảng cáo dễ dàng
 - Test IDs cho việc phát triển và kiểm thử quảng cáo
+- Tối ưu hiển thị quảng cáo native:
+  - Thêm chức năng mở rộng/thu gọn phần mô tả quảng cáo (ad body text)
+  - Thêm chỉ dẫn "Nhấn để xem thêm" để nâng cao trải nghiệm người dùng
+  - Cải thiện hiển thị text với màu sắc và kích thước dễ đọc hơn
+  - Sử dụng nền có màu nhẹ để làm nổi bật phần mô tả
+  - Tự động ẩn chỉ dẫn khi phần mô tả ngắn
 
 ### Changed
 
@@ -74,6 +80,11 @@
 - Nâng cấp dalle-workflow.mdc với hướng dẫn chi tiết về tối ưu prompt cho từng loại ảnh
 - Cập nhật giao diện màn hình danh sách file đã khôi phục để hỗ trợ chế độ chọn nhiều
 - Cải thiện cách xử lý loại MIME khi chia sẻ file
+- Cải thiện hiển thị quảng cáo native:
+  - Thay đổi màu text từ xám (#5F6368) sang đen (#000000) để dễ đọc hơn
+  - Tăng kích thước font từ 12sp lên 14sp cho phần mô tả
+  - Thêm padding và khoảng cách dòng để text dễ đọc hơn
+  - Thay đổi hiển thị UI khi không có dữ liệu từ INVISIBLE sang GONE
 
 ### Deprecated
 
