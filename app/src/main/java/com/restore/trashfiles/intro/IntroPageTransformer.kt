@@ -52,7 +52,7 @@ class IntroPageTransformer : ViewPager2.PageTransformer {
                 page.scaleY = scaleFactor
                 
                 // Thêm hiệu ứng parallax cải tiến - di chuyển nhẹ nhàng hơn
-                val imageView = page.findViewById<View>(com.htnguyen.ifu.R.id.introImage)
+                val imageView = page.findViewById<View>(com.restore.trashfiles.R.id.introImage)
                 imageView?.let {
                     // Giảm mức độ di chuyển để ảnh không bị nghiêng nhiều
                     it.translationX = -position * (pageWidth / 8f)

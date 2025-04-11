@@ -231,7 +231,7 @@ class FileRecoveryActivity : AppCompatActivity() {
         
         // Xử lý khi nhấn nút View Recovered Files
         viewRecoveredButton.setOnClickListener {
-            val intent = Intent(this, com.htnguyen.ifu.RecoveredFilesActivity::class.java)
+            val intent = Intent(this, com.restore.trashfiles.RecoveredFilesActivity::class.java)
             startActivity(intent)
         }
     }
@@ -1066,7 +1066,7 @@ class FileRecoveryActivity : AppCompatActivity() {
             val totalCount = selectedFiles.size
             
             // Database for storing recovered files
-            val database = com.htnguyen.ifu.db.RecoveredFilesDatabase.getInstance(this@FileRecoveryActivity)
+            val database = com.restore.trashfiles.db.RecoveredFilesDatabase.getInstance(this@FileRecoveryActivity)
             
             for (index in selectedFiles.indices) {
                 val item = selectedFiles[index]
@@ -1106,7 +1106,7 @@ class FileRecoveryActivity : AppCompatActivity() {
                     }
                     
                     // Add to recovered files database
-                    val recoveredFile = com.htnguyen.ifu.model.RecoveredFile(
+                    val recoveredFile = com.restore.trashfiles.model.RecoveredFile(
                         path = destFile.absolutePath,
                         name = destFile.name,
                         size = destFile.length(),

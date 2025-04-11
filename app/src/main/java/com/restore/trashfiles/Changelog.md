@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+- Đổi tên package từ `com.htnguyen.ifu` thành `com.restore.trashfiles` để phù hợp với tính năng ứng dụng
+- Cập nhật tất cả các tham chiếu trong mã nguồn và tài nguyên để phản ánh tên package mới
+
 ### Added
 - Tính năng khôi phục ảnh (PhotoRecoveryActivity)
   - Giao diện để quét và hiển thị các ảnh có thể khôi phục

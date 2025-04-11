@@ -381,21 +381,27 @@ Tính năng Intro App giới thiệu các chức năng chính của ứng dụng
    - Slide 3: Giới thiệu tính năng khôi phục video
    - Slide 4: Giới thiệu tính năng khôi phục tệp tin
 
-2. **Animation nâng cao**:
+2. **Thiết kế màu sắc hài hòa**:
+   - Sử dụng bảng màu chính của ứng dụng trong các slide intro (#1E5799, #4285F4, #2EB62C, #DB4437, #F4B400, #1976D2)
+   - Mỗi slide có gradient độc đáo với góc gradient khác nhau tạo hiệu ứng đa dạng
+   - Gradient được thiết kế để phản ánh chức năng của từng slide:
+     - Slide 1 (Welcome): Gradient xanh dương (header) - xanh Google (tương tự màu ứng dụng)
+     - Slide 2 (Photo): Gradient xanh Google - xanh lá (phù hợp với biểu tượng khôi phục ảnh)
+     - Slide 3 (Video): Gradient đỏ - vàng (thể hiện sự sống động của video)
+     - Slide 4 (File): Gradient vàng - xanh dương nhạt (phản ánh nhiều loại tệp tin khác nhau)
+   - Văn bản được tăng cường độ tương phản với đổ bóng sâu hơn để dễ đọc trên nền gradient
+
+3. **Animation nâng cao**:
    - **Hiệu ứng chuyển trang**: Hiệu ứng phóng to/thu nhỏ mượt mà khi vuốt qua các trang
    - **Hiển thị hình ảnh đúng tỷ lệ**: Sử dụng scaleType="fitCenter" và adjustViewBounds="true" để hình ảnh luôn hiển thị đúng chiều và tỷ lệ
    - **Hiệu ứng xuất hiện mượt mà**: Hình ảnh xuất hiện với hiệu ứng phóng to, tiêu đề và mô tả hiện lên với hiệu ứng trượt dọc tự nhiên
-   - **Nền gradient động**: Mỗi slide có màu nền gradient riêng tạo cảm giác sinh động
-   - **Hiệu ứng nút**: Các nút có animation khi nhấn và chuyển đổi, đặc biệt khi chuyển từ "Next" sang "Start"
    - **Indicator chuyển động mượt mà**: Hiệu ứng "worm" khi chuyển giữa các trang
 
-3. **Thiết kế nâng cấp**:
-   - **Card view với bo tròn**: Hình ảnh được hiển thị trong card view với góc bo tròn và đổ bóng tinh tế
+4. **Thiết kế nâng cấp**:
+   - **Card view với bo tròn**: Hình ảnh được hiển thị trong card view với góc bo tròn lớn (20dp) và đổ bóng sâu (10dp)
    - **Tỷ lệ hình ảnh chuẩn**: Đảm bảo hình ảnh luôn hiển thị đúng tỷ lệ và không bị méo, nghiêng
    - **Padding phù hợp**: Sử dụng padding đủ lớn để hình ảnh không bị sát cạnh và dễ nhìn hơn
-   - **Nâng cao độ tương phản**: Tăng độ tương phản cho card view để hình ảnh nổi bật hơn trên nền gradient
-
-4. **Chỉ báo vị trí trang**: Hiển thị các chấm tròn ở dưới màn hình để biểu thị số lượng trang và vị trí hiện tại, với animation chuyển động.
+   - **Typography cải tiến**: Tăng kích thước chữ tiêu đề (30sp) và nội dung (18sp), tăng khoảng cách dòng (6sp) cho trải nghiệm đọc tốt hơn
 
 5. **Nút điều hướng**:
    - Nút "Bỏ qua" (Skip): Cho phép người dùng bỏ qua intro và chuyển thẳng đến màn hình chính, ẩn đi ở slide cuối cùng
@@ -419,12 +425,13 @@ Tính năng Intro App giới thiệu các chức năng chính của ứng dụng
 Tính năng được triển khai bằng cách:
 - Sử dụng ViewPager2 với IntroPageTransformer tùy chỉnh không có hiệu ứng xoay để tránh méo ảnh
 - ScaleType="fitCenter" và adjustViewBounds="true" cho ImageView để ảnh luôn đúng tỷ lệ
-- IntroSlideAdapter để điều khiển hiển thị nội dung với hiệu ứng scale thay vì dịch chuyển
+- IntroSlideAdapter với màu gradient tùy chỉnh cho mỗi slide dựa trên bảng màu của ứng dụng
+- Góc gradient đa dạng (TR_BL, TL_BR, BL_TR, BR_TL) cho mỗi slide tạo hiệu ứng phong phú
 - WormDotsIndicator custom view để tạo hiệu ứng indicator mượt mà
-- CardView với cardCornerRadius và cardElevation để tạo hiệu ứng nổi 3D cho hình ảnh
-- SharedPreferences để lưu trạng thái đã xem intro
-- Gradient background riêng cho từng slide tạo cảm giác khác biệt
+- CardView với cardCornerRadius và cardElevation lớn hơn để tạo hiệu ứng nổi 3D cho hình ảnh
+- Tăng cường đổ bóng cho văn bản (shadowDx, shadowDy, shadowRadius) để dễ đọc trên nền gradient
 - Animation theo trục dọc cho tiêu đề và mô tả để tạo hiệu ứng tự nhiên hơn
+- SharedPreferences để lưu trạng thái đã xem intro
 
 ## Luồng Điều Hướng Ứng Dụng
 

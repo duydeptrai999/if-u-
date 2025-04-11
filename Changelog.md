@@ -189,3 +189,11 @@
   - Tăng độ tương phản và bo tròn cho card view chứa ảnh
   - Điều chỉnh hiệu ứng parallax để ảnh di chuyển mượt mà hơn
   - Chuyển animation tiêu đề và mô tả từ dịch chuyển ngang sang dịch chuyển dọc
+
+### Cải tiến
+- Cập nhật màu sắc cho màn hình intro phù hợp với màu chủ đạo của ứng dụng:
+  - Thay đổi màu gradient cho từng slide sử dụng bảng màu chính của ứng dụng (#1E5799, #4285F4, #2EB62C, #DB4437, #F4B400, #1976D2)
+  - Tạo các hiệu ứng gradient đa dạng với góc gradient khác nhau cho mỗi slide (TR_BL, TL_BR, BL_TR, BR_TL)
+  - Tăng kích thước và đổ bóng cho văn bản để dễ đọc hơn trên nền gradient
+  - Nâng cấp card view chứa hình ảnh với bo góc lớn hơn (20dp) và đổ bóng sâu hơn (10dp)
+  - Tăng kích thước chữ và khoảng cách dòng cho nội dung mô tả

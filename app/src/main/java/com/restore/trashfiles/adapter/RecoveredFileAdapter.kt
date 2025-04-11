@@ -335,7 +335,7 @@ class RecoveredFileAdapter(private var files: List<RecoveredFile>) :
          */
         private fun openInCurrentApp(context: Context, file: RecoveredFile) {
             // Mở intent để xem chi tiết file trong ứng dụng hiện tại
-            val intent = Intent(context, com.htnguyen.ifu.FileViewerActivity::class.java).apply {
+            val intent = Intent(context, com.restore.trashfiles.FileViewerActivity::class.java).apply {
                 putExtra("file_path", file.path)
                 putExtra("file_name", file.name)
                 putExtra("file_type", if (isImageFile(file.name)) "image" else if (isVideoFile(file.name)) "video" else "other")

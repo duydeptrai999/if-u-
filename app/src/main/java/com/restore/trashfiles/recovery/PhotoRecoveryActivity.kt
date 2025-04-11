@@ -240,7 +240,7 @@ class PhotoRecoveryActivity : AppCompatActivity() {
         
         viewRecoveredButton.setOnClickListener {
             // Mở màn hình RecoveredFilesActivity để xem danh sách các file đã khôi phục
-            val intent = Intent(this, com.htnguyen.ifu.RecoveredFilesActivity::class.java)
+            val intent = Intent(this, com.restore.trashfiles.RecoveredFilesActivity::class.java)
             startActivity(intent)
         }
         
@@ -1138,7 +1138,7 @@ class PhotoRecoveryActivity : AppCompatActivity() {
             // Lưu thông tin ảnh đã khôi phục vào database
             try {
                 val modifiedDate = Date(recoveredFile.lastModified())
-                val recoveredFileObj = com.htnguyen.ifu.model.RecoveredFile(
+                val recoveredFileObj = com.restore.trashfiles.model.RecoveredFile(
                     recoveredFile.absolutePath,
                     recoveredFile.name,
                     recoveredFile.length(),
@@ -1147,11 +1147,11 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                 )
                 
                 // Thêm vào database
-                val db = com.htnguyen.ifu.db.RecoveredFilesDatabase.getInstance(applicationContext)
+                val db = com.restore.trashfiles.db.RecoveredFilesDatabase.getInstance(applicationContext)
                 
                 // Kiểm tra xem file đã tồn tại trong database chưa
                 if (!db.fileExists(recoveredFile.absolutePath)) {
-                    val id = db.addRecoveredFile(recoveredFileObj, com.htnguyen.ifu.db.RecoveredFilesDatabase.TYPE_PHOTO)
+                    val id = db.addRecoveredFile(recoveredFileObj, com.restore.trashfiles.db.RecoveredFilesDatabase.TYPE_PHOTO)
                     Log.d("PhotoRecovery", "Đã lưu thông tin ảnh vào database, ID: $id")
                 } else {
                     Log.d("PhotoRecovery", "Ảnh đã tồn tại trong database")
@@ -1183,7 +1183,7 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                 // Lưu thông tin vào database cho bản sao lưu
                 try {
                     val modifiedDate = Date(backupFile.lastModified())
-                    val recoveredFileObj = com.htnguyen.ifu.model.RecoveredFile(
+                    val recoveredFileObj = com.restore.trashfiles.model.RecoveredFile(
                         backupFile.absolutePath,
                         backupFile.name,
                         backupFile.length(),
@@ -1192,11 +1192,11 @@ class PhotoRecoveryActivity : AppCompatActivity() {
                     )
                     
                     // Thêm vào database
-                    val db = com.htnguyen.ifu.db.RecoveredFilesDatabase.getInstance(applicationContext)
+                    val db = com.restore.trashfiles.db.RecoveredFilesDatabase.getInstance(applicationContext)
                     
                     // Kiểm tra xem file đã tồn tại trong database chưa
                     if (!db.fileExists(backupFile.absolutePath)) {
-                        val id = db.addRecoveredFile(recoveredFileObj, com.htnguyen.ifu.db.RecoveredFilesDatabase.TYPE_PHOTO)
+                        val id = db.addRecoveredFile(recoveredFileObj, com.restore.trashfiles.db.RecoveredFilesDatabase.TYPE_PHOTO)
                         Log.d("PhotoRecovery", "Đã lưu thông tin ảnh sao lưu vào database, ID: $id")
                     }
                 } catch (e: Exception) {
