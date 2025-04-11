@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="card_elevation_selected">2dp</dimen>
+    <dimen name="indicator_width">8dp</dimen>
+    <dimen name="indicator_height">8dp</dimen>
+    <dimen name="indicator_margin">4dp</dimen>
 </resources> 

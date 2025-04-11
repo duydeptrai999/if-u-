@@ -33,6 +33,10 @@
         </activity>
         
         <activity
+            android:name="com.htnguyen.ifu.IntroActivity"
+            android:exported="false" />
+        
+        <activity
             android:name="com.htnguyen.ifu.MainActivity"
             android:exported="true">
         </activity>

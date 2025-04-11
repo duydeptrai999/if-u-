@@ -81,17 +81,23 @@ Tài liệu này mô tả các sơ đồ quan trọng trong hệ thống. Mỗi 
 ## Sơ đồ màn hình
 
 ```
-[Màn hình chính] --> [Màn hình A]
-                  --> [Màn hình B] --> [Màn hình B1]
-                                    --> [Màn hình B2]
-                  --> [Màn hình C]
+[App Start] --> [Language Selection] --> [Intro Slides] --> [Main Activity]
+                                            |                    |
+                                            v                    v
+                                          [Skip]------------> [Recovery Options]
+                                                                 |
+                                                                 +--> [Photo Recovery]
+                                                                 +--> [Video Recovery]
+                                                                 +--> [File Recovery]
+                                                                 +--> [Settings]
 ```
 
 ### Mô tả màn hình
 
-- **Màn hình chính**: [Mô tả chức năng và các thành phần chính]
-- **Màn hình A**: [Mô tả chức năng và các thành phần chính]
-- **Màn hình B**: [Mô tả chức năng và các thành phần chính]
-- **Màn hình B1**: [Mô tả chức năng và các thành phần chính]
-- **Màn hình B2**: [Mô tả chức năng và các thành phần chính]
-- **Màn hình C**: [Mô tả chức năng và các thành phần chính]
+- **Language Selection**: Người dùng chọn ngôn ngữ ứng dụng (tiếng Anh, Việt, Pháp, Tây Ban Nha, Đức)
+- **Intro Slides**: Giới thiệu các tính năng của ứng dụng qua 4 slide có hiệu ứng chuyển tiếp
+- **Main Activity**: Màn hình chính hiển thị các tùy chọn khôi phục
+- **Photo Recovery**: Tìm và khôi phục ảnh đã xóa
+- **Video Recovery**: Tìm và khôi phục video đã xóa
+- **File Recovery**: Tìm và khôi phục các loại file khác
+- **Settings**: Cài đặt ứng dụng và tùy chọn ngôn ngữ

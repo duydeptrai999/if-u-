@@ -366,3 +366,74 @@ Với cải tiến này, người dùng chỉ cần:
 - Cải thiện trải nghiệm người dùng bằng cách ngăn chặn các lỗi giao diện
 - Giảm tải cho hệ thống bằng cách tránh các quá trình quét trùng lặp
 - Đảm bảo người dùng luôn nhận được phản hồi phù hợp về trạng thái quét
+
+# Tính năng Intro App
+
+Tính năng Intro App giới thiệu các chức năng chính của ứng dụng Easy Recovery với người dùng thông qua một chuỗi các màn hình trượt (slide) trực quan và hấp dẫn.
+
+## Luồng màn hình
+- Màn hình chọn ngôn ngữ ➔ Màn hình Intro ➔ Màn hình chính
+
+## Các tính năng chính
+1. **Nhiều slide giới thiệu**: Ứng dụng hiển thị 4 slides giới thiệu các tính năng chính của ứng dụng:
+   - Slide 1: Giới thiệu tổng quan về Easy Recovery
+   - Slide 2: Giới thiệu tính năng khôi phục ảnh
+   - Slide 3: Giới thiệu tính năng khôi phục video
+   - Slide 4: Giới thiệu tính năng khôi phục tệp tin
+
+2. **Animation nâng cao**:
+   - **Hiệu ứng chuyển trang**: Phóng to/thu nhỏ, xoay và hiệu ứng parallax khi vuốt qua lại
+   - **Xuất hiện tuần tự**: Các phần tử trong mỗi slide (hình ảnh, tiêu đề, mô tả) xuất hiện tuần tự với animation
+   - **Nền gradient động**: Mỗi slide có màu nền gradient riêng tạo cảm giác sinh động
+   - **Hiệu ứng nút**: Các nút có animation khi nhấn và chuyển đổi, đặc biệt khi chuyển từ "Next" sang "Start"
+   - **Indicator chuyển động mượt mà**: Hiệu ứng "worm" khi chuyển giữa các trang
+
+3. **Chỉ báo vị trí trang**: Hiển thị các chấm tròn ở dưới màn hình để biểu thị số lượng trang và vị trí hiện tại, với animation chuyển động.
+
+4. **Nút điều hướng**:
+   - Nút "Bỏ qua" (Skip): Cho phép người dùng bỏ qua intro và chuyển thẳng đến màn hình chính, ẩn đi ở slide cuối cùng
+   - Nút "Tiếp" (Next): Chuyển đến slide tiếp theo, có animation khi nhấn
+   - Nút "Bắt đầu" (Start): Xuất hiện ở slide cuối cùng với hiệu ứng chuyển đổi màu sắc và animation phóng to
+
+5. **Lưu trạng thái**: Sau khi xem intro lần đầu, hệ thống sẽ lưu trạng thái và không hiển thị lại intro trong những lần mở ứng dụng tiếp theo.
+
+6. **Hỗ trợ đa ngôn ngữ**: Nội dung hiển thị theo ngôn ngữ đã chọn.
+
+## Cách sử dụng
+1. Khi cài đặt ứng dụng lần đầu, chọn ngôn ngữ ưa thích.
+2. Sau khi chọn ngôn ngữ, người dùng sẽ được dẫn đến màn hình intro.
+3. Vuốt qua lại giữa các slide để xem thông tin giới thiệu về các tính năng.
+4. Người dùng có thể:
+   - Nhấn "Bỏ qua" để chuyển ngay đến màn hình chính
+   - Nhấn "Tiếp" để di chuyển đến slide tiếp theo
+   - Ở slide cuối cùng, nhấn "Bắt đầu" để vào màn hình chính
+
+## Giải thích kỹ thuật
+Tính năng được triển khai bằng cách:
+- Sử dụng ViewPager2 với IntroPageTransformer tùy chỉnh để tạo hiệu ứng chuyển trang
+- IntroSlideAdapter để điều khiển hiển thị nội dung và animation xuất hiện tuần tự
+- WormDotsIndicator custom view để tạo hiệu ứng indicator mượt mà
+- SharedPreferences để lưu trạng thái đã xem intro
+- ObjectAnimator và ViewPropertyAnimator để tạo các hiệu ứng nút và chuyển đổi
+- Gradient backgrounds tùy chỉnh theo từng slide
+- Cơ chế animation phức hợp với AnimatorSet
+
+## Luồng Điều Hướng Ứng Dụng
+
+Luồng điều hướng hiện tại của ứng dụng:
+
+1. **Khởi động ứng dụng**:
+   - Nếu chưa chọn ngôn ngữ: Hiển thị màn hình chọn ngôn ngữ (LanguageSelectionActivity)
+   - Nếu đã chọn ngôn ngữ: Chuyển sang màn hình intro (IntroActivity)
+
+2. **Sau khi chọn ngôn ngữ**:
+   - Ấn nút "Next" -> Chuyển đến màn hình intro (IntroActivity)
+
+3. **Màn hình intro**:
+   - Nếu đã xem intro trước đó: Bỏ qua và chuyển thẳng đến MainActivity
+   - Nếu chưa xem intro: Hiển thị các slide intro
+   - Ấn "Skip" hoặc "Start" (ở slide cuối) -> Chuyển đến MainActivity
+
+4. **MainActivity**: Màn hình chính của ứng dụng, hiển thị các tính năng khôi phục dữ liệu
+
+Lưu ý: Trạng thái "đã chọn ngôn ngữ" và "đã xem intro" được lưu trong SharedPreferences để đảm bảo hiển thị phù hợp mỗi khi khởi động ứng dụng.

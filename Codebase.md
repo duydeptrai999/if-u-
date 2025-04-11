@@ -173,24 +173,99 @@
   - `showError`: Hiển thị thông báo lỗi và xử lý khi không thể mở file
   - `onPause`/`onDestroy`: Quản lý vòng đời của VideoView
 
-# Cấu trúc dự án
-
-## Package/Module: com.htnguyen.ifu
-
 ### LanguageSelectionActivity
-Activity hiển thị màn hình chọn ngôn ngữ khi khởi động ứng dụng lần đầu.
-setupUI() - Thiết lập giao diện và xử lý sự kiện
-setLocale(languageCode) - Thiết lập ngôn ngữ ứng dụng
-saveLanguagePreference(languageCode) - Lưu ngôn ngữ đã chọn
-isLanguageSelected() - Kiểm tra xem người dùng đã chọn ngôn ngữ chưa
-startMainActivity() - Chuyển đến MainActivity
+- Màn hình chọn ngôn ngữ cho ứng dụng
+- Hỗ trợ 5 ngôn ngữ: English, Vietnamese, French, Spanish, German
+- Lưu lựa chọn ngôn ngữ vào SharedPreferences
+- **Điều hướng**: Chuyển đến IntroActivity sau khi người dùng chọn ngôn ngữ
+
+### IntroActivity
+- Màn hình giới thiệu (intro) hiển thị sau khi chọn ngôn ngữ
+- Quản lý các slides giới thiệu 4 tính năng chính của ứng dụng
+- Cho phép vuốt và điều hướng giữa các slides
+- Lưu trạng thái đã xem intro để không hiển thị lại
+- initViews(), setupViewPager(), setupButtons(), setupPageIndicators(), updateIndicators()
+
+### PhotoRecoveryActivity 
+- Màn hình khôi phục ảnh đã xóa
+- Hiển thị giao diện quét và danh sách ảnh tìm thấy
+- setupUI(), startScan(), setupRecyclerView(), loadDeletedPhotos()
+
+### VideoRecoveryActivity 
+- Màn hình khôi phục video đã xóa
+- Hiển thị giao diện quét và danh sách video tìm thấy
+- setupUI(), startScan(), setupRecyclerView(), loadDeletedVideos()
+
+### FileRecoveryActivity 
+- Màn hình khôi phục tệp tin khác đã xóa
+- Hiển thị giao diện quét và danh sách tệp tin tìm thấy
+- setupUI(), startScan(), setupRecyclerView(), loadDeletedFiles()
+
+### RecoveredFilesActivity 
+- Màn hình hiển thị danh sách tệp tin đã khôi phục
+- setupTabs(), setupViewPager()
+
+### RecoveredFilesDetailActivity 
+- Màn hình hiển thị chi tiết về tệp tin đã khôi phục
+- loadRecoveredFiles(), setupRecyclerView()
+
+### FileViewerActivity 
+- Màn hình xem tệp tin (ảnh, video, v.v.)
+- loadFile(), setupMediaPlayer()
+
+### SettingsActivity 
+- Màn hình cài đặt ứng dụng
+- Cho phép thay đổi ngôn ngữ, xem thông tin, v.v.
+- setupUI(), changeLanguage()
 
 ### BaseActivity
-Lớp cơ sở cho tất cả các Activity trong ứng dụng, quản lý việc áp dụng ngôn ngữ.
-attachBaseContext(newBase) - Ghi đè để áp dụng ngôn ngữ đã lưu
-applyLanguage() - Áp dụng ngôn ngữ từ SharedPreferences
+- Activity cơ sở chứa các phương thức dùng chung
+- Quản lý ngôn ngữ hiển thị
+- applyLanguage()
 
-### MyApplication
-Lớp Application quản lý trạng thái toàn cục của ứng dụng, bao gồm cả ngôn ngữ.
-attachBaseContext(base) - Ghi đè để áp dụng ngôn ngữ đã lưu
-applyLanguage() - Khởi tạo ngôn ngữ cho toàn bộ ứng dụng
+## Adapters
+
+### IntroSlideAdapter
+- Adapter xử lý hiển thị các slide giới thiệu trong ViewPager2
+- Quản lý nội dung và hình ảnh cho 4 slide intro
+- onCreateViewHolder(), onBindViewHolder(), getItemCount()
+
+### (Các adapter khác)...
+
+## Components
+
+### MyApplication 
+- Application class chính
+- Khởi tạo và áp dụng ngôn ngữ cho toàn bộ ứng dụng
+- attachBaseContext(), applyLanguage()
+
+## Database
+
+### RecoveredFilesDatabase 
+- Database quản lý thông tin về các tệp đã khôi phục
+- countRecoveredFiles(), getTotalSize(), addRecoveredFile()
+
+## Models
+
+### (Các model trong ứng dụng)...
+
+## Resources
+
+### Layout Resources
+- activity_intro.xml: Layout cho màn hình intro
+- intro_slide.xml: Layout cho mỗi slide trong intro
+- (Các layout khác)...
+
+### Drawable Resources
+- indicator_active.xml: Drawable cho chỉ báo trang active
+- indicator_inactive.xml: Drawable cho chỉ báo trang inactive
+- intro_welcome.xml: Icon cho slide giới thiệu
+- intro_photo.xml: Icon cho slide khôi phục ảnh
+- intro_video.xml: Icon cho slide khôi phục video
+- intro_file.xml: Icon cho slide khôi phục tệp tin
+- (Các drawable khác)...
+
+### String Resources
+- strings.xml: Chuỗi tiếng Anh
+- strings.xml (values-vi): Chuỗi tiếng Việt
+- (Các resource khác)...

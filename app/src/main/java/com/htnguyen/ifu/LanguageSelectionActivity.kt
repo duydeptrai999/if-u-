@@ -38,8 +38,8 @@ class LanguageSelectionActivity : AppCompatActivity() {
         // Kiểm tra xem đã chọn ngôn ngữ chưa
         sharedPreferences = getSharedPreferences("app_prefs", MODE_PRIVATE)
         if (isLanguageSelected()) {
-            // Nếu đã chọn ngôn ngữ, chuyển đến MainActivity
-            startMainActivity()
+            // Nếu đã chọn ngôn ngữ, chuyển đến màn hình intro
+            startIntroActivity()
             return
         }
         
@@ -101,7 +101,7 @@ class LanguageSelectionActivity : AppCompatActivity() {
         btnNext.setOnClickListener {
             setLocale(selectedLanguage)
             saveLanguagePreference(selectedLanguage)
-            startMainActivity()
+            startIntroActivity()
         }
     }
     
@@ -170,8 +170,8 @@ class LanguageSelectionActivity : AppCompatActivity() {
         return sharedPreferences.getBoolean("language_selected", false)
     }
 
-    private fun startMainActivity() {
-        val intent = Intent(this, MainActivity::class.java)
+    private fun startIntroActivity() {
+        val intent = Intent(this, IntroActivity::class.java)
         startActivity(intent)
         finish()
     }

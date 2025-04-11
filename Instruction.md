@@ -86,9 +86,47 @@ Tài liệu này chứa hướng dẫn chi tiết để phát triển [tên dự
 - Ngôn ngữ được áp dụng nhất quán trên toàn bộ ứng dụng
 - Người dùng có thể thay đổi ngôn ngữ trong phần Cài đặt
 
-### 3. Tính năng C ❌
+### 3. Tính năng Intro App ⏳
 
-**Mô tả**: [Mô tả ngắn gọn về tính năng C]
+**Mô tả**: Tạo màn hình giới thiệu (intro) ứng dụng sau khi người dùng chọn ngôn ngữ và trước khi vào màn hình chính.
+
+**Thành phần**:
+
+- Màn hình giới thiệu với 4 slides trình bày về các tính năng chính
+- Hệ thống chuyển trang với hiệu ứng vuốt
+- Chỉ báo vị trí trang hiện tại
+- Nút bỏ qua và nút tiếp tục
+
+**Yêu cầu chức năng**:
+
+- Hiển thị 4 slides giới thiệu tính năng chính của ứng dụng
+- Cho phép người dùng vuốt để chuyển giữa các slides
+- Hiển thị chỉ báo vị trí trang hiện tại
+- Cung cấp nút bỏ qua để đi thẳng đến màn hình chính
+- Lưu trạng thái đã xem intro để không hiển thị lại
+
+**Ràng buộc**:
+
+- Hỗ trợ đa ngôn ngữ (tiếng Anh, tiếng Việt)
+- Giao diện đẹp mắt và chuyên nghiệp
+- Chuyển động mượt mà khi chuyển giữa các slides
+- Tối ưu trải nghiệm người dùng
+
+**Tham chiếu**:
+
+- Các nội dung giới thiệu trong strings.xml
+- Thiết kế hiện đại và trực quan
+
+**Tiêu chí hoàn thành**:
+
+- Hiển thị đúng nội dung 4 slides giới thiệu
+- Chuyển động mượt mà giữa các slides
+- Lưu trạng thái đã xem intro thành công
+- Hỗ trợ đầy đủ đa ngôn ngữ
+
+### 4. Tính năng D ❌
+
+**Mô tả**: [Mô tả ngắn gọn về tính năng D]
 
 **Thành phần**:
 

@@ -23,6 +23,19 @@
     <string name="german">German</string>
     <string name="next">Next</string>
     <string name="continue_button">Continue</string>
+    <string name="skip">Skip</string>
+    <string name="start">Start</string>
+    
+    <!-- Intro slides -->
+    <string name="intro_image_description">Intro image</string>
+    <string name="intro_title_1">Welcome to Easy Recovery</string>
+    <string name="intro_desc_1">A simple and effective solution for recovering your deleted data on Android devices</string>
+    <string name="intro_title_2">Recover Photos</string>
+    <string name="intro_desc_2">Find and recover your precious deleted photos and memories</string>
+    <string name="intro_title_3">Recover Videos</string>
+    <string name="intro_desc_3">Never lose important moments with our powerful video recovery tool</string>
+    <string name="intro_title_4">Recover Files</string>
+    <string name="intro_desc_4">Easily recover documents, music files and other types of files</string>
     
     <!-- New strings for recovery features -->
     <string name="scan_button">Start Scan</string>

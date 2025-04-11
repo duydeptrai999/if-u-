@@ -23,6 +23,19 @@
     <string name="german">Tiếng Đức</string>
     <string name="next">Tiếp</string>
     <string name="continue_button">Tiếp tục</string>
+    <string name="skip">Bỏ qua</string>
+    <string name="start">Bắt đầu</string>
+    
+    <!-- Intro slides -->
+    <string name="intro_image_description">Hình giới thiệu</string>
+    <string name="intro_title_1">Chào mừng đến với Easy Recovery</string>
+    <string name="intro_desc_1">Giải pháp đơn giản và hiệu quả để khôi phục dữ liệu đã xóa trên thiết bị Android</string>
+    <string name="intro_title_2">Khôi phục ảnh</string>
+    <string name="intro_desc_2">Tìm và khôi phục những kỷ niệm quý giá từ những bức ảnh đã xóa</string>
+    <string name="intro_title_3">Khôi phục video</string>
+    <string name="intro_desc_3">Không bao giờ mất đi những khoảnh khắc quan trọng với công cụ khôi phục video mạnh mẽ</string>
+    <string name="intro_title_4">Khôi phục tệp tin</string>
+    <string name="intro_desc_4">Dễ dàng khôi phục tài liệu, tệp nhạc và nhiều loại tệp tin khác</string>
     
     <!-- Chuỗi mới cho tính năng khôi phục -->
     <string name="scan_button">Bắt đầu quét</string>
