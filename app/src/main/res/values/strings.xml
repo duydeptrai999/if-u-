@@ -141,4 +141,5 @@
     <string name="ad_interstitial_id">ca-app-pub-3940256099942544/1033173712</string>
     <string name="ad_rewarded_id">ca-app-pub-3940256099942544/5224354917</string>
     <string name="ad_native_id">ca-app-pub-3940256099942544/2247696110</string>
+    <string name="ad_section_title">Sponsored Content</string>
 </resources>

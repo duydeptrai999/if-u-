@@ -52,20 +52,58 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Container cho quảng cáo native ở cuối màn hình -->
-    <FrameLayout
-        android:id="@+id/nativeAdContainer"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/adCardContainer"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="#F0F7FF"
+        app:cardUseCompatPadding="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <!-- Tiêu đề cho phần quảng cáo -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_circle_blue"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:text="@string/ad_section_title"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <!-- Container thực tế cho quảng cáo native -->
+            <FrameLayout
+                android:id="@+id/nativeAdContainer"
+                android:layout_width="match_parent"
+                android:layout_height="300dp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintTop_toBottomOf="@+id/tvSelectPreferred"
-        app:layout_constraintBottom_toTopOf="@+id/nativeAdContainer">
+        app:layout_constraintBottom_toTopOf="@+id/adCardContainer">
 
         <LinearLayout
             android:layout_width="match_parent"

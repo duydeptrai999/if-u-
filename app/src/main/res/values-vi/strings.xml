@@ -130,4 +130,11 @@
     <string name="recovery_success_description">Đã khôi phục thành công. Các ảnh đã được lưu vào thư viện.</string>
     <string name="view_recovered_files">Xem tệp</string>
     <string name="scanning_in_progress">Đang quét, vui lòng đợi...</string>
+    
+    <!-- Ad related strings -->
+    <string name="ad_loading">Đang tải quảng cáo...</string>
+    <string name="ad_failed_to_load">Không thể tải quảng cáo</string>
+    <string name="remove_ads">Xóa quảng cáo</string>
+    <string name="watch_ad_to_continue">Xem quảng cáo để tiếp tục</string>
+    <string name="ad_section_title">Nội dung được tài trợ</string>
 </resources> 
