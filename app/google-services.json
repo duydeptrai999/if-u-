@@ -1,29 +1,68 @@
 {
-  "project_info": {
-    "project_number": "123456789000",
-    "project_id": "trash-files-recovery",
-    "storage_bucket": "trash-files-recovery.appspot.com"
-  },
-  "client": [
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:123456789000:android:0123456789abcdef",
-        "android_client_info": {
-          "package_name": "com.restore.trashfiles"
+    "project_info": {
+      "project_number": "225851605558",
+      "project_id": "mathgenius-2e0c7",
+      "storage_bucket": "mathgenius-2e0c7.firebasestorage.app"
+    },
+    "client": [
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:225851605558:android:bd24e1a1a6cd05bbb6ce97",
+          "android_client_info": {
+            "package_name": "com.example.mathgenius"
+          }
+        },
+        "oauth_client": [],
+        "api_key": [
+          {
+            "current_key": "AIzaSyBBmM0lNsV70UFEkTbvdyYGFeAOcQXRqHI"
+          }
+        ],
+        "services": {
+          "appinvite_service": {
+            "other_platform_oauth_client": []
+          }
         }
       },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyD-example-key-for-setup"
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:225851605558:android:8d64658ef312ff45b6ce97",
+          "android_client_info": {
+            "package_name": "com.magicmath.aihomeworkhelper"
+          }
+        },
+        "oauth_client": [],
+        "api_key": [
+          {
+            "current_key": "AIzaSyBBmM0lNsV70UFEkTbvdyYGFeAOcQXRqHI"
+          }
+        ],
+        "services": {
+          "appinvite_service": {
+            "other_platform_oauth_client": []
+          }
         }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
+      },
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:225851605558:android:e6dab872fa73e1ceb6ce97",
+          "android_client_info": {
+            "package_name": "com.restore.trashfiles"
+          }
+        },
+        "oauth_client": [],
+        "api_key": [
+          {
+            "current_key": "AIzaSyBBmM0lNsV70UFEkTbvdyYGFeAOcQXRqHI"
+          }
+        ],
+        "services": {
+          "appinvite_service": {
+            "other_platform_oauth_client": []
+          }
         }
       }
-    }
-  ],
-  "configuration_version": "1"
-} 
+    ],
+    "configuration_version": "1"
+  }
+  

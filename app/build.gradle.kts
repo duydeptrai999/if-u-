@@ -39,6 +39,15 @@ android {
     }
 }
 
+// Giải quyết xung đột manifest
+configurations.all {
+    resolutionStrategy {
+        // Giải quyết xung đột Firebase Analytics với AdMob
+        force("com.google.android.gms:play-services-ads-lite:23.0.0")
+        force("com.google.android.gms:play-services-measurement-api:21.6.1")
+    }
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
