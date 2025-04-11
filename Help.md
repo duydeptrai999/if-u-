@@ -367,59 +367,56 @@ Với cải tiến này, người dùng chỉ cần:
 - Giảm tải cho hệ thống bằng cách tránh các quá trình quét trùng lặp
 - Đảm bảo người dùng luôn nhận được phản hồi phù hợp về trạng thái quét
 
-# Tính năng Intro App (Nâng cao)
+# Tính năng Intro App
 
 Tính năng Intro App giới thiệu các chức năng chính của ứng dụng Easy Recovery với người dùng thông qua một chuỗi các màn hình trượt (slide) trực quan và hấp dẫn.
 
-### Các tính năng nâng cao
+## Luồng màn hình
+- Màn hình chọn ngôn ngữ ➔ Màn hình Intro ➔ Màn hình chính
 
-1. **Lottie Animations**: Thay thế các hình ảnh tĩnh bằng các animation chuyên nghiệp, sinh động
-   - Animation chào mừng với hiệu ứng xoay và mở rộng
-   - Animation hình ảnh với hiệu ứng camera
-   - Animation video với hiệu ứng nút play
-   - Animation tệp tin với hiệu ứng rung nhẹ
+## Các tính năng chính
+1. **Nhiều slide giới thiệu**: Ứng dụng hiển thị 4 slides giới thiệu các tính năng chính của ứng dụng:
+   - Slide 1: Giới thiệu tổng quan về Easy Recovery
+   - Slide 2: Giới thiệu tính năng khôi phục ảnh
+   - Slide 3: Giới thiệu tính năng khôi phục video
+   - Slide 4: Giới thiệu tính năng khôi phục tệp tin
 
-2. **Tương tác cử chỉ nâng cao**:
-   - **Vuốt xuống để bỏ qua**: Người dùng có thể vuốt xuống bất kỳ lúc nào để bỏ qua toàn bộ intro
-   - **Gợi ý thông minh**: Hiển thị gợi ý vuốt xuống sau 10 giây nếu người dùng vẫn đang xem intro
-   - **Tương tác với hình ảnh**: Chạm vào hình ảnh để tăng tốc độ animation với hiệu ứng phóng to
+2. **Animation nâng cao**:
+   - **Hiệu ứng chuyển trang**: Phóng to/thu nhỏ, xoay và hiệu ứng parallax khi vuốt qua lại
+   - **Xuất hiện tuần tự**: Các phần tử trong mỗi slide (hình ảnh, tiêu đề, mô tả) xuất hiện tuần tự với animation
+   - **Nền gradient động**: Mỗi slide có màu nền gradient riêng tạo cảm giác sinh động
+   - **Hiệu ứng nút**: Các nút có animation khi nhấn và chuyển đổi, đặc biệt khi chuyển từ "Next" sang "Start"
+   - **Indicator chuyển động mượt mà**: Hiệu ứng "worm" khi chuyển giữa các trang
 
-3. **Phản hồi xúc giác** (Haptic feedback):
-   - Tạo rung nhẹ khi nhấn vào các nút điều hướng
-   - Tạo phản hồi rung khi vuốt xuống để bỏ qua intro
-   - Phản hồi xúc giác khi tương tác với animation
+3. **Chỉ báo vị trí trang**: Hiển thị các chấm tròn ở dưới màn hình để biểu thị số lượng trang và vị trí hiện tại, với animation chuyển động.
 
-4. **Hiệu ứng nền nâng cao**:
-   - Gradient background với animation xoay và thay đổi hướng
-   - Màu sắc gradient phù hợp với chủ đề của từng slide
-   - Hiệu ứng chuyển đổi mượt mà giữa các màu sắc
+4. **Nút điều hướng**:
+   - Nút "Bỏ qua" (Skip): Cho phép người dùng bỏ qua intro và chuyển thẳng đến màn hình chính, ẩn đi ở slide cuối cùng
+   - Nút "Tiếp" (Next): Chuyển đến slide tiếp theo, có animation khi nhấn
+   - Nút "Bắt đầu" (Start): Xuất hiện ở slide cuối cùng với hiệu ứng chuyển đổi màu sắc và animation phóng to
 
-5. **Hiệu ứng chuyển tiếp cải tiến**:
-   - Hiệu ứng ẩn hiện tuần tự theo thứ tự logic cho các thành phần UI
-   - Animation đặc biệt khi bỏ qua intro (hiệu ứng trượt xuống)
-   - Hiệu ứng nảy (bounce) cho các thành phần khi xuất hiện
+5. **Lưu trạng thái**: Sau khi xem intro lần đầu, hệ thống sẽ lưu trạng thái và không hiển thị lại intro trong những lần mở ứng dụng tiếp theo.
 
-### Cách sử dụng
+6. **Hỗ trợ đa ngôn ngữ**: Nội dung hiển thị theo ngôn ngữ đã chọn.
+
+## Cách sử dụng
 1. Khi cài đặt ứng dụng lần đầu, chọn ngôn ngữ ưa thích.
-2. Sau khi chọn ngôn ngữ, người dùng sẽ được dẫn đến màn hình intro nâng cao.
-3. Các cách điều hướng:
-   - Vuốt qua lại giữa các slide để xem thông tin
-   - Nhấn "Tiếp" để di chuyển đến slide tiếp theo
-   - Vuốt xuống bất kỳ lúc nào để bỏ qua intro
+2. Sau khi chọn ngôn ngữ, người dùng sẽ được dẫn đến màn hình intro.
+3. Vuốt qua lại giữa các slide để xem thông tin giới thiệu về các tính năng.
+4. Người dùng có thể:
    - Nhấn "Bỏ qua" để chuyển ngay đến màn hình chính
-   - Chạm vào animation để tương tác
+   - Nhấn "Tiếp" để di chuyển đến slide tiếp theo
    - Ở slide cuối cùng, nhấn "Bắt đầu" để vào màn hình chính
 
-4. Tương tác với animation:
-   - Chạm và giữ vào animation để thấy hiệu ứng tăng tốc và phóng to
-   - Khi thả ra, animation trở về trạng thái bình thường
-
-### Cải tiến kỹ thuật
-- Sử dụng thư viện Lottie cho animation phức tạp, nhẹ và mượt mà
-- Phát hiện cử chỉ thông qua GestureDetector để tạo trải nghiệm tương tác trực quan
-- Hệ thống haptic feedback tùy chỉnh cho trải nghiệm đa giác quan
-- Gradient animation phức tạp với ValueAnimator và GradientDrawable
-- Xử lý các sự kiện đa chạm và tương tác thông minh
+## Giải thích kỹ thuật
+Tính năng được triển khai bằng cách:
+- Sử dụng ViewPager2 với IntroPageTransformer tùy chỉnh để tạo hiệu ứng chuyển trang
+- IntroSlideAdapter để điều khiển hiển thị nội dung và animation xuất hiện tuần tự
+- WormDotsIndicator custom view để tạo hiệu ứng indicator mượt mà
+- SharedPreferences để lưu trạng thái đã xem intro
+- ObjectAnimator và ViewPropertyAnimator để tạo các hiệu ứng nút và chuyển đổi
+- Gradient backgrounds tùy chỉnh theo từng slide
+- Cơ chế animation phức hợp với AnimatorSet
 
 ## Luồng Điều Hướng Ứng Dụng
 

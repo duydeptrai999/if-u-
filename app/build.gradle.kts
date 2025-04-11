@@ -48,10 +48,4 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    
-    // Lottie Animation
-    implementation("com.airbnb.android:lottie:5.2.0")
-    
-    // Haptic feedback library
-    implementation("com.github.raheemadamboev:compose-force-touch:1.0.3")
 }

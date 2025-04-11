@@ -131,5 +131,4 @@
     <string name="recovery_success_description">Đã khôi phục thành công. Các ảnh đã được lưu vào thư viện.</string>
     <string name="view_recovered_files">View Files</string>
     <string name="scanning_in_progress">Đang quét, vui lòng đợi...</string>
-    <string name="swipe_down_to_skip">Swipe down to skip intro</string>
 </resources>
