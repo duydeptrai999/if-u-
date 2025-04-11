@@ -12,6 +12,18 @@
     <string name="others">Khác</string>
     <string name="settings">Cài đặt</string>
     
+    <!-- Language selection screen -->
+    <string name="select_language">Chọn ngôn ngữ / Select Language</string>
+    <string name="choose_language">Chọn Ngôn Ngữ Của Bạn</string>
+    <string name="select_preferred_language">Chọn ngôn ngữ bạn ưa thích</string>
+    <string name="english">Tiếng Anh</string>
+    <string name="vietnamese">Tiếng Việt</string>
+    <string name="french">Tiếng Pháp</string>
+    <string name="spanish">Tiếng Tây Ban Nha</string>
+    <string name="german">Tiếng Đức</string>
+    <string name="next">Tiếp</string>
+    <string name="continue_button">Tiếp tục</string>
+    
     <!-- Chuỗi mới cho tính năng khôi phục -->
     <string name="scan_button">Bắt đầu quét</string>
     <string name="scan_button_short">QUÉT</string>
@@ -49,7 +61,6 @@
     <string name="file_icon">Biểu tượng tệp tin</string>
     <string name="recovery_success_gallery">Đã khôi phục thành công. Các video đã được lưu vào thư viện.</string>
     <string name="file_recovery_success">Đã khôi phục thành công. Các tệp tin đã được lưu vào thư mục Documents và Downloads.</string>
-    <string name="continue_button">Tiếp tục</string>
     <string name="view_recovered_button">Xem video</string>
     <string name="view_recovered_button_photo">Xem ảnh</string>
 
@@ -60,8 +71,6 @@
     <string name="premium_benefits">Loại bỏ quảng cáo và tận hưởng nhiều lợi ích hơn.</string>
     <string name="upgrade">Nâng cấp</string>
     <string name="language">Đổi ngôn ngữ</string>
-    <string name="vietnamese">Tiếng Việt</string>
-    <string name="english">English</string>
     <string name="rate_app">Đánh giá ứng dụng</string>
     <string name="share_app">Chia sẻ ứng dụng</string>
     <string name="privacy_policy">Chính sách bảo mật</string>

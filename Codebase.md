@@ -172,3 +172,25 @@
   - `showNoPreview`: Hiển thị thông báo khi không thể hiển thị xem trước
   - `showError`: Hiển thị thông báo lỗi và xử lý khi không thể mở file
   - `onPause`/`onDestroy`: Quản lý vòng đời của VideoView
+
+# Cấu trúc dự án
+
+## Package/Module: com.htnguyen.ifu
+
+### LanguageSelectionActivity
+Activity hiển thị màn hình chọn ngôn ngữ khi khởi động ứng dụng lần đầu.
+setupUI() - Thiết lập giao diện và xử lý sự kiện
+setLocale(languageCode) - Thiết lập ngôn ngữ ứng dụng
+saveLanguagePreference(languageCode) - Lưu ngôn ngữ đã chọn
+isLanguageSelected() - Kiểm tra xem người dùng đã chọn ngôn ngữ chưa
+startMainActivity() - Chuyển đến MainActivity
+
+### BaseActivity
+Lớp cơ sở cho tất cả các Activity trong ứng dụng, quản lý việc áp dụng ngôn ngữ.
+attachBaseContext(newBase) - Ghi đè để áp dụng ngôn ngữ đã lưu
+applyLanguage() - Áp dụng ngôn ngữ từ SharedPreferences
+
+### MyApplication
+Lớp Application quản lý trạng thái toàn cục của ứng dụng, bao gồm cả ngôn ngữ.
+attachBaseContext(base) - Ghi đè để áp dụng ngôn ngữ đã lưu
+applyLanguage() - Khởi tạo ngôn ngữ cho toàn bộ ứng dụng

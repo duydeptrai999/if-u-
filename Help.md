@@ -313,4 +313,56 @@ Với cải tiến này, người dùng chỉ cần:
 - Ngăn chặn việc thực hiện quét lại không cần thiết
 - Cải thiện trải nghiệm người dùng bằng cách ngăn chặn các lỗi giao diện
 - Giảm tải cho hệ thống bằng cách tránh các quá trình quét trùng lặp
-- Đảm bảo người dùng luôn nhận được phản hồi phù hợp về trạng thái quét 
+- Đảm bảo người dùng luôn nhận được phản hồi phù hợp về trạng thái quét
+
+# Tính năng chọn ngôn ngữ
+
+## Mô tả
+Tính năng này cho phép người dùng chọn ngôn ngữ mặc định của ứng dụng khi mở ứng dụng lần đầu tiên, hiện tại hỗ trợ hai ngôn ngữ: tiếng Anh và tiếng Việt.
+
+## Cách hoạt động
+1. Khi người dùng mở ứng dụng lần đầu tiên, màn hình chọn ngôn ngữ sẽ hiển thị.
+2. Người dùng có thể chọn giữa tiếng Anh hoặc tiếng Việt.
+3. Ngôn ngữ đã chọn sẽ được lưu và áp dụng cho toàn bộ ứng dụng.
+4. Người dùng có thể thay đổi ngôn ngữ sau này trong phần Cài đặt.
+
+## Thành phần
+- **LanguageSelectionActivity**: Hiển thị giao diện chọn ngôn ngữ khi mở ứng dụng lần đầu.
+- **BaseActivity**: Class cơ sở cho các activity, đảm bảo ngôn ngữ được áp dụng đồng nhất.
+- **MyApplication**: Class application quản lý ngôn ngữ cho toàn bộ ứng dụng.
+- **strings.xml và values-vi/strings.xml**: Lưu trữ văn bản cho từng ngôn ngữ.
+
+## Quản lý ngôn ngữ
+- Ngôn ngữ được lưu trong SharedPreferences với khóa "language"
+- Giá trị "en" cho tiếng Anh và "vi" cho tiếng Việt
+- BaseActivity và MyApplication làm việc cùng nhau để đảm bảo ngôn ngữ được áp dụng nhất quán
+
+## Chuyển đổi ngôn ngữ
+Người dùng có thể chuyển đổi ngôn ngữ trong ứng dụng bằng cách:
+1. Mở màn hình Cài đặt
+2. Chọn mục "Ngôn ngữ" hoặc "Language"
+3. Chọn ngôn ngữ mới
+4. Ứng dụng sẽ tự động khởi động lại activity hiện tại để áp dụng ngôn ngữ mới
+
+## Cải tiến nút quét trong tính năng khôi phục
+
+### Vấn đề đã sửa
+Trước đây, trong tính năng khôi phục ảnh (Video và File), khi người dùng nhấn nút "QUÉT" để bắt đầu quá trình quét tìm dữ liệu đã xóa, đôi khi nút quét không nhận sự kiện quét. Ngoài ra, nếu người dùng nhấn nhiều lần vào nút quét, hệ thống sẽ thực hiện lại quá trình quét, gây lãng phí tài nguyên và lỗi giao diện.
+
+### Cách đã sửa
+- Đã thêm biến trạng thái `isScanning` để theo dõi xem quá trình quét đang diễn ra hay không
+- Khi `isScanning = true`, các nhấn tiếp theo vào nút quét sẽ bị bỏ qua, ngăn chặn việc thực hiện quét lại
+- Đảm bảo biến `isScanning` luôn được đặt lại về `false` sau khi quá trình quét kết thúc hoặc bị lỗi
+- Thêm phương thức `onStop()` để reset trạng thái nếu người dùng thoát khỏi màn hình
+
+### Cách sử dụng
+Với cải tiến này, người dùng chỉ cần:
+1. Nhấn nút "QUÉT" một lần để bắt đầu quét
+2. Chờ quá trình quét hoàn thành
+3. Không cần nhấn nút quét nhiều lần nếu bạn không thấy phản hồi ngay lập tức - hệ thống đã nhận lệnh quét và đang xử lý
+
+### Lợi ích
+- Ngăn chặn việc thực hiện quét lại không cần thiết
+- Cải thiện trải nghiệm người dùng bằng cách ngăn chặn các lỗi giao diện
+- Giảm tải cho hệ thống bằng cách tránh các quá trình quét trùng lặp
+- Đảm bảo người dùng luôn nhận được phản hồi phù hợp về trạng thái quét

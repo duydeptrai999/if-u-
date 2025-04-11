@@ -8,7 +8,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,7 +19,7 @@ import java.io.File
 /**
  * Activity hiển thị chi tiết các tệp tin đã khôi phục theo từng loại
  */
-class RecoveredFilesDetailActivity : AppCompatActivity() {
+class RecoveredFilesDetailActivity : BaseActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RecoveredFileAdapter

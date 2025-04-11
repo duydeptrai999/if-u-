@@ -2,7 +2,6 @@ package com.htnguyen.ifu
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.widget.Toast
 import androidx.cardview.widget.CardView
 import android.widget.ImageView
@@ -22,7 +21,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private val storagePermissionRequest = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()

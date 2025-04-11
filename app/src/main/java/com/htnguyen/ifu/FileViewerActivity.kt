@@ -11,14 +11,13 @@ import android.widget.MediaController
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.VideoView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import java.io.File
 
 /**
  * Activity hiển thị nội dung file (ảnh, video) trực tiếp trong ứng dụng
  */
-class FileViewerActivity : AppCompatActivity() {
+class FileViewerActivity : BaseActivity() {
 
     private lateinit var imageView: ImageView
     private lateinit var videoView: VideoView

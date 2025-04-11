@@ -12,6 +12,18 @@
     <string name="others">Tệp khác</string>
     <string name="settings">Cài đặt</string>
     
+    <!-- Language selection screen -->
+    <string name="select_language">Select Language / Chọn ngôn ngữ</string>
+    <string name="choose_language">Choose Your Language</string>
+    <string name="select_preferred_language">Select your preferred language</string>
+    <string name="english">English</string>
+    <string name="vietnamese">Tiếng Việt</string>
+    <string name="french">French</string>
+    <string name="spanish">Spanish</string>
+    <string name="german">German</string>
+    <string name="next">Next</string>
+    <string name="continue_button">Continue</string>
+    
     <!-- New strings for recovery features -->
     <string name="scan_button">Start Scan</string>
     <string name="scan_button_short">SCAN</string>
@@ -54,8 +66,6 @@
     <string name="premium_benefits">Remove ads and enjoy more benefits.</string>
     <string name="upgrade">Upgrade</string>
     <string name="language">Language</string>
-    <string name="vietnamese">Tiếng Việt</string>
-    <string name="english">English</string>
     <string name="rate_app">Rate App</string>
     <string name="share_app">Share App</string>
     <string name="privacy_policy">Privacy Policy</string>
@@ -106,7 +116,6 @@
     <string name="recovering_count">%1$d / %2$d</string>
     <string name="recovery_success">Recovery Success</string>
     <string name="recovery_success_description">Đã khôi phục thành công. Các ảnh đã được lưu vào thư viện.</string>
-    <string name="continue_button">Continue</string>
     <string name="view_recovered_files">View Files</string>
     <string name="scanning_in_progress">Đang quét, vui lòng đợi...</string>
 </resources>

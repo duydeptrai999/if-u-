@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import com.htnguyen.ifu.db.RecoveredFilesDatabase
 import com.htnguyen.ifu.model.RecoveredFile
@@ -13,7 +12,7 @@ import com.htnguyen.ifu.model.RecoveredFile
 /**
  * Activity hiển thị danh sách các tệp tin đã được khôi phục, được phân loại thành ảnh, video và tệp tin khác.
  */
-class RecoveredFilesActivity : AppCompatActivity() {
+class RecoveredFilesActivity : BaseActivity() {
 
     private lateinit var db: RecoveredFilesDatabase
 

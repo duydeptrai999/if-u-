@@ -54,33 +54,37 @@ Tài liệu này chứa hướng dẫn chi tiết để phát triển [tên dự
 - Hỗ trợ đa ngôn ngữ (Anh, Việt)
 - Có các placeholder cho việc hiển thị thống kê
 
-### 2. Tính năng B ❌
+### 2. Tính năng chọn ngôn ngữ khi khởi động lần đầu ✅
 
-**Mô tả**: [Mô tả ngắn gọn về tính năng B]
+**Mô tả**: Tạo màn hình chọn ngôn ngữ khi người dùng mở ứng dụng lần đầu tiên.
 
 **Thành phần**:
 
-- Component 1
-- Component 2
+- Màn hình chọn ngôn ngữ với 2 lựa chọn: tiếng Anh và tiếng Việt
+- Hệ thống quản lý ngôn ngữ xuyên suốt ứng dụng
 
 **Yêu cầu chức năng**:
 
-- Yêu cầu 1
-- Yêu cầu 2
+- Hiển thị màn hình chọn ngôn ngữ khi ứng dụng khởi động lần đầu
+- Lưu lựa chọn ngôn ngữ của người dùng
+- Áp dụng ngôn ngữ đã chọn cho toàn bộ ứng dụng
+- Cho phép thay đổi ngôn ngữ sau này trong phần Cài đặt
 
 **Ràng buộc**:
 
-- Ràng buộc 1
-- Ràng buộc 2
+- Hỗ trợ đầy đủ cả tiếng Anh và tiếng Việt
+- Áp dụng ngôn ngữ nhất quán trên toàn bộ ứng dụng
+- Lưu trữ cài đặt ngôn ngữ giữa các lần khởi động
 
 **Tham chiếu**:
 
-- [Liên kết đến tài liệu liên quan]
+- Tham khảo cấu trúc strings.xml và values-vi/strings.xml
 
 **Tiêu chí hoàn thành**:
 
-- Tiêu chí 1
-- Tiêu chí 2
+- Màn hình chọn ngôn ngữ hoạt động đúng
+- Ngôn ngữ được áp dụng nhất quán trên toàn bộ ứng dụng
+- Người dùng có thể thay đổi ngôn ngữ trong phần Cài đặt
 
 ### 3. Tính năng C ❌
 

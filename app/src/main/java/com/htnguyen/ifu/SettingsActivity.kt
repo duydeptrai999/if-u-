@@ -1,6 +1,7 @@
 package com.htnguyen.ifu
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -9,16 +10,18 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import java.util.Locale
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : BaseActivity() {
+
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
+        sharedPreferences = getSharedPreferences("app_prefs", MODE_PRIVATE)
         setupUI()
     }
 
@@ -40,8 +43,8 @@ class SettingsActivity : AppCompatActivity() {
         val languageSettingItem = findViewById<LinearLayout>(R.id.languageSettingItem)
         val currentLanguageText = findViewById<TextView>(R.id.tvCurrentLanguage)
         
-        // Hiển thị ngôn ngữ hiện tại
-        val currentLanguage = Locale.getDefault().language
+        // Hiển thị ngôn ngữ hiện tại từ SharedPreferences
+        val currentLanguage = sharedPreferences.getString("language", Locale.getDefault().language)
         if (currentLanguage == "en") {
             currentLanguageText.setText(R.string.english)
         } else {
@@ -50,7 +53,6 @@ class SettingsActivity : AppCompatActivity() {
         
         languageSettingItem.setOnClickListener {
             // Đơn giản chỉ chuyển đổi giữa tiếng Việt và tiếng Anh
-            // Trong thực tế, nên hiển thị dialog chọn ngôn ngữ
             if (currentLanguage == "en") {
                 // Chuyển sang tiếng Việt
                 setLocale("vi")
@@ -102,6 +104,11 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setLocale(languageCode: String) {
+        // Lưu ngôn ngữ đã chọn
+        val editor = sharedPreferences.edit()
+        editor.putString("language", languageCode)
+        editor.apply()
+        
         // Thay đổi ngôn ngữ
         val locale = Locale(languageCode)
         Locale.setDefault(locale)

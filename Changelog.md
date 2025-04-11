@@ -47,6 +47,12 @@
 - Thêm tính năng chia sẻ ảnh và video từ màn hình xem file
 - Thêm chế độ chọn nhiều file trong màn hình danh sách file đã khôi phục
 - Thêm tính năng chia sẻ nhiều file cùng lúc từ màn hình danh sách file đã khôi phục
+- Thêm tính năng chọn ngôn ngữ khi mở app lần đầu
+- Tạo màn hình chọn ngôn ngữ khi người dùng mở ứng dụng lần đầu tiên
+- Hỗ trợ hai ngôn ngữ: tiếng Anh và tiếng Việt
+- Cải thiện hệ thống quản lý ngôn ngữ với BaseActivity và MyApplication
+- Thêm tính năng thay đổi ngôn ngữ trong cài đặt
+- Đảm bảo cơ chế thay đổi ngôn ngữ mượt mà và nhất quán
 
 ### Changed
 
