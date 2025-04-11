@@ -48,9 +48,19 @@ object AdHelper {
      * Loads a native ad
      * @param context The context
      * @param adContainer The ViewGroup container for the ad
+     * @param layoutResId Optional custom layout resource ID
      */
-    fun loadNativeAd(context: Context, adContainer: ViewGroup) {
-        AdManager.getInstance().loadNativeAd(context, adContainer)
+    fun loadNativeAd(context: Context, adContainer: ViewGroup, layoutResId: Int = AdManager.LAYOUT_DEFAULT) {
+        AdManager.getInstance().loadNativeAd(context, adContainer, layoutResId)
+    }
+    
+    /**
+     * Loads a native ad with intro layout
+     * @param context The context
+     * @param adContainer The ViewGroup container for the ad
+     */
+    fun loadIntroNativeAd(context: Context, adContainer: ViewGroup) {
+        AdManager.getInstance().loadNativeAd(context, adContainer, AdManager.LAYOUT_INTRO)
     }
     
     /**

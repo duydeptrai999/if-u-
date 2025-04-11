@@ -8,10 +8,12 @@ import android.os.Bundle
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.OvershootInterpolator
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.viewpager2.widget.ViewPager2
+import com.restore.trashfiles.ads.AdHelper
 import com.restore.trashfiles.intro.IntroPageTransformer
 import com.restore.trashfiles.intro.IntroSlideAdapter
 import com.restore.trashfiles.intro.WormDotsIndicator
@@ -26,6 +28,7 @@ class IntroActivity : AppCompatActivity() {
     private lateinit var nextButtonContainer: CardView
     private lateinit var wormDotsIndicator: WormDotsIndicator
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var nativeAdContainer: FrameLayout
     
     private val introSlideAdapter by lazy { IntroSlideAdapter(this) }
 
@@ -46,6 +49,9 @@ class IntroActivity : AppCompatActivity() {
         setupButtons()
         setupPageIndicators()
         
+        // Hiển thị quảng cáo native
+        setupNativeAd()
+        
         // Thêm hiệu ứng cho các nút
         animateIntroButtons()
     }
@@ -57,6 +63,12 @@ class IntroActivity : AppCompatActivity() {
         skipButtonContainer = findViewById(R.id.skipButtonContainer)
         nextButtonContainer = findViewById(R.id.nextButtonContainer)
         wormDotsIndicator = findViewById(R.id.wormDotsIndicator)
+        nativeAdContainer = findViewById(R.id.nativeAdContainer)
+    }
+    
+    private fun setupNativeAd() {
+        // Hiển thị quảng cáo native với layout tùy chỉnh
+        AdHelper.loadIntroNativeAd(this, nativeAdContainer)
     }
     
     private fun setupViewPager() {
@@ -247,5 +259,10 @@ class IntroActivity : AppCompatActivity() {
         startActivity(intent)
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         finish()
+    }
+    
+    override fun onDestroy() {
+        // Giải phóng tài nguyên khi activity bị hủy
+        super.onDestroy()
     }
 } 

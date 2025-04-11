@@ -39,6 +39,9 @@ class AdManager private constructor() {
     private val AD_FREQUENCY = 3 // Show interstitial ad every 3 actions
 
     companion object {
+        const val LAYOUT_DEFAULT = R.layout.ad_unified
+        const val LAYOUT_INTRO = R.layout.ad_unified_intro
+        
         @Volatile
         private var instance: AdManager? = null
 
@@ -81,7 +84,7 @@ class AdManager private constructor() {
     }
 
     // Native Ads
-    fun loadNativeAd(context: Context, adContainer: ViewGroup) {
+    fun loadNativeAd(context: Context, adContainer: ViewGroup, layoutResId: Int = LAYOUT_DEFAULT) {
         val adLoader = AdLoader.Builder(context, context.getString(R.string.ad_native_id))
             .forNativeAd { ad ->
                 // Nếu activity đã bị destroy thì cần giải phóng nativeAd
@@ -96,7 +99,7 @@ class AdManager private constructor() {
                 
                 // Tạo native ad view và đặt vào container
                 val inflater = LayoutInflater.from(context)
-                val adView = inflater.inflate(R.layout.ad_unified, adContainer, false) as NativeAdView
+                val adView = inflater.inflate(layoutResId, adContainer, false) as NativeAdView
                 populateNativeAdView(ad, adView)
                 
                 adContainer.removeAllViews()
