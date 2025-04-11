@@ -91,19 +91,22 @@
 - Sửa lỗi ClassCastException khi cố gắng ép kiểu MaterialButton thành ImageView cho shareSelectedButton
 - Sửa lỗi nút quét trong tính năng khôi phục ảnh (PhotoRecoveryActivity) bị miss sự kiện và thực hiện lại việc quét khi nhấn nhiều lần. Thêm biến isScanning để kiểm soát trạng thái quét và ngăn không cho người dùng quét lại khi đang trong quá trình quét.
 
-## [1.0.1] - 2024-03-23
+## [1.0.2] - 2024-04-11
 
-### Added
+### Improved
+- Nâng cấp phần intro ứng dụng với các cải tiến tương tác và trải nghiệm người dùng:
+  - Thêm Lottie Animation thay thế cho các icon tĩnh
+  - Thêm tính năng vuốt xuống để bỏ qua intro
+  - Thêm phản hồi xúc giác (haptic feedback) khi tương tác
+  - Cải thiện hiệu ứng gradient background với animation xoay
+  - Thêm tính năng tương tác với animation (chạm để tăng tốc)
+  - Thêm gợi ý thông minh cho tính năng vuốt xuống sau 10 giây
 
-- Bổ sung quy trình nâng cấp APK từ project Android nguồn
-- Hỗ trợ build APK trực tiếp từ project Android với key debug
-- Cậi tiến quy trình tích hợp package từ APK nguồn sang APK đích
-- Tài liệu hướng dẫn cho quy trình tích hợp mới
+## [1.0.1] - 2024-04-10
 
-### Changed
-
-- Nâng cấp quy trình tương tác tích hợp APK
-- Cập nhật tài liệu hướng dẫn
+### Fixed
+- Sửa lỗi luồng điều hướng: Khi người dùng chọn ngôn ngữ và ấn next, ứng dụng chuyển trực tiếp đến màn hình intro thay vì vào main activity
+- Đổi tên phương thức từ `startMainActivity()` thành `startIntroActivity()` trong LanguageSelectionActivity để rõ nghĩa hơn
 
 ## [2.0.0] - 2024-05-24
 
@@ -183,9 +186,3 @@
   - Hỗ trợ đa ngôn ngữ (tiếng Anh, tiếng Việt)
   - Các nút bỏ qua và tiếp tục/bắt đầu
   - Tích hợp với luồng điều hướng ứng dụng
-
-## [1.0.1] - 2024-04-10
-
-### Fixed
-- Sửa lỗi luồng điều hướng: Khi người dùng chọn ngôn ngữ và ấn next, ứng dụng chuyển trực tiếp đến màn hình intro thay vì vào main activity
-- Đổi tên phương thức từ `startMainActivity()` thành `startIntroActivity()` trong LanguageSelectionActivity để rõ nghĩa hơn

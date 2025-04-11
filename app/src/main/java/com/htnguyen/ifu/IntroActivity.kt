@@ -4,20 +4,29 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.view.GestureDetector
+import android.view.HapticFeedbackConstants
+import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
+import androidx.core.view.GestureDetectorCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.htnguyen.ifu.intro.IntroPageTransformer
 import com.htnguyen.ifu.intro.IntroSlideAdapter
 import com.htnguyen.ifu.intro.WormDotsIndicator
-import androidx.core.content.ContextCompat
 
-class IntroActivity : AppCompatActivity() {
+class IntroActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     private lateinit var viewPager: ViewPager2
     private lateinit var skipButton: TextView
@@ -26,6 +35,13 @@ class IntroActivity : AppCompatActivity() {
     private lateinit var nextButtonContainer: CardView
     private lateinit var wormDotsIndicator: WormDotsIndicator
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var gestureDetector: GestureDetectorCompat
+    
+    // Thêm biến đếm thời gian đã trôi qua để hiện gợi ý vuốt xuống
+    private var elapsedTime = 0L
+    private val handler = Handler(Looper.getMainLooper())
+    private var showSwipeHintRunnable: Runnable? = null
+    private var swipeHintShown = false
     
     private val introSlideAdapter by lazy { IntroSlideAdapter(this) }
 
@@ -41,6 +57,9 @@ class IntroActivity : AppCompatActivity() {
         
         setContentView(R.layout.activity_intro)
         
+        // Khởi tạo gesture detector để phát hiện vuốt xuống
+        gestureDetector = GestureDetectorCompat(this, this)
+        
         initViews()
         setupViewPager()
         setupButtons()
@@ -48,6 +67,9 @@ class IntroActivity : AppCompatActivity() {
         
         // Thêm hiệu ứng cho các nút
         animateIntroButtons()
+        
+        // Thiết lập hẹn giờ để hiển thị gợi ý vuốt xuống
+        setupSwipeDownHintTimer()
     }
     
     private fun initViews() {
@@ -124,6 +146,13 @@ class IntroActivity : AppCompatActivity() {
     }
     
     private fun animateButtonClick(button: View) {
+        // Thêm phản hồi xúc giác
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            button.performHapticFeedback(HapticFeedbackConstants.TEXT_HANDLE_MOVE)
+        } else {
+            button.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+        }
+        
         button.animate()
             .scaleX(0.9f)
             .scaleY(0.9f)
@@ -247,5 +276,110 @@ class IntroActivity : AppCompatActivity() {
         startActivity(intent)
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         finish()
+    }
+    
+    private fun setupSwipeDownHintTimer() {
+        showSwipeHintRunnable = Runnable {
+            if (!swipeHintShown && !isFinishing) {
+                showSwipeDownHint()
+                swipeHintShown = true
+            }
+        }
+        
+        // Hiển thị gợi ý vuốt xuống sau 10 giây
+        handler.postDelayed(showSwipeHintRunnable!!, 10000)
+    }
+    
+    private fun showSwipeDownHint() {
+        // Tạo một snackbar hoặc toast để hiển thị gợi ý
+        val snackbar = com.google.android.material.snackbar.Snackbar.make(
+            viewPager,
+            getString(R.string.swipe_down_to_skip),
+            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+        )
+        
+        // Hiệu ứng xuất hiện từ trên xuống cho snackbar
+        snackbar.view.translationY = -200f
+        snackbar.view.alpha = 0f
+        snackbar.show()
+        
+        snackbar.view.animate()
+            .translationY(0f)
+            .alpha(1f)
+            .setDuration(500)
+            .setInterpolator(OvershootInterpolator(1.2f))
+            .start()
+    }
+    
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        return if (gestureDetector.onTouchEvent(event)) {
+            true
+        } else {
+            super.onTouchEvent(event)
+        }
+    }
+    
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        gestureDetector.onTouchEvent(ev)
+        return super.dispatchTouchEvent(ev)
+    }
+
+    // Implement GestureDetector.OnGestureListener methods
+    override fun onDown(e: MotionEvent): Boolean = false
+    override fun onShowPress(e: MotionEvent) {}
+    override fun onSingleTapUp(e: MotionEvent): Boolean = false
+    override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean = false
+    override fun onLongPress(e: MotionEvent) {}
+    
+    override fun onFling(
+        e1: MotionEvent?,
+        e2: MotionEvent,
+        velocityX: Float,
+        velocityY: Float
+    ): Boolean {
+        // Phát hiện vuốt xuống để bỏ qua intro
+        if (e1 != null && e2.y - e1.y > SWIPE_THRESHOLD && velocityY > SWIPE_VELOCITY_THRESHOLD) {
+            performHapticFeedback()
+            animateSkipIntro()
+            return true
+        }
+        return false
+    }
+    
+    private fun animateSkipIntro() {
+        // Hiệu ứng vuốt xuống để bỏ qua
+        viewPager.animate()
+            .alpha(0f)
+            .translationY(500f)
+            .setDuration(300)
+            .withEndAction {
+                skipIntro()
+            }
+            .start()
+        
+        // Ẩn các nút và indicator
+        skipButtonContainer.animate().alpha(0f).setDuration(300).start()
+        nextButtonContainer.animate().alpha(0f).setDuration(300).start()
+        wormDotsIndicator.animate().alpha(0f).setDuration(300).start()
+    }
+    
+    private fun performHapticFeedback() {
+        // Tạo feedback xúc giác khi vuốt xuống
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            viewPager.performHapticFeedback(HapticFeedbackConstants.GESTURE_START)
+        } else {
+            viewPager.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Clean up
+        showSwipeHintRunnable?.let { handler.removeCallbacks(it) }
+    }
+    
+    companion object {
+        private const val SWIPE_THRESHOLD = 100
+        private const val SWIPE_VELOCITY_THRESHOLD = 100
     }
 } 
