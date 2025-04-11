@@ -11,27 +11,28 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.htnguyen.ifu.R
+import android.graphics.Color
 
 class IntroSlideAdapter(private val context: Context) : 
     RecyclerView.Adapter<IntroSlideAdapter.SlideViewHolder>() {
     
-    // Thêm mảng màu gradient cho từng slide
+    // Màu gradient mới phù hợp với màu chính của ứng dụng
     private val backgroundColors = arrayOf(
         intArrayOf(
-            ContextCompat.getColor(context, android.R.color.holo_blue_light),
-            ContextCompat.getColor(context, android.R.color.holo_blue_dark)
+            Color.parseColor("#1E5799"),    // Xanh đậm của header
+            Color.parseColor("#4285F4")     // Xanh Google (màu icon khôi phục ảnh)
         ),
         intArrayOf(
-            ContextCompat.getColor(context, android.R.color.holo_green_light),
-            ContextCompat.getColor(context, android.R.color.holo_green_dark)
+            Color.parseColor("#4285F4"),    // Xanh Google (màu icon khôi phục ảnh)
+            Color.parseColor("#2EB62C")     // Xanh lá của header
         ),
         intArrayOf(
-            ContextCompat.getColor(context, android.R.color.holo_orange_light),
-            ContextCompat.getColor(context, android.R.color.holo_orange_dark)
+            Color.parseColor("#DB4437"),    // Đỏ Google (màu icon khôi phục video)
+            Color.parseColor("#F4B400")     // Vàng Google (màu icon khôi phục file)
         ),
         intArrayOf(
-            ContextCompat.getColor(context, android.R.color.holo_purple),
-            ContextCompat.getColor(context, R.color.design_default_color_primary)
+            Color.parseColor("#F4B400"),    // Vàng Google (màu icon khôi phục file)
+            Color.parseColor("#1976D2")     // Xanh dương nhạt (màu chính của ứng dụng)
         )
     )
     
@@ -80,7 +81,13 @@ class IntroSlideAdapter(private val context: Context) :
         // Thiết lập màu gradient cho slide
         val gradientColors = backgroundColors[position % backgroundColors.size]
         holder.itemView.background = android.graphics.drawable.GradientDrawable(
-            android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
+            // Sử dụng góc gradient khác nhau để tạo hiệu ứng đa dạng
+            when (position) {
+                0 -> android.graphics.drawable.GradientDrawable.Orientation.TR_BL // Slide 1: Trên phải -> Dưới trái
+                1 -> android.graphics.drawable.GradientDrawable.Orientation.TL_BR // Slide 2: Trên trái -> Dưới phải
+                2 -> android.graphics.drawable.GradientDrawable.Orientation.BL_TR // Slide 3: Dưới trái -> Trên phải
+                else -> android.graphics.drawable.GradientDrawable.Orientation.BR_TL // Slide 4: Dưới phải -> Trên trái
+            },
             gradientColors
         )
         

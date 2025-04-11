@@ -163,6 +163,12 @@
 - Thêm màn hình thông báo kết quả quét
 - Hỗ trợ đa ngôn ngữ (Tiếng Anh và Tiếng Việt)
 
+## [1.0.1] - 2024-04-10
+
+### Fixed
+- Sửa lỗi luồng điều hướng: Khi người dùng chọn ngôn ngữ và ấn next, ứng dụng chuyển trực tiếp đến màn hình intro thay vì vào main activity
+- Đổi tên phương thức từ `startMainActivity()` thành `startIntroActivity()` trong LanguageSelectionActivity để rõ nghĩa hơn
+
 ## [Phiên bản đang phát triển]
 
 ### Cải tiến
@@ -175,17 +181,11 @@
   - Thêm hiệu ứng chuyển đổi khi đến slide cuối (Next -> Start)
   - Nâng cấp thiết kế tổng thể với card view và bóng đổ
 
-### Thêm
-- Tính năng Intro App hiển thị sau khi chọn ngôn ngữ
-  - Tạo 4 màn hình giới thiệu với nội dung và hình ảnh
-  - Thêm hiệu ứng chuyển trang và chỉ báo vị trí
-  - Lưu trạng thái để không hiển thị lại intro sau lần đầu
-  - Hỗ trợ đa ngôn ngữ (tiếng Anh, tiếng Việt)
-  - Các nút bỏ qua và tiếp tục/bắt đầu
-  - Tích hợp với luồng điều hướng ứng dụng
-
-## [1.0.1] - 2024-04-10
-
-### Fixed
-- Sửa lỗi luồng điều hướng: Khi người dùng chọn ngôn ngữ và ấn next, ứng dụng chuyển trực tiếp đến màn hình intro thay vì vào main activity
-- Đổi tên phương thức từ `startMainActivity()` thành `startIntroActivity()` trong LanguageSelectionActivity để rõ nghĩa hơn
+### Cải tiến
+- Cải thiện hiển thị ảnh trong intro slides:
+  - Loại bỏ hiệu ứng xoay (rotation) làm ảnh bị nghiêng
+  - Thay đổi animation cho ảnh từ dịch chuyển sang phóng to/thu nhỏ để tránh méo ảnh
+  - Thêm scaleType="fitCenter" và adjustViewBounds="true" để ảnh hiển thị đúng tỷ lệ
+  - Tăng độ tương phản và bo tròn cho card view chứa ảnh
+  - Điều chỉnh hiệu ứng parallax để ảnh di chuyển mượt mà hơn
+  - Chuyển animation tiêu đề và mô tả từ dịch chuyển ngang sang dịch chuyển dọc

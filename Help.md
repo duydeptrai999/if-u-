@@ -382,22 +382,29 @@ Tính năng Intro App giới thiệu các chức năng chính của ứng dụng
    - Slide 4: Giới thiệu tính năng khôi phục tệp tin
 
 2. **Animation nâng cao**:
-   - **Hiệu ứng chuyển trang**: Phóng to/thu nhỏ, xoay và hiệu ứng parallax khi vuốt qua lại
-   - **Xuất hiện tuần tự**: Các phần tử trong mỗi slide (hình ảnh, tiêu đề, mô tả) xuất hiện tuần tự với animation
+   - **Hiệu ứng chuyển trang**: Hiệu ứng phóng to/thu nhỏ mượt mà khi vuốt qua các trang
+   - **Hiển thị hình ảnh đúng tỷ lệ**: Sử dụng scaleType="fitCenter" và adjustViewBounds="true" để hình ảnh luôn hiển thị đúng chiều và tỷ lệ
+   - **Hiệu ứng xuất hiện mượt mà**: Hình ảnh xuất hiện với hiệu ứng phóng to, tiêu đề và mô tả hiện lên với hiệu ứng trượt dọc tự nhiên
    - **Nền gradient động**: Mỗi slide có màu nền gradient riêng tạo cảm giác sinh động
    - **Hiệu ứng nút**: Các nút có animation khi nhấn và chuyển đổi, đặc biệt khi chuyển từ "Next" sang "Start"
    - **Indicator chuyển động mượt mà**: Hiệu ứng "worm" khi chuyển giữa các trang
 
-3. **Chỉ báo vị trí trang**: Hiển thị các chấm tròn ở dưới màn hình để biểu thị số lượng trang và vị trí hiện tại, với animation chuyển động.
+3. **Thiết kế nâng cấp**:
+   - **Card view với bo tròn**: Hình ảnh được hiển thị trong card view với góc bo tròn và đổ bóng tinh tế
+   - **Tỷ lệ hình ảnh chuẩn**: Đảm bảo hình ảnh luôn hiển thị đúng tỷ lệ và không bị méo, nghiêng
+   - **Padding phù hợp**: Sử dụng padding đủ lớn để hình ảnh không bị sát cạnh và dễ nhìn hơn
+   - **Nâng cao độ tương phản**: Tăng độ tương phản cho card view để hình ảnh nổi bật hơn trên nền gradient
 
-4. **Nút điều hướng**:
+4. **Chỉ báo vị trí trang**: Hiển thị các chấm tròn ở dưới màn hình để biểu thị số lượng trang và vị trí hiện tại, với animation chuyển động.
+
+5. **Nút điều hướng**:
    - Nút "Bỏ qua" (Skip): Cho phép người dùng bỏ qua intro và chuyển thẳng đến màn hình chính, ẩn đi ở slide cuối cùng
    - Nút "Tiếp" (Next): Chuyển đến slide tiếp theo, có animation khi nhấn
    - Nút "Bắt đầu" (Start): Xuất hiện ở slide cuối cùng với hiệu ứng chuyển đổi màu sắc và animation phóng to
 
-5. **Lưu trạng thái**: Sau khi xem intro lần đầu, hệ thống sẽ lưu trạng thái và không hiển thị lại intro trong những lần mở ứng dụng tiếp theo.
+6. **Lưu trạng thái**: Sau khi xem intro lần đầu, hệ thống sẽ lưu trạng thái và không hiển thị lại intro trong những lần mở ứng dụng tiếp theo.
 
-6. **Hỗ trợ đa ngôn ngữ**: Nội dung hiển thị theo ngôn ngữ đã chọn.
+7. **Hỗ trợ đa ngôn ngữ**: Nội dung hiển thị theo ngôn ngữ đã chọn.
 
 ## Cách sử dụng
 1. Khi cài đặt ứng dụng lần đầu, chọn ngôn ngữ ưa thích.
@@ -410,13 +417,14 @@ Tính năng Intro App giới thiệu các chức năng chính của ứng dụng
 
 ## Giải thích kỹ thuật
 Tính năng được triển khai bằng cách:
-- Sử dụng ViewPager2 với IntroPageTransformer tùy chỉnh để tạo hiệu ứng chuyển trang
-- IntroSlideAdapter để điều khiển hiển thị nội dung và animation xuất hiện tuần tự
+- Sử dụng ViewPager2 với IntroPageTransformer tùy chỉnh không có hiệu ứng xoay để tránh méo ảnh
+- ScaleType="fitCenter" và adjustViewBounds="true" cho ImageView để ảnh luôn đúng tỷ lệ
+- IntroSlideAdapter để điều khiển hiển thị nội dung với hiệu ứng scale thay vì dịch chuyển
 - WormDotsIndicator custom view để tạo hiệu ứng indicator mượt mà
+- CardView với cardCornerRadius và cardElevation để tạo hiệu ứng nổi 3D cho hình ảnh
 - SharedPreferences để lưu trạng thái đã xem intro
-- ObjectAnimator và ViewPropertyAnimator để tạo các hiệu ứng nút và chuyển đổi
-- Gradient backgrounds tùy chỉnh theo từng slide
-- Cơ chế animation phức hợp với AnimatorSet
+- Gradient background riêng cho từng slide tạo cảm giác khác biệt
+- Animation theo trục dọc cho tiêu đề và mô tả để tạo hiệu ứng tự nhiên hơn
 
 ## Luồng Điều Hướng Ứng Dụng
 

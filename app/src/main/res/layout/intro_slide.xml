@@ -11,8 +11,8 @@
         android:layout_width="260dp"
         android:layout_height="260dp"
         android:layout_marginBottom="32dp"
-        app:cardElevation="8dp"
-        app:cardCornerRadius="16dp"
+        app:cardElevation="10dp"
+        app:cardCornerRadius="20dp"
         android:layout_gravity="center_horizontal"
         app:cardBackgroundColor="@android:color/white"
         android:alpha="0.95">
@@ -34,12 +34,12 @@
         android:layout_marginBottom="24dp"
         android:gravity="center"
         android:textColor="@android:color/white"
-        android:textSize="28sp"
+        android:textSize="30sp"
         android:textStyle="bold"
         android:shadowColor="@android:color/black"
-        android:shadowDx="1"
-        android:shadowDy="1"
-        android:shadowRadius="2" />
+        android:shadowDx="1.5"
+        android:shadowDy="1.5"
+        android:shadowRadius="3" />
 
     <TextView
         android:id="@+id/introDescription"
@@ -47,11 +47,11 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:lineSpacingExtra="4sp"
+        android:textSize="18sp"
+        android:lineSpacingExtra="6sp"
         android:shadowColor="@android:color/black"
-        android:shadowDx="0.5"
-        android:shadowDy="0.5"
-        android:shadowRadius="1" />
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="2" />
 
 </LinearLayout> 
