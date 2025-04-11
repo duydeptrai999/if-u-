@@ -456,17 +456,19 @@ Lưu ý: Trạng thái "đã chọn ngôn ngữ" và "đã xem intro" được l
 ## Tính năng Quảng cáo (Firebase AdMob)
 
 ### Mô tả
-Ứng dụng đã tích hợp Firebase AdMob để hiển thị quảng cáo, bao gồm banner ads, interstitial ads và rewarded ads.
+Ứng dụng đã tích hợp Firebase AdMob để hiển thị quảng cáo, bao gồm banner ads, interstitial ads, rewarded ads và native ads.
 
 ### Các loại quảng cáo
 1. **Banner Ads**: Quảng cáo dạng banner hiển thị ở dưới màn hình trong các trang chính.
 2. **Interstitial Ads**: Quảng cáo toàn màn hình hiển thị tại các thời điểm chuyển đổi trong ứng dụng (khi hoàn thành khôi phục, khi chuyển giữa các màn hình chính).
 3. **Rewarded Ads**: Quảng cáo thưởng cung cấp phần thưởng cho người dùng sau khi xem hoàn thành.
+4. **Native Ads**: Quảng cáo hiển thị tích hợp vào giao diện ứng dụng, trông giống như một phần tự nhiên của ứng dụng (hiện có ở màn hình chọn ngôn ngữ).
 
 ### Cấu trúc quản lý quảng cáo
 - `AdManager`: Singleton class quản lý việc tải và hiển thị quảng cáo, giao tiếp trực tiếp với AdMob SDK.
 - `AdHelper`: Helper class cung cấp các phương thức đơn giản để hiển thị quảng cáo từ các activity.
 - `ad_banner_layout.xml`: Layout chung cho banner ads có thể sử dụng lại trong các màn hình khác nhau.
+- `ad_unified.xml`: Layout cho quảng cáo native hiển thị nội dung phong phú hơn.
 
 ### Cách sử dụng
 1. **Hiển thị Banner Ad**:
@@ -488,16 +490,24 @@ Lưu ý: Trạng thái "đã chọn ngôn ngữ" và "đã xem intro" được l
    }
    ```
 
+4. **Hiển thị Native Ad**:
+   ```kotlin
+   val nativeAdContainer = findViewById<FrameLayout>(R.id.nativeAdContainer)
+   AdHelper.loadNativeAd(this, nativeAdContainer)
+   ```
+
 ### Test IDs
 Ứng dụng hiện sử dụng test IDs của Google cho việc phát triển:
 - Banner Ad: ca-app-pub-3940256099942544/6300978111
 - Interstitial Ad: ca-app-pub-3940256099942544/1033173712
 - Rewarded Ad: ca-app-pub-3940256099942544/5224354917
+- Native Ad: ca-app-pub-3940256099942544/2247696110
 
 ### Tùy chỉnh
 - Tần suất hiển thị interstitial ads có thể điều chỉnh bằng cách sửa đổi `AD_FREQUENCY` trong `AdManager`.
 - Các chuỗi liên quan đến quảng cáo được định nghĩa trong `strings.xml`.
 - Ad unit IDs có thể được thay đổi trong `strings.xml` để sử dụng IDs thực tế khi xuất bản.
+- Layout của quảng cáo native có thể thay đổi trong `ad_unified.xml` để phù hợp với giao diện ứng dụng.
 
 ### Chức năng "Remove Ads"
 Có thể phát triển thêm tính năng premium để loại bỏ quảng cáo, sử dụng Google Play Billing Library.

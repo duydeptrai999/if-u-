@@ -4,10 +4,12 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import com.restore.trashfiles.ads.AdManager
 import java.util.Locale
 
 class LanguageSelectionActivity : AppCompatActivity() {
@@ -31,6 +33,9 @@ class LanguageSelectionActivity : AppCompatActivity() {
     
     // Next button
     private lateinit var btnNext: TextView
+    
+    // Native Ad container
+    private lateinit var nativeAdContainer: FrameLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +51,15 @@ class LanguageSelectionActivity : AppCompatActivity() {
         setContentView(R.layout.activity_language_selection)
         initViews()
         setupListeners()
+        
+        // Hiển thị quảng cáo native
+        loadNativeAd()
+    }
+    
+    private fun loadNativeAd() {
+        // Hiển thị quảng cáo native
+        val adManager = AdManager.getInstance()
+        adManager.loadNativeAd(this, nativeAdContainer)
     }
 
     private fun initViews() {
@@ -65,6 +79,9 @@ class LanguageSelectionActivity : AppCompatActivity() {
         
         // Initialize next button
         btnNext = findViewById(R.id.btnNext)
+        
+        // Initialize native ad container
+        nativeAdContainer = findViewById(R.id.nativeAdContainer)
         
         // Set English as default selected language
         updateSelectedView("en")
@@ -174,5 +191,10 @@ class LanguageSelectionActivity : AppCompatActivity() {
         val intent = Intent(this, IntroActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    override fun onDestroy() {
+        // Giải phóng tài nguyên quảng cáo khi activity bị hủy
+        super.onDestroy()
     }
 } 

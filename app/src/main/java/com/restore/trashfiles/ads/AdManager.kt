@@ -3,10 +3,17 @@ package com.restore.trashfiles.ads
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.RatingBar
+import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
@@ -15,6 +22,10 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.gms.ads.nativead.MediaView
+import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdOptions
+import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.restore.trashfiles.R
@@ -23,6 +34,7 @@ class AdManager private constructor() {
     private val TAG = "AdManager"
     private var interstitialAd: InterstitialAd? = null
     private var rewardedAd: RewardedAd? = null
+    private var nativeAd: NativeAd? = null
     private var adCounter = 0
     private val AD_FREQUENCY = 3 // Show interstitial ad every 3 actions
 
@@ -66,6 +78,131 @@ class AdManager private constructor() {
         
         adContainer.removeAllViews()
         adContainer.addView(adView)
+    }
+
+    // Native Ads
+    fun loadNativeAd(context: Context, adContainer: ViewGroup) {
+        val adLoader = AdLoader.Builder(context, context.getString(R.string.ad_native_id))
+            .forNativeAd { ad ->
+                // Nếu activity đã bị destroy thì cần giải phóng nativeAd
+                if ((context as? Activity)?.isDestroyed == true) {
+                    ad.destroy()
+                    return@forNativeAd
+                }
+                
+                // Giải phóng native ad cũ nếu có
+                nativeAd?.destroy()
+                nativeAd = ad
+                
+                // Tạo native ad view và đặt vào container
+                val inflater = LayoutInflater.from(context)
+                val adView = inflater.inflate(R.layout.ad_unified, adContainer, false) as NativeAdView
+                populateNativeAdView(ad, adView)
+                
+                adContainer.removeAllViews()
+                adContainer.addView(adView)
+            }
+            .withAdListener(object : AdListener() {
+                override fun onAdFailedToLoad(error: LoadAdError) {
+                    Log.e(TAG, "Native ad failed to load: ${error.message}")
+                }
+                
+                override fun onAdLoaded() {
+                    Log.d(TAG, "Native ad loaded successfully")
+                }
+            })
+            .withNativeAdOptions(
+                NativeAdOptions.Builder()
+                .build()
+            )
+            .build()
+            
+        adLoader.loadAd(AdRequest.Builder().build())
+    }
+    
+    private fun populateNativeAdView(nativeAd: NativeAd, adView: NativeAdView) {
+        // Đặt các thành phần của quảng cáo vào view
+        
+        // Headline
+        adView.findViewById<TextView>(R.id.ad_headline)?.let {
+            it.text = nativeAd.headline
+            adView.headlineView = it
+        }
+        
+        // Body
+        adView.findViewById<TextView>(R.id.ad_body)?.let {
+            it.text = nativeAd.body
+            adView.bodyView = it
+        }
+        
+        // Call to action
+        adView.findViewById<Button>(R.id.ad_call_to_action)?.let {
+            it.text = nativeAd.callToAction
+            adView.callToActionView = it
+        }
+        
+        // Icon
+        adView.findViewById<ImageView>(R.id.ad_app_icon)?.let {
+            if (nativeAd.icon != null) {
+                it.visibility = View.VISIBLE
+                it.setImageDrawable(nativeAd.icon?.drawable)
+            } else {
+                it.visibility = View.GONE
+            }
+            adView.iconView = it
+        }
+        
+        // Media (video, images)
+        adView.findViewById<MediaView>(R.id.ad_media)?.let {
+            adView.mediaView = it
+        }
+        
+        // Price
+        adView.findViewById<TextView>(R.id.ad_price)?.let {
+            if (nativeAd.price != null) {
+                it.visibility = View.VISIBLE
+                it.text = nativeAd.price
+            } else {
+                it.visibility = View.INVISIBLE
+            }
+            adView.priceView = it
+        }
+        
+        // Store
+        adView.findViewById<TextView>(R.id.ad_store)?.let {
+            if (nativeAd.store != null) {
+                it.visibility = View.VISIBLE
+                it.text = nativeAd.store
+            } else {
+                it.visibility = View.INVISIBLE
+            }
+            adView.storeView = it
+        }
+        
+        // Rating
+        adView.findViewById<RatingBar>(R.id.ad_stars)?.let {
+            if (nativeAd.starRating != null) {
+                it.visibility = View.VISIBLE
+                it.rating = nativeAd.starRating!!.toFloat()
+            } else {
+                it.visibility = View.INVISIBLE
+            }
+            adView.starRatingView = it
+        }
+        
+        // Advertiser
+        adView.findViewById<TextView>(R.id.ad_advertiser)?.let {
+            if (nativeAd.advertiser != null) {
+                it.visibility = View.VISIBLE
+                it.text = nativeAd.advertiser
+            } else {
+                it.visibility = View.INVISIBLE
+            }
+            adView.advertiserView = it
+        }
+
+        // Đặt native ad vào view
+        adView.setNativeAd(nativeAd)
     }
 
     // Interstitial Ads

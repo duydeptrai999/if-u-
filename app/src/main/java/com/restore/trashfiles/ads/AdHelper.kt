@@ -45,6 +45,15 @@ object AdHelper {
     }
     
     /**
+     * Loads a native ad
+     * @param context The context
+     * @param adContainer The ViewGroup container for the ad
+     */
+    fun loadNativeAd(context: Context, adContainer: ViewGroup) {
+        AdManager.getInstance().loadNativeAd(context, adContainer)
+    }
+    
+    /**
      * Determines if an interstitial ad should be shown based on frequency settings
      * This is a helper method that can be used for custom ad showing logic
      * @return true if ad should be shown
