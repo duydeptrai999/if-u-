@@ -102,13 +102,16 @@ object AdHelper {
                 if (textView.maxLines == 3) {
                     // Mở rộng để hiển thị toàn bộ text
                     textView.maxLines = Integer.MAX_VALUE
-                    hintTextView?.text = "Nhấn để thu gọn"
+                    hintTextView?.text = "Nhấn để thu gọn ↑" 
                 } else {
                     // Thu gọn về 3 dòng
                     textView.maxLines = 3
-                    hintTextView?.text = "Nhấn để xem thêm"
+                    hintTextView?.text = "Nhấn để xem thêm ↓"
                 }
             }
+            
+            // Ban đầu đặt text với mũi tên xuống
+            hintTextView?.text = "Nhấn để xem thêm ↓"
             
             // Hint cũng có thể được click
             hintTextView?.setOnClickListener {
